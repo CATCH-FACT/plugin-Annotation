@@ -1,0 +1,27 @@
+
+div#annotation-type-form div.inputs {
+	width: 60%;
+	
+}
+
+div#location_form {
+	margin-top: 12px;
+}
+
+/* User Profiles integration */
+
+h2.annotation-userprofile  {
+	margin-bottom: 3px;
+}
+
+.annotation-userprofile-visibility {
+	cursor: pointer;
+}
+
+p#annotation-userprofile-visibility {
+	margin: 2px;
+}
+
+div.annotation-userprofile.exists {
+	display: none;
+}
