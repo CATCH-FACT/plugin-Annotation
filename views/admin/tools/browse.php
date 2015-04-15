@@ -22,7 +22,6 @@ echo $this->partial('annotation-navigation.php');
         <thead id="types-table-head">
             <tr>
                 <th><?php echo __("Name"); ?></th>
-                <th><?php echo __("Tool Type"); ?></th>
                 <th><?php echo __("Description"); ?></th>
                 <th><?php echo __("Edit"); ?></th>
                 <th><?php echo __("Validated"); ?></th>
@@ -32,7 +31,6 @@ echo $this->partial('annotation-navigation.php');
 <?php foreach ($annotation_tools as $tool): ?>
     <tr>
         <td><strong><?php echo metadata($tool, 'display_name'); ?></strong></td>
-        <td><?php  echo __(metadata($tool, 'tool_type')); ?></td>
         <td><?php  echo __(metadata($tool, 'description')); ?></td>
         <td><a href="<?php echo url(array('action' => 'edit', 'id' => $tool->id)); ?>" class="edit"><?php echo __("Edit"); ?></a></td>
         <td><?php  echo __(metadata($tool, 'validated')); ?></td>

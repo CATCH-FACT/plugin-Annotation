@@ -22,8 +22,8 @@ function annotation_admin_header($subsections = array())
     $subsections = array_merge(array($mainTitle), $subsections);
     $displayTitle = implode(' | ', $subsections);
     $head = array('title' => $displayTitle,
-            'bodyclass' => 'annotation',
-            'content_class' => 'horizontal-nav');
+                    'bodyclass' => 'annotation',
+                    'content_class' => 'horizontal-nav');
     echo head($head);
 }
 
@@ -61,3 +61,25 @@ function annotation_annotate_url($actionName = null)
     return get_view()->url($options, $route, array(), true);
 }
 
+
+
+function annotation_element_form($element, $record, $options = array())
+{
+    $html = '';
+    // If we have an array of Elements, loop through the form to display them.
+    if (is_array($element)) {
+        foreach ($element as $key => $e) {
+            $html .= get_view()->annotationElementForm($e, $record, $options);
+        }
+    } else {
+        $html = get_view()->annotationElementForm($element, $record, $options);
+    }
+    return $html;
+}
+
+
+//not really a theme helper
+//returns tool data to element-form-tool.php
+function annotation_element_tool($element){
+    return $element;
+}

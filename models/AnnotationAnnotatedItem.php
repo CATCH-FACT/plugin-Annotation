@@ -16,6 +16,7 @@ class AnnotationAnnotatedItem extends Omeka_Record_AbstractRecord
     public $id;
     public $item_id;
     public $public;
+    public $finished;
     public $anonymous;
     
     protected $_related = array(
@@ -36,6 +37,16 @@ class AnnotationAnnotatedItem extends Omeka_Record_AbstractRecord
         $item->save();
         release_object($item);
     }
+
+    public function makeFinished()
+    {
+//        $this->finished = true;
+        $item = $this->Item;
+        $item->finished = true;
+        $item->save();
+        release_object($item);
+    }
+
     
     public function getAnnotator()
     {

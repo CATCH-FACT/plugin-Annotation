@@ -46,47 +46,46 @@ class Annotation_TypesController extends Omeka_Controller_AbstractActionControll
         $this->_redirect('/');
     }
 
-    public function addExistingElementAction()
+
+    public function addExistingTypeElementAction()
     {
         if ($this->_getParam('from_post') == 'true') {
-            $elementTempIdOut = $this->_getParam('elementTempIdOut');
-            $elementTempIdIn = $this->_getParam('elementTempIdIn');
-            $elementIdOut = $this->_getParam('elementIdOut');
-            $elementIdIn = $this->_getParam('elementIdIn');
+            $elementTempId = $this->_getParam('elementTempId');
+            $elementId = $this->_getParam('elementId');
             $elementToolId = $this->_getParam('elementToolId');
-            $elementOut = $this->_helper->db->getTable('Element')->find($elementIdOut);
-            $elementIn = $this->_helper->db->getTable('Element')->find($elementIdIn);
-            if ($elementOut) {
+            $element = $this->_helper->db->getTable('Element')->find($elementId);
+            if ($element) {
                 $elementDescription = $element->description;
+                $elementEnglishName = strtolower($element->name);
             }
             $elementOrder = $this->_getParam('elementOrder');
             $elementPromptValue = $element->prompt;
         } else {
-            $elementTempIdOut = '' . time();
-            $elementTempIdIn = '' . time();
-            $elementIdOut = '';
-            $elementIdIn = '';
+            $elementTempId = '' . time();
+            $elementId = '';
             $elementToolId = '';
             $elementDescription = '';
             $elementOrder = intval($this->_getParam('elementCount')) + 1;
             $elementPromptValue = '';
         }
     
-        $stemOut = Omeka_Form_ItemTypes::ELEMENTS_TO_ADD_INPUT_NAME . "[$elementTempIdOut]";
-        $stemIn = Omeka_Form_ItemTypes::ELEMENTS_TO_ADD_INPUT_NAME . "[$elementTempIdIn]";
-        $elementIdOutName = $stemOut .'[idout]';
-        $elementIdInName = $stemIn .'[idin]';
-        $elementToolName = $stemOut .'[toolid]';
-        $elementOrderName = $stemOut .'[order]';
-        $elementPromptName = $stemOut . '[prompt]';
-        $elementLongName = $stemOut . '[long_text]';
+        $stem = Omeka_Form_ItemTypes::ELEMENTS_TO_ADD_INPUT_NAME . "[$elementTempId]";
+        $elementIdName = $stem .'[id]';
+        $elementToolName = $stem .'[toolid]';
+        $elementOrderName = $stem .'[order]';
+        $elementPromptName = $stem . '[prompt]';
+        $elementLongName = $stem . '[long_text]';
+        $elementRepeatedName = $stem . '[repeated_field]';
+        $elementScoresliderName = $stem . '[score_slider]';
+        $elementDatepickerName = $stem . '[date_picker]';
+        $elementDateRangepickerName = $stem . '[date_range_picker]';
+        $elementEnglishName = $stem . '[english_name]';
         
         $item_type_id = $this->_getParam('itemTypeId');
         $this->view->assign(array(
-                'element_id_out_name' => $elementIdOutName,
-                'element_id_out_value' => $elementIdOut,
-                'element_id_in_name' => $elementIdInName,
-                'element_id_in_value' => $elementIdIn,
+                'element_id_name' => $elementIdName,
+                'element_id_value' => $elementId,
+                'element_english_name' => $elementEnglishName,
                 'element_tool_name' => $elementToolName,
                 'element_tool_value' => $elementToolId,
                 'element_description' => $elementDescription,
@@ -95,11 +94,15 @@ class Annotation_TypesController extends Omeka_Controller_AbstractActionControll
                 'element_prompt_name' => $elementPromptName,
                 'element_prompt_value' => $elementPromptValue,
                 'element_long_name' => $elementLongName,
+                'element_repeated_name' => $elementRepeatedName,
+                'element_scoreslider_name' => $elementScoresliderName,
+                'element_datepicker_name' => $elementDatepickerName,
+                'element_daterangepicker_name' => $elementDateRangepickerName,
                 'item_type_id' => $item_type_id 
         ));
     }
     
-    public function changeExistingElementAction()
+    public function changeExistingTypeElementAction()
     {
         $elementId = $this->_getParam('elementId');
         $element = $this->_helper->db->getTable('Element')->find($elementId);
@@ -143,15 +146,23 @@ class Annotation_TypesController extends Omeka_Controller_AbstractActionControll
                     if(isset($_POST['elements-to-add'])) {
                         foreach($_POST['elements-to-add'] as $tempId=>$elementInfo) {
                             if(empty($elementInfo['prompt'])) {
-                                $elementInfo['prompt'] = $elementTable->find($elementInfo['idout'])->name;
+                                $elementInfo['prompt'] = $elementTable->find($elementInfo['id'])->name;
                             }
+                            if(empty($elementInfo['english_name'])) {
+                                $elementInfo['english_name'] = strtolower($elementTable->find($elementInfo['id'])->name);
+                            }
+
                             $annotationEl = new AnnotationTypeElement();
-                            $annotationEl->element_id_out = $elementInfo['idout'];
-                            $annotationEl->element_id_in = $elementInfo['idin'];
+                            $annotationEl->element_id = $elementInfo['id'];
+                            $annotationEl->english_name = $elementInfo['english_name'];
                             $annotationEl->tool_id = $elementInfo['toolid'];
                             $annotationEl->prompt = $elementInfo['prompt'];
                             $annotationEl->order = $elementInfo['order'];
                             $annotationEl->long_text = $elementInfo['long_text'];
+                            $annotationEl->repeated_field = $elementInfo['repeated_field'];
+                            $annotationEl->score_slider = $elementInfo['score_slider'];
+                            $annotationEl->date_picker = $elementInfo['date_picker'];
+                            $annotationEl->date_range_picker = $elementInfo['date_range_picker'];
                             $annotationEl->type_id = $record->id;
                             $annotationEl->save();
                         }                        
@@ -165,10 +176,18 @@ class Annotation_TypesController extends Omeka_Controller_AbstractActionControll
                             if(empty($elementInfo['prompt'])) {
                                 $elementInfo['prompt'] = $elementTable->find($annotationEl->element_id)->name;
                             }
+                            if(empty($elementInfo['english_name'])) {
+                                $elementInfo['english_name'] = strtolower($elementTable->find($annotationEl->element_id)->name);
+                            }
+                            $annotationEl->english_name = $elementInfo['english_name'];
                             $annotationEl->tool_id = $elementInfo['toolid'];
                             $annotationEl->prompt = $elementInfo['prompt'];
-                            $annotationEl->order = $elementInfo['order'];                        
+                            $annotationEl->order = $elementInfo['order'];
                             $annotationEl->long_text = $elementInfo['long_text'];
+                            $annotationEl->repeated_field = $elementInfo['repeated_field'];
+                            $annotationEl->score_slider = $elementInfo['score_slider'];
+                            $annotationEl->date_picker = $elementInfo['date_picker'];
+                            $annotationEl->date_range_picker = $elementInfo['date_range_picker'];
                             $annotationEl->save();
                         }
                     }

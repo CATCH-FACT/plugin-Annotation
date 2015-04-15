@@ -1,6 +1,6 @@
 <?php
 
-class Annotation_ItemsController extends Omeka_Controller_AbstractActionController
+class Annotation_CloneController extends Omeka_Controller_AbstractActionController
 {
     
     public function _getBrowseRecordsPerPage()
@@ -14,8 +14,9 @@ class Annotation_ItemsController extends Omeka_Controller_AbstractActionControll
     
     public function init()
     {
-        $this->_helper->db->setDefaultModelName('AnnotationAnnotatedItem');
+        $this->_helper->db->setDefaultModelName('Item');
     }
+    
     
     
     

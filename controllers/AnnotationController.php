@@ -18,11 +18,27 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
      */
     public function indexAction()
     {
-        $this->_forward('annotate');
+        _log("Forwarding to annotate.");
+        if (isset($_GET['annotation_type'])){
+            _log($_GET['annotation_type']);
+            $this->_setupAnnotateSubmit($_GET['annotation_type']);
+            $this->view->typeForm = $this->view->render('annotation/type-form.php');
+        }
+        $this->_forward('add');
+    }
+    
+    public function existingAction(){
+        // Get all the element sets that apply to the item.
+        $this->view->elementSets = $this->_getItemElementSets();
+        if (!Zend_Registry::isRegistered('file_derivative_creator') && is_allowed('Settings', 'edit')) {
+            $this->_helper->flashMessenger(__('The ImageMagick directory path has not been set. No derivative images will be created. If you would like Omeka to create derivative images, please set the path in Settings.'));
+        }
+        parent::editAction();
     }
     
     public function myAnnotationsAction()
     {
+        
         $user = current_user();
         $contribItemTable = $this->_helper->db->getTable('AnnotationAnnotatedItem');
                 
@@ -53,29 +69,72 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
         $this->view->contrib_items = $contribItems;
         
     }
-    
+
     /**
      * Action for main annotation form.
+     *  redirect to actual annotation 
      */
-    public function annotateAction()
+    public function addAction()
     {
-        if ($this->_processForm($_POST)) {
-            $route = $this->getFrontController()->getRouter()->getCurrentRouteName();
-            $this->_helper->_redirector->gotoRoute(array('action' => 'thankyou'), $route);
-                        
-        } else {
 
+        _log("Annotation action started");
+
+        if ($this->_processForm($_POST)) {
+            $this->_helper->flashMessenger("Data accepted. Pre-annotated Item created.");
+            $route = $this->getFrontController()->getRouter()->getCurrentRouteName();
+            $this->_helper->_redirector->gotoRoute(array('action' => 'doannotation'), $route);
+#            $this->_helper->_redirector->gotoRoute(array('action' => 'thankyou'), $route);
+
+        } else {
             $typeId = null;
             if (isset($_POST['annotation_type']) && ($postedType = $_POST['annotation_type'])) {
                 $typeId = $postedType;
             } else if ($defaultType = get_option('annotation_default_type')) {
                 $typeId = $defaultType;
             }
-
+            _log("type_id" . $typeId);
             if ($typeId) {
-                if(!get_option('annotation_simple') && $user = current_user()) {
+                if($user = current_user()) {
                     $this->_setupAnnotateSubmit($typeId);
-                    $this->view->typeForm = $this->view->render('annotation/type-form.php');
+                    $this->view->typeForm = $this->view->render('annotation/form.php');
+                }
+            }
+
+            if(isset($this->_profile) && !$this->_profile->exists()) {
+                $this->_helper->flashMessenger($this->_profile->getErrors(), 'error');
+                return;
+            }
+
+        }
+    }
+    
+    /**
+     * Action for main annotation form.
+     *  redirect to actual annotation 
+     */
+    public function annotateAction()
+    {
+        
+        _log("Annotation action started");
+        
+        if ($this->_processForm($_POST)) {
+            $this->_helper->flashMessenger("Data accepted. Pre-annotated Item created.");
+            $route = $this->getFrontController()->getRouter()->getCurrentRouteName();
+            $this->_helper->_redirector->gotoRoute(array('action' => 'doannotation'), $route);
+#            $this->_helper->_redirector->gotoRoute(array('action' => 'thankyou'), $route);
+                        
+        } else {
+            $typeId = null;
+            if (isset($_POST['annotation_type']) && ($postedType = $_POST['annotation_type'])) {
+                $typeId = $postedType;
+            } else if ($defaultType = get_option('annotation_default_type')) {
+                $typeId = $defaultType;
+            }
+            _log("type_id" . str($typeId));
+            if ($typeId) {
+                if($user = current_user()) {
+                    $this->_setupAnnotateSubmit($typeId);
+                    $this->view->typeForm = $this->view->render('annotation/form.php');
                 }
             }
             
@@ -86,6 +145,14 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
 
         }
     }
+
+    /**
+     * Displays a "Thank You" message to users who have annotated an item 
+     * through the public form.
+     */
+    public function doannotationAction(){
+        $this->_helper->flashMessenger( __('Your annotations has been successfully added.'), 'success');
+    }
     
     /**
      * Action for AJAX request from annotate form.
@@ -94,6 +161,51 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
     {
         $this->_setupAnnotateSubmit($_POST['annotation_type']);
     }
+
+    protected function set_view_variables_for_form(){
+        $elementId = (int)$_POST['element_id'];
+        $recordType = $_POST['record_type'];
+        $recordId  = (int)$_POST['record_id'];
+          
+        // Re-index the element form posts so that they are displayed in the correct order
+        // when one is removed.
+        $_POST['Elements'][$elementId] = array_merge($_POST['Elements'][$elementId]);
+
+        $element = $this->_helper->db->getTable('Element')->find($elementId);
+        $annotationTypeElement = $this->_helper->db->getTable('AnnotationTypeElement')->findByElementId($elementId);
+//        $annotationTool = $this->_helper->db->getTable('AnnotationTool')->find($annotationTypeElement->tool_id);
+        $record = $this->_helper->db->getTable($recordType)->find($recordId);
+
+        if (!$record) {
+            $record = new $recordType;
+        }
+        $this->view->assign(compact('annotationTypeElement', 'element', 'record')); //assigning the variables to the view
+    }
+
+    /**
+     * Action for AJAX request from type form.
+     * element and record are regsistered here
+     */
+    public function elementFormToolAction(){
+        $this->set_view_variables_for_form();
+    }
+
+    /**
+     * Action for AJAX request from type form.
+     * element and record are regsistered here
+     */
+    public function elementFormNoaddAction(){        
+        $this->set_view_variables_for_form();
+    }
+
+    /**
+     * Action for AJAX request from type form.
+     * element and record are regsistered here
+     */
+    public function elementFormAction(){        
+        $this->set_view_variables_for_form();
+    }
+
     
     /**
      * Displays terms of service for annotation.
@@ -153,31 +265,25 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
      * @return bool
      */
     protected function _processForm($post)
-    {    
+    {   
         if (!empty($post)) {
-
             //for the "Simple" configuration, look for the user if exists by email. Log them in.
             //If not, create the user and log them in.
             $user = current_user();
-            $simple = get_option('annotation_simple');
-            
-            if(!$user && $simple) {
-                $user = $this->_helper->db->getTable('User')->findByEmail($post['annotation_simple_email']);
-            }
-            
-            // if still not a user, need to create one based on the email address
             if(!$user) {
-                $user = $this->_createNewGuestUser($post);
-            }            
-            
+                return false;
+            }
             // The final form submit was not pressed.
             if (!isset($post['form-submit'])) {
+                print "processing form: no form-submit in post.<br>";
                 return false;
             }
             
             if (!$this->_validateAnnotation($post)) {
+                print "annotation not vaildated.";
                 return false;
             }
+            print "processing form<br>";
             
             $annotationTypeId = trim($post['annotation_type']);
             if ($annotationTypeId !== "" && is_numeric($annotationTypeId)) {
@@ -230,38 +336,15 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
             fire_plugin_hook('annotation_save_form', array('annotationType'=>$annotationType,'item'=>$item, 'post'=>$post));
             $item->save();
             
-            if( !$simple && !$this->_processUserProfile($post) ) {
-                return false;
-            }
+            $this->temp_item = $item;
             
-            $this->_linkItemToAnnotatedItem($item, $annotator, $post);
-            $this->_sendEmailNotifications($user->email, $item);
+            $this->_linkItemToAnnotatedItem($item, $annotator, $post); 
+//            $this->_sendEmailNotifications($user->email, $item); //goed idee (voor trage sessies)
             return true;
         }
         return false;
     }
-    
-    protected function _processUserProfile($post)
-    {
-        $profileTypeId = get_option('annotation_user_profile_type');
-        if($profileTypeId) {
-            $user = current_user();
-            $profile = $this->_helper->db->getTable('UserProfilesProfile')->findByUserIdAndTypeId($user->id, $profileTypeId);
-            if(!$profile) {
-                $profile = new UserProfilesProfile();
-                $profile->setOwner($user);
-                $profile->type_id = $profileTypeId;
-                $profile->public = 0;
-                $profile->setRelationData(array('subject_id'=>$user->id));
-            }    
-        }
-        $profile->setPostData($post);
-        $this->_profile = $profile;
-        if(!$profile->save(false)) {
-            return false;
-        }
-        return true;
-    }
+
     
     /**
      * Deals with files specified on the annotation form.
@@ -299,7 +382,8 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
         $linkage->annotator_id = $annotator->id;
         $linkage->item_id = $item->id;
         $linkage->public = $post['annotation-public'];
-        $linkage->anonymous = $post['annotation-anonymous'];
+        $linkage->finished = $post['annotation-finished'];
+        $linkage->anonymous = false;
         $linkage->save();
     }
     
@@ -334,10 +418,6 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
      */
     protected function _validateAnnotation($post)
     {
-        if (!@$post['terms-agree']) {
-            $this->_helper->flashMessenger(__('You must agree to the Terms and Conditions.'), 'error');
-            return false;
-        }
         return true;
     }
     
@@ -404,21 +484,4 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
             }
         }
     }
-    
-    protected function _createNewGuestUser($post)
-    {
-        $user = new User();
-        $email = $post['annotation_simple_email'];
-        $split = explode('@', $email);
-        $name = $split[0];
-        $username = str_replace('@', 'AT', $name);
-        $username = str_replace('.', 'DOT', $username);
-        $user->email = $email;
-        $user->name = $name;
-        $user->username = $username;
-        $user->role = 'guest';
-        $user->save();
-        return $user;
-    }
-    
 }

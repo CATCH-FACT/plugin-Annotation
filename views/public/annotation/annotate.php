@@ -23,7 +23,10 @@ if(get_option('annotation_user_profile_type') && plugin_is_active('UserProfiles'
 
 $head = array('title' => 'Annotate',
               'bodyclass' => 'annotation');
-echo head($head); ?>
+echo head($head); 
+
+echo js_escape(url($annotationPath.'/type-form'));
+?>
 <script type="text/javascript">
 // <![CDATA[
 enableAnnotationAjaxForm(<?php echo js_escape(url($annotationPath.'/type-form')); ?>);

@@ -7,8 +7,12 @@
  */
 
 $annotationType = $annotation_type;
+
 $annotationTypeElements = $annotation_type->AnnotationTypeElements;
+$annotationManualtypeElements = $annotation_type->AnnotationManualtypeElements;
+
 $itemType = $annotation_type->ItemType;
+
 if($itemType) {
     $elements = $itemType->Elements;    
 } else {

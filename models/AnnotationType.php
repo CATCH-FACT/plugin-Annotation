@@ -2,7 +2,7 @@
 /**
  * @version $Id$
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
- * @copyright Center for History and New Media, 2010
+ * @copyright Twente University 2015
  * @package Annotation
  * @subpackage Models
  */
@@ -20,7 +20,9 @@ class AnnotationType extends Omeka_Record_AbstractRecord
 {
 
     public $item_type_id;
+    public $collection_id; #the collection that the annotated item will end up in
     public $display_name;
+    public $tags_tool_id;
     public $file_permissions = 'Disallowed';
     
     protected $_related = array('AnnotationTypeElements' => 'getTypeElements',
@@ -56,6 +58,49 @@ class AnnotationType extends Omeka_Record_AbstractRecord
     public function getTypeElements()
     {
         return $this->_db->getTable('AnnotationTypeElement')->findByType($this);
+    }
+
+    /**
+     * Get the type elements associated with this type.
+     *
+     * @return array
+     */
+    public function getUniqueInputTypeElements()
+    {
+        $return_elements = array();
+        $typeElements = $this->getTypeElements();
+        $add = true;
+        foreach ($typeElements as $element){
+            foreach ($return_elements as $return_element){
+                $add = $element->Element == $return_element->Element ? false : true;
+/*                if ($element->Element == $return_element->Element){
+                    $add = false;
+                }
+                else{
+                    $add = true;
+                }*/
+            }
+            if ($add) $return_elements[] = $element;
+        }
+        return $return_elements;
+    }
+    
+
+    /**
+    *   Returns true if the input field is specified multiple times
+    **/
+    public function containsInputFieldMulti($compare){
+        $total = 0;
+        $typeElements = $this->getTypeElements();
+        foreach ($typeElements as $annotationTypeElement) {
+            if ($annotationTypeElement->Element == $compare->Element){
+                $total++;
+            }
+        }
+        if ($total > 1){ 
+            return true;
+        }
+        return false;
     }
     
     /**

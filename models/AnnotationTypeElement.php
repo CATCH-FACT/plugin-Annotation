@@ -16,23 +16,37 @@
 class AnnotationTypeElement extends Omeka_Record_AbstractRecord
 {
     public $type_id;
-    public $element_id_out;
+    public $element_id;
     public $tool_id;
-    public $element_id_in;
     public $prompt;
+    public $english_name;
     public $order;
     public $long_text;
+    public $repeated_field;
+    public $score_slider; #add a score slider to restrict annotation values (js)
+    public $date_picker; #adds a date picker (js)
+    public $date_range_picker; #adds a date range picker (js)
     
     protected $_related = array('AnnotationType' => 'getType',
-                                'ElementOut'          => 'getElementOut',
-                                'ElementIn'          => 'getElementIn',
-                                'Tool'          => 'getTool');
+                                'Element'        => 'getElement',
+                                'Tool'           => 'getTool');
 
     protected function _validate()
     {
-        if(empty($this->element_id_out)) {
+        if(empty($this->element_id)) {
             $this->addError('element', 'You must select an element to annotate.');
         }
+    }
+
+    
+    /**
+     * Get the type associated with this type element.
+     *
+     * @return AnnotationType
+     */
+    public function getScoreslider()
+    {
+        return $this->_db->getTable('AnnotationType')->find($this->score_slider);
     }
 
     /**
@@ -45,19 +59,10 @@ class AnnotationTypeElement extends Omeka_Record_AbstractRecord
         return $this->_db->getTable('AnnotationType')->find($this->type_id);
     }
     
-    /**
-     * Get the Element associated with this type element.
-     *
-     * @return Element
-     */
-    public function getElementOut()
+    /** alias for get element **/
+    public function getElement()
     {
-        return $this->_db->getTable('Element')->find($this->element_id_out);
-    }
-
-    public function getElementIn()
-    {
-        return $this->_db->getTable('Element')->find($this->element_id_in);
+        return $this->_db->getTable('Element')->find($this->element_id);
     }
 
     public function getTool()

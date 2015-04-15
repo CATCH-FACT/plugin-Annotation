@@ -29,8 +29,12 @@ class Table_AnnotationTypeElement extends Omeka_Db_Table
         } else {
             $typeId = $type->id;
         }
-        
         return $this->findBySql('type_id = ?', array($typeId));
+    }
+    
+    public function findByElementId($id)
+    {
+        return $this->findBySql('element_id = ?', array($id));
     }
     
     public function getSelect()

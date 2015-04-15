@@ -2,7 +2,7 @@
 /**
  * @version $Id$
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
- * @copyright Center for History and New Media, 2010
+ * @copyright University of Twente
  * @package Annotation
  */
 
@@ -11,17 +11,18 @@ $annotationTypeElements = $annotation_type->AnnotationTypeElements;
 $typeName = html_escape($annotation_type->display_name);
 queue_css_file('annotation-type-form');
 
-$addNewRequestUrl = admin_url('annotation/types/add-new-element');
-$addExistingRequestUrl = admin_url('annotation/types/add-existing-element');
-$changeExistingElementUrl = admin_url('annotation/types/change-existing-element'); 
+$addNewTypeRequestUrl = admin_url('annotation/types/add-new-type-element');
+$addExistingTypeRequestUrl = admin_url('annotation/types/add-existing-type-element');
+$changeExistingtypeElementUrl = admin_url('annotation/types/change-existing-type-element'); 
 
 queue_js_file('annotation-types');
+
 $js = "
     jQuery(document).ready(function () {
-        var addNewRequestUrl = '" . admin_url('annotation/types/add-new-element') . "'
-        var addExistingRequestUrl = '" . admin_url('annotation/types/add-existing-element') . "'
-        var changeExistingElementUrl = '" . admin_url('annotation/types/change-existing-element') . "'
-        Omeka.AnnotationTypes.manageAnnotationTypes(addNewRequestUrl, addExistingRequestUrl, changeExistingElementUrl);
+        var addNewTypeRequestUrl = '" . admin_url('annotation/types/add-new-type-element') . "'
+        var addExistingTypeRequestUrl = '" . admin_url('annotation/types/add-existing-type-element') . "'
+        var changeExistingTypeElementUrl = '" . admin_url('annotation/types/change-existing-type-element') . "'
+        Omeka.AnnotationTypes.manageAnnotationTypes(addNewTypeRequestUrl, addExistingTypeRequestUrl, changeExistingTypeElementUrl);
         Omeka.AnnotationTypes.enableSorting();
     });                
     ";

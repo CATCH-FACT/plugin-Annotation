@@ -10,14 +10,14 @@ Omeka.AnnotationTypes = {};
      */
     Omeka.AnnotationTypes.enableSorting = function () {
         $('.sortable').sortable({
-            items: 'li.element',
+            items: 'li.type-element',
             forcePlaceholderSize: true,
             forceHelperSize: true,
             placeholder: 'ui-sortable-highlight',
             axis: 'y',
             containment: '#annotation-type-elements',
             update: function (event, ui) {
-                $(this).find('.element-order').each(function (index) {
+                $(this).find('.type-element-order').each(function (index) {
                     $(this).val(index + 1);
                 });
             }
@@ -53,33 +53,33 @@ Omeka.AnnotationTypes = {};
      * @param {string} addExistingRequestUrl
      * @param {string} changeExistingElementUrl
      */
-    Omeka.AnnotationTypes.manageAnnotationTypes = function (addNewRequestUrl, addExistingRequestUrl, changeExistingElementUrl) {
+    Omeka.AnnotationTypes.manageAnnotationTypes = function (addNewTypeRequestUrl, addExistingTypeRequestUrl, changeExistingTypeElementUrl) {
         /**
          * Activate dropdown for selecting from existing elements.
          */
-        function activateSelectElementDropdowns() {
-            $('select.existing-element-drop-down').change(function () {
+        function activateSelectTypeElementDropdowns() {
+            $('select.existing-type-element-drop-down').change(function () {
                 var dropDown = $(this);
-                var elementId = dropDown.val();
-                var addExistingElementIdPrefix = 'add-existing-element-id-';
-                var addExistingElementId = this.getAttribute('id');
-                if (addExistingElementId) {
-                    var elementTempId = addExistingElementId.substring(addExistingElementIdPrefix.length);
+                var typeElementId = dropDown.val();
+                var addExistingTypeElementIdPrefix = 'add-existing-type-element-id-';
+                var addExistingTypeElementId = this.getAttribute('id');
+                if (addExistingTypeElementId) {
+                    var typeElementTempId = addExistingTypeElementId.substring(addExistingTypeElementIdPrefix.length);
                     $.ajax({
-                        url: changeExistingElementUrl,
+                        url: changeExistingTypeElementUrl,
                         dataType: 'json',
-                        data: {elementId: elementId, elementTempId: elementTempId},
+                        data: {typeElementId: typeElementId, typeElementTempId: typeElementTempId},
                         success: function (response) {
-                            var elementDescriptionCol = dropDown.parent().next();
-                            if(response.elementDescription) {
-                                elementDescriptionCol.html('<div class="element-description">' + response.elementDescription + '</div>');
-                                elementDescriptionCol.toggle();
+                            var typeElementDescriptionCol = dropDown.parent().next();
+                            if(response.typeElementDescription) {
+                                typeElementDescriptionCol.html('<div class="type-element-description">' + response.typeElementDescription + '</div>');
+                                typeElementDescriptionCol.toggle();
                             } else {
-                                elementDescriptionCol.hide();
+                                typeElementDescriptionCol.hide();
                             }
                         },
                         error: function () {
-                            alert('Unable to get selected element data.');
+                            alert('Unable to get selected type-element data.');
                         }
                     });
                 }
@@ -89,29 +89,29 @@ Omeka.AnnotationTypes = {};
         /**
          * Turn all the links into AJAX requests that will mark the element for deletion and update the list.
          */
-        function activateRemoveElementLinks() {
+        function activateRemoveTypeElementLinks() {
 
-            $(document).on('click', '.delete-element', function (event) {
+            $(document).on('click', '.delete-type-element', function (event) {
                 event.preventDefault();
-                toggleElements(this);
+                toggleTypeElements(this);
             });
-            $('a.undo-delete').click( function (event) {
+            $('a.type-undo-delete').click( function (event) {
                 event.preventDefault();
-                toggleElements(this);
+                toggleTypeElements(this);
             });
         }
         
-        function toggleElements(button) {
-            var elementsToRemove = $('#elements_to_remove');
-            var removeElementLinkPrefix = 'remove-element-link-';
-            var removeElementLinkId = button.getAttribute('id');
-            if ($(button).hasClass('delete-element')) {
-                if (removeElementLinkId !== null) {
-                    var elementId = removeElementLinkId.substring(removeElementLinkPrefix.length);
-                    if (elementId) {
-                        elementsToRemove.attr('value', elementsToRemove.attr('value') + elementId + ',');
+        function toggleTypeElements(button) {
+            var typeElementsToRemove = $('#type-elements_to_remove');
+            var removeTypeElementLinkPrefix = 'remove-type-element-link-';
+            var removeTypeElementLinkId = button.getAttribute('id');
+            if ($(button).hasClass('delete-type-element')) {
+                if (removeTypeElementLinkId !== null) {
+                    var typeElementId = removeTypeElementLinkId.substring(removeTypeElementLinkPrefix.length);
+                    if (typeElementId) {
+                        typeElementsToRemove.attr('value', typeElementsToRemove.attr('value') + typeElementId + ',');
                     }
-                    $(button).prevAll('.element-order').attr('name', '');
+                    $(button).prevAll('.type-element-order').attr('name', '');
                     $(button).parent().addClass('deleted');
                     $(button).parent().next().addClass('deleted');
                     $(button).prev().toggle();
@@ -122,18 +122,18 @@ Omeka.AnnotationTypes = {};
                 }
             } else {
                 if (removeElementLinkId) {
-                    var elementId = removeElementLinkId.substring(removeElementLinkPrefix.length);
-                    $(button).prevAll('.element-order').attr('name', 'elements[' + elementId + '][order]');
+                    var typeElementId = removeTypeElementLinkId.substring(removeTypeElementLinkPrefix.length);
+                    $(button).prevAll('.type-element-order').attr('name', 'type-elements[' + typeElementId + '][order]');
                 }
-                var removeIds = elementsToRemove.attr('value').split(',');
-                var elementId = removeElementLinkId.substring(removeElementLinkPrefix.length);
+                var removeIds = typeElementsToRemove.attr('value').split(',');
+                var typeElementId = removeTypeElementLinkId.substring(removeTypeElementLinkPrefix.length);
                 var atts = '';
                 for(var i=0; i<removeIds.length; i++) {
-                    if((removeIds[i] != elementId) && removeIds[i] != "") {
+                    if((removeIds[i] != typeElementId) && removeIds[i] != "") {
                         atts += removeIds[i] + ','; 
                     }
                 }
-                elementsToRemove.attr('value', atts);
+                typeElementsToRemove.attr('value', atts);
                 $(button).parent().removeClass('deleted');
                 $(button).parent().next().removeClass('deleted');
                 $(button).next().toggle();
@@ -141,7 +141,7 @@ Omeka.AnnotationTypes = {};
             }
         }
 
-        $('#add-element').click( function (event) {
+        $('#add-existing-type-element').click( function (event) {
             event.preventDefault();
             var elementCount = $('#annotation-type-elements li').length;
             var requestUrl;
@@ -151,14 +151,14 @@ Omeka.AnnotationTypes = {};
                 alert('Please choose an item type above before adding elements.');
                 return;
             }
-                requestUrl = addExistingRequestUrl;
+                requestUrl = addExistingTypeRequestUrl;
             $.ajax({
                 url: requestUrl,
                 dataType: 'text',
                 data: {elementCount: elementCount, itemTypeId: itemTypeId},
                 success: function (responseText) {
                     var response = responseText || 'no response text';
-                    $('#add-element').parent().before(response);
+                    $('#add-existing-type-element').parent().before(response);
                 },
                 error: function () {
                     alert('Unable to get a new element.');
@@ -166,6 +166,6 @@ Omeka.AnnotationTypes = {};
             });
         });
 
-        activateRemoveElementLinks();
+        activateRemoveTypeElementLinks();
     };
 })(jQuery);
