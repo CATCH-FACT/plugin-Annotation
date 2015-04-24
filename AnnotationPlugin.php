@@ -41,7 +41,8 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
 
     protected $_filters = array(
         'admin_navigation_main',
-        'simple_vocab_routes'
+        'simple_vocab_routes',
+        'admin_dashboard_panels'
         );
 
     protected $_options = array(
@@ -55,6 +56,57 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         'annotation_simple',
         'annotation_simple_email'
     );
+
+    /**
+     * Append search to dashboard
+     * 
+     * @return void
+     **/
+    function filterAdminDashboardPanels($panels){
+//        array_unshift($panels, $this->_addDashboardAnnotationStuff($panels));
+        $panels[1] = $this->_addDashboardAnnotationStuff($panels);
+        return $panels;
+    }
+
+    function _addDashboardAnnotationStuff($panels){
+        
+        $db = $this->_db;
+        $annotation_types = $db->getTable('AnnotationType')->findAll();
+        
+        $zoeken_html = "<H1>" . __("Annotate a new Item") . "</H1><br>";
+
+        $zoeken_html .= "<H2>" . __("Types to annotate") . "</H2>";
+        
+        $zoeken_html .= '<table>';
+        $zoeken_html .= '    <thead id="types-table-head">';
+        $zoeken_html .= "        <tr>";
+        $zoeken_html .= "            <th>" . __("Name") . "</th>";
+        $zoeken_html .= "            <th>" . __("Annotated Items") . "</th>";
+        $zoeken_html .= "            <th>" . __("Annotate a new item") . "</th>";
+        $zoeken_html .= "        </tr>";
+        $zoeken_html .= "    </thead>";
+        $zoeken_html .= '    <tbody id="types-table-body">';
+        
+        //http://127.0.0.1/vb2.2.2/admin/annotation/annotation?annotation_type=2
+        
+        foreach ($annotation_types as $type){
+            $zoeken_html .= "<tr>";
+            $zoeken_html .= "<td><strong>" . metadata($type, 'display_name') . " (" . __($type->ItemType->name) . ")</strong></td>";
+            $zoeken_html .= "<td><a href='" . url('items/browse/annotated/1/type/' . $type->item_type_id) . "'>" . __("View") . "</a></td>";
+            $zoeken_html .= "<td><a href='" . url('annotation/annotation?annotation_type=' . $type->id) . "' class='add button small green'>" . __("New") . " " . metadata($type, 'display_name') . "</a></td>";
+            $zoeken_html .= "</tr>";
+        }
+        $zoeken_html .= '    </tbody>';
+        $zoeken_html .= '</table>';
+        
+        
+
+        $zoeken_html .= "<H2>" . __("Recently annotated Items") . "</H2>";
+
+        $zoeken_html .= "<H2>" . __("") . "</H2>";
+
+    	return $zoeken_html;
+    }
 
     public function setUp() 
     {
@@ -71,7 +123,8 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         echo '<ul style="margin: 0; padding: 0;"><li style="display: inline-block;">';
         echo link_to_item(__("Annotate"), $props = array(), $action = 'annotate', $item);
 //        echo link_to_item(__('Annotate'), array('class' => 'annotate'), 'annotate-existing');
-        echo '&nbsp&middot&nbsp</li><li style="display: inline-block;">';
+        echo '&nbsp&middot&nbsp';
+        echo '</li><li style="display: inline-block;">';
         echo link_to_item(__('Clone'), array('class' => 'annotate'), 'clone-existing');
         echo '</li></ul>';
 //        echo '<ul class="action-links"><li><a href="/vb2.2.2/admin/items/clone-confirm/72290" class="clone-confirm">clonen</a></li></ul>';
@@ -127,7 +180,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
             `score_slider`  TINYINT(1) UNSIGNED NOT NULL DEFAULT '0', # for: text build-up ()when idx) / annotation threshold (when no idx)
             `date_range_picker` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
             `date_picker` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
-            `autocomplete_on` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0', #autocomplete flag
+            `autocomplete` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0', #autocomplete flag
             `autocomplete_main_id`  INT UNSIGNED NULL,                  #in which element are we going to search?
             `autocomplete_extra_id`  INT UNSIGNED NULL,                 #maybe some extra field needs to be checked?
             `autocomplete_itemtype_id`  INT UNSIGNED NULL,              #do we need to restrict to a certain Itemtype?
@@ -142,6 +195,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $sql = "CREATE TABLE IF NOT EXISTS `$db->AnnotationAnnotatedItem` (
             `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
             `item_id` INT UNSIGNED NOT NULL,
+            `annotation_type_id` INT UNSIGNED NOT NULL,   #what kind of annotation type was used?
             `finished` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
             `public` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
             `anonymous` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
@@ -224,9 +278,10 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
     public function hookDefineAcl($args)
     {
         $acl = $args['acl'];
+        
         $acl->addResource('Annotation_Annotation');
         $acl->allow(array('super', 'admin', 'contributor'), 'Annotation_Annotation');
-        $acl->allow(null, 'Annotation_Annotation', array('add', 'doannotation', 'element-form-noadd', 'element-form-tool', 'element-form', "tag-form", "type-form"));
+        $acl->allow(null, 'Annotation_Annotation', array('add', 'doannotation', 'element-form-noadd', 'element-form-element', 'element-form-tool', 'element-form', "tag-form", "type-form", "autocomplete"));
         
         $acl->addResource('Annotation_Annotators');
         $acl->allow(null, 'Annotation_Annotators');
@@ -303,10 +358,10 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $annotationCount = get_db()->getTable('AnnotationAnnotatedItems')->count();
         if($annotationCount > 0) {
             $uri = url('annotation/items');
-            $label = __('Annotated Items');
+            $label = __('Assisted Annotation');
         } else {
             $uri = url('annotation/index');
-            $label = __('Annotation');
+            $label = __('Assisted Annotation');
         }        
         
         $nav[] = array(
@@ -599,6 +654,11 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->repeated_field = false;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
+        $textElement->autocomplete = false;
+        $textElement->autocomplete_main_id = false;
+        $textElement->autocomplete_extra_id = false;
+        $textElement->autocomplete_itemtype_id = false;
+        $textElement->autocomplete_collection_id = false;
         $textElement->save();
         
         $textElement = new AnnotationTypeElement;
@@ -613,6 +673,11 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->repeated_field = false;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
+        $textElement->autocomplete = false;
+        $textElement->autocomplete_main_id = false;
+        $textElement->autocomplete_extra_id = false;
+        $textElement->autocomplete_itemtype_id = false;
+        $textElement->autocomplete_collection_id = false;
         $textElement->save();
         
         $textElement = new AnnotationTypeElement;
@@ -627,6 +692,11 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->repeated_field = false;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
+        $textElement->autocomplete = false;
+        $textElement->autocomplete_main_id = false;
+        $textElement->autocomplete_extra_id = false;
+        $textElement->autocomplete_itemtype_id = false;
+        $textElement->autocomplete_collection_id = false;
         $textElement->save();
 
         $textElement = new AnnotationTypeElement;
@@ -641,6 +711,11 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->repeated_field = false;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
+        $textElement->autocomplete = false;
+        $textElement->autocomplete_main_id = false;
+        $textElement->autocomplete_extra_id = false;
+        $textElement->autocomplete_itemtype_id = false;
+        $textElement->autocomplete_collection_id = false;
         $textElement->save();
 
         $textElement = new AnnotationTypeElement;
@@ -656,6 +731,11 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->repeated_field = false;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
+        $textElement->autocomplete = false;
+        $textElement->autocomplete_main_id = false;
+        $textElement->autocomplete_extra_id = false;
+        $textElement->autocomplete_itemtype_id = false;
+        $textElement->autocomplete_collection_id = false;
         $textElement->save();
         
         $textElement = new AnnotationTypeElement;
@@ -670,6 +750,11 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->repeated_field = false;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
+        $textElement->autocomplete = false;
+        $textElement->autocomplete_main_id = false;
+        $textElement->autocomplete_extra_id = false;
+        $textElement->autocomplete_itemtype_id = false;
+        $textElement->autocomplete_collection_id = false;
         $textElement->save();
 
         $textElement = new AnnotationTypeElement;
@@ -684,6 +769,11 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->repeated_field = true;
         $textElement->date_picker = false;
         $textElement->date_range_picker = true;
+        $textElement->autocomplete = false;
+        $textElement->autocomplete_main_id = false;
+        $textElement->autocomplete_extra_id = false;
+        $textElement->autocomplete_itemtype_id = false;
+        $textElement->autocomplete_collection_id = false;
         $textElement->save();
 
         $textElement = new AnnotationTypeElement;
@@ -698,11 +788,16 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->repeated_field = true;            //there can be multiple collectors
         $textElement->date_picker = false;              //this is no date
         $textElement->date_range_picker = false;        //this is no date
-        $textElement->autocomplete_on = true;           //automplete, yes please
+        $textElement->autocomplete = true;           //automplete, yes please
         $textElement->autocomplete_main_id = 50;        //look in titles
         $textElement->autocomplete_extra_id = false;    //and nowhere else
         $textElement->autocomplete_itemtype_id = false; //dont' restrict to certain item type
         $textElement->autocomplete_collection_id = 9;   //but only look in collection verzamelaars
+        $textElement->autocomplete = true;
+        $textElement->autocomplete_main_id = 50;
+        $textElement->autocomplete_extra_id = false;
+        $textElement->autocomplete_itemtype_id = false;
+        $textElement->autocomplete_collection_id = 9;
         $textElement->save();
         
         $textElement = new AnnotationTypeElement;
@@ -717,7 +812,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->repeated_field = true;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
-        $textElement->autocomplete_on = true;           //automplete, yes please
+        $textElement->autocomplete = true;              //automplete, yes please
         $textElement->autocomplete_main_id = 50;        //look in titles
         $textElement->autocomplete_extra_id = false;    //and nowhere else
         $textElement->autocomplete_itemtype_id = false; //dont' restrict to certain item type
@@ -736,6 +831,11 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->repeated_field = true;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
+        $textElement->autocomplete = false;
+        $textElement->autocomplete_main_id = false;
+        $textElement->autocomplete_extra_id = false;
+        $textElement->autocomplete_itemtype_id = false;
+        $textElement->autocomplete_collection_id = false;
         $textElement->save();
         
         $textElement = new AnnotationTypeElement;
@@ -750,6 +850,11 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->repeated_field = false;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
+        $textElement->autocomplete = false;
+        $textElement->autocomplete_main_id = false;
+        $textElement->autocomplete_extra_id = false;
+        $textElement->autocomplete_itemtype_id = false;
+        $textElement->autocomplete_collection_id = false;
         $textElement->save();
         
         $textElement = new AnnotationTypeElement;
@@ -764,6 +869,11 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->repeated_field = true;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
+        $textElement->autocomplete = false;
+        $textElement->autocomplete_main_id = false;
+        $textElement->autocomplete_extra_id = false;
+        $textElement->autocomplete_itemtype_id = false;
+        $textElement->autocomplete_collection_id = false;
         $textElement->save();
 
         $textElement = new AnnotationTypeElement;
@@ -778,6 +888,11 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->repeated_field = true;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
+        $textElement->autocomplete = true;
+        $textElement->autocomplete_main_id = 51;
+        $textElement->autocomplete_extra_id = false;
+        $textElement->autocomplete_itemtype_id = false;
+        $textElement->autocomplete_collection_id = 1;
         $textElement->save();
 
         $textElement = new AnnotationTypeElement;
@@ -792,6 +907,11 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->repeated_field = false;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
+        $textElement->autocomplete = false;
+        $textElement->autocomplete_main_id = false;
+        $textElement->autocomplete_extra_id = false;
+        $textElement->autocomplete_itemtype_id = false;
+        $textElement->autocomplete_collection_id = false;
         $textElement->save();
 
         $textElement = new AnnotationTypeElement;
@@ -806,6 +926,11 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->repeated_field = true;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
+        $textElement->autocomplete = false;
+        $textElement->autocomplete_main_id = false;
+        $textElement->autocomplete_extra_id = false;
+        $textElement->autocomplete_itemtype_id = false;
+        $textElement->autocomplete_collection_id = false;
         $textElement->save();
         
         $textElement = new AnnotationTypeElement;
@@ -820,6 +945,11 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->repeated_field = true;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
+        $textElement->autocomplete = false;
+        $textElement->autocomplete_main_id = false;
+        $textElement->autocomplete_extra_id = false;
+        $textElement->autocomplete_itemtype_id = false;
+        $textElement->autocomplete_collection_id = false;
         $textElement->save();
         
         $textElement = new AnnotationTypeElement;
@@ -834,6 +964,11 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->repeated_field = true;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
+        $textElement->autocomplete = false;
+        $textElement->autocomplete_main_id = false;
+        $textElement->autocomplete_extra_id = false;
+        $textElement->autocomplete_itemtype_id = false;
+        $textElement->autocomplete_collection_id = false;
         $textElement->save();
 
         $textElement = new AnnotationTypeElement;
@@ -848,9 +983,9 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->repeated_field = true;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
-        $textElement->autocomplete_on = true;           //automplete, yes please
+        $textElement->autocomplete = true;           //automplete, yes please
         $textElement->autocomplete_main_id = 43;        //look in identifiers
-        $textElement->autocomplete_extra_id = 50;       //and search in titles
+        $textElement->autocomplete_extra_id = 50;       //and search in titles (and show titles as well?)
         $textElement->autocomplete_itemtype_id = false; //dont' restrict to certain item type
         $textElement->autocomplete_collection_id = 3;   //but only look in collection verhaaltypen
         $textElement->save();
@@ -867,7 +1002,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->repeated_field = true;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
-        $textElement->autocomplete_on = true;           //automplete, yes please
+        $textElement->autocomplete = true;              //automplete, yes please
         $textElement->autocomplete_main_id = 43;        //look in identifiers
         $textElement->autocomplete_extra_id = 50;       //and search in titles
         $textElement->autocomplete_itemtype_id = false; //dont' restrict to certain item type
@@ -886,6 +1021,11 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->repeated_field = false;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
+        $textElement->autocomplete = false;
+        $textElement->autocomplete_main_id = false;
+        $textElement->autocomplete_extra_id = false;
+        $textElement->autocomplete_itemtype_id = false;
+        $textElement->autocomplete_collection_id = false;
         $textElement->save();
         
         $textElement = new AnnotationTypeElement;
@@ -900,6 +1040,11 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->repeated_field = false;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
+        $textElement->autocomplete = false;
+        $textElement->autocomplete_main_id = false;
+        $textElement->autocomplete_extra_id = false;
+        $textElement->autocomplete_itemtype_id = false;
+        $textElement->autocomplete_collection_id = false;
         $textElement->save();
     }
     

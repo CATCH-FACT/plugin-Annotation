@@ -1,5 +1,6 @@
 function DocumentModel(){
     
+    //predefine a 1000 sliders, that oughta do it
     sliderValueArray = [];
     for (i = 0; i < 1000; i++){
         sliderValueArray[i] = 20;
@@ -207,22 +208,3 @@ jQuery.dateRangePickerLanguages['custom'] =
 	'spring': 'Lente van',
 	'fall': 'Herfst van'
 };
-//jQuery(document).ready(function() {
-    
-    // connect the knockout model to the page
-//    var model = new DocumentModel();
-//    ko.applyBindings(model);
-    
-//    console.log(model.slider_values());
-    
-//    var startvalue = 40;
-        
-//    console.log("activating sliders");
-//    var sliders = jQuery(".slider");
-    
-//    test = model.element();
-//    test[1] = "tewtjerbgwerghb ";
-//    model.element.valueHasMutated();
-//    console.log(model.element()[1]);
-//    model.text("testt testt testt");
-//});

@@ -17,6 +17,7 @@ class AnnotationAnnotatedItem extends Omeka_Record_AbstractRecord
     public $item_id;
     public $public;
     public $finished;
+    public $annotation_type_id;
     public $anonymous;
     
     protected $_related = array(

@@ -578,7 +578,6 @@
 
 			if ($(this).data('date-picker-opened'))
 			{
-			    console.log("closing in init");
 				closeDatePicker();
 				return;
 			}
@@ -1595,7 +1594,6 @@
                             html += '<option disabled selected> -- ' + lang(key) + '  -- </option>';
                             var obj = opt.partOfFragmentation[key];
                             for (var value in obj){
-                                console.log(value);
                                 html += '<option value=' + value + '>' + lang(value) + '</option>';
                             }
                             html += '</select>'

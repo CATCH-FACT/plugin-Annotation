@@ -6,6 +6,7 @@ function toggleProfileEdit() {
 
 function enableAnnotationAjaxForm(url) {
     jQuery(document).ready(function() {
+        
         // Div that will contain the AJAX'ed form.
         var form = jQuery('#annotation-type-form');
         // Select element that controls the AJAX form.

@@ -47,7 +47,7 @@ class Annotation_TypesController extends Omeka_Controller_AbstractActionControll
     }
 
 
-    public function addExistingTypeElementAction()
+    public function addTypeElementAction()
     {
         if ($this->_getParam('from_post') == 'true') {
             $elementTempId = $this->_getParam('elementTempId');
@@ -60,6 +60,11 @@ class Annotation_TypesController extends Omeka_Controller_AbstractActionControll
             }
             $elementOrder = $this->_getParam('elementOrder');
             $elementPromptValue = $element->prompt;
+            $elementAutocomplete = $this->_getParam('elementAutocomplete');
+            $elementAutocompleteMainId = $this->_getParam('elementAutocompleteMain');
+            $elementAutocompleteExtraId = $this->_getParam('elementAutocompleteExtraId');
+            $elementAutocompleteItemtypeId = $this->_getParam('elementAutocompleteItemtypeId');
+            $elementAutocompleteCollectionId = $this->_getParam('elementAutocompleteCollectionId');
         } else {
             $elementTempId = '' . time();
             $elementId = '';
@@ -67,6 +72,12 @@ class Annotation_TypesController extends Omeka_Controller_AbstractActionControll
             $elementDescription = '';
             $elementOrder = intval($this->_getParam('elementCount')) + 1;
             $elementPromptValue = '';
+            $elementAutocomplete = '';
+            $elementAutocompleteMainId = '';
+            $elementAutocompleteExtraId = '';
+            $elementAutocompleteItemtypeId = '';
+            $elementAutocompleteCollectionId = '';
+            
         }
     
         $stem = Omeka_Form_ItemTypes::ELEMENTS_TO_ADD_INPUT_NAME . "[$elementTempId]";
@@ -80,8 +91,20 @@ class Annotation_TypesController extends Omeka_Controller_AbstractActionControll
         $elementDatepickerName = $stem . '[date_picker]';
         $elementDateRangepickerName = $stem . '[date_range_picker]';
         $elementEnglishName = $stem . '[english_name]';
+
+        $elementAutocompleteName = $stem . '[autocomplete]';
+        $elementAutocompleteMainName = $stem . '[autocomplete_main]';
+        $elementAutocompleteExtraName = $stem . '[autocomplete_extra]';
+        $elementAutocompleteItemtypeName = $stem . '[autocomplete_itemtype]';
+        $elementAutocompleteCollectionName = $stem . '[autocomplete_collection]';
+//        $elementAutocompleteId = $stem . '[element_autocomplete]';
+//        $elementAutocompleteMainId = $stem . '[element_autocomplete_main]';
+//        $elementAutocompleteExtraId = $stem . '[element_autocomplete_extra]';
+//        $elementAutocompleteItemtypeId = $stem . '[element_autocomplete_itemtype]';
+//        $elementAutocompleteCollectionId = $stem . '[element_autocomplete_collection]';
         
         $item_type_id = $this->_getParam('itemTypeId');
+        
         $this->view->assign(array(
                 'element_id_name' => $elementIdName,
                 'element_id_value' => $elementId,
@@ -98,11 +121,22 @@ class Annotation_TypesController extends Omeka_Controller_AbstractActionControll
                 'element_scoreslider_name' => $elementScoresliderName,
                 'element_datepicker_name' => $elementDatepickerName,
                 'element_daterangepicker_name' => $elementDateRangepickerName,
+                'element_autocomplete_name' => $elementAutocompleteName,
+                'element_autocomplete_main_name' => $elementAutocompleteMainName,
+                'element_autocomplete_extra_name' => $elementAutocompleteExtraName,
+                'element_autocomplete_itemtype_name' =>$elementAutocompleteItemtypeName,
+                'element_autocomplete_collection_name' => $elementAutocompleteCollectionName,
+                'element_autocomplete_value' => $elementAutocomplete,
+                'element_autocomplete_main_value' => $elementAutocompleteMainId,
+                'element_autocomplete_extra_value' => $elementAutocompleteExtraId,
+                'element_autocomplete_itemtype_value' =>$elementAutocompleteItemtypeId,
+                'element_autocomplete_collection_value' => $elementAutocompleteCollectionId,
+                                                
                 'item_type_id' => $item_type_id 
         ));
     }
     
-    public function changeExistingTypeElementAction()
+    public function changeTypeElementAction()
     {
         $elementId = $this->_getParam('elementId');
         $element = $this->_helper->db->getTable('Element')->find($elementId);
@@ -163,6 +197,11 @@ class Annotation_TypesController extends Omeka_Controller_AbstractActionControll
                             $annotationEl->score_slider = $elementInfo['score_slider'];
                             $annotationEl->date_picker = $elementInfo['date_picker'];
                             $annotationEl->date_range_picker = $elementInfo['date_range_picker'];
+                            $annotationEl->autocomplete = $elementInfo['autocomplete'];
+                            $annotationEl->autocomplete_main_id = $elementInfo['autocomplete_main_id'];
+                            $annotationEl->autocomplete_extra_id = $elementInfo['autocomplete_extra_id'];
+                            $annotationEl->autocomplete_itemtype_id = $elementInfo['autocomplete_itemtype_id'];
+                            $annotationEl->autocomplete_collection_id = $elementInfo['autocomplete_collection_id'];
                             $annotationEl->type_id = $record->id;
                             $annotationEl->save();
                         }                        
@@ -188,6 +227,11 @@ class Annotation_TypesController extends Omeka_Controller_AbstractActionControll
                             $annotationEl->score_slider = $elementInfo['score_slider'];
                             $annotationEl->date_picker = $elementInfo['date_picker'];
                             $annotationEl->date_range_picker = $elementInfo['date_range_picker'];
+                            $annotationEl->autocomplete = $elementInfo['autocomplete'];
+                            $annotationEl->autocomplete_main_id = $elementInfo['autocomplete_main_id'];
+                            $annotationEl->autocomplete_extra_id = $elementInfo['autocomplete_extra_id'];
+                            $annotationEl->autocomplete_itemtype_id = $elementInfo['autocomplete_itemtype_id'];
+                            $annotationEl->autocomplete_collection_id = $elementInfo['autocomplete_collection_id'];
                             $annotationEl->save();
                         }
                     }

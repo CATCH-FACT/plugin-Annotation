@@ -9,7 +9,6 @@
 $annotationType = $annotation_type;
 
 $annotationTypeElements = $annotation_type->AnnotationTypeElements;
-$annotationManualtypeElements = $annotation_type->AnnotationManualtypeElements;
 
 $itemType = $annotation_type->ItemType;
 
@@ -19,17 +18,17 @@ if($itemType) {
     $elements = array();
 }
 
-$addNewRequestUrl = admin_url('annotation/types/add-existing-element');
-$addExistingRequestUrl = admin_url('annotation/types/add-existing-element');
-$changeExistingElementUrl = admin_url('annotation/types/change-existing-element');
+$addNewRequestUrl = admin_url('annotation/types/add-type-element');
+$addRequestUrl = admin_url('annotation/types/add-type-element');
+$changeElementUrl = admin_url('annotation/types/change-element');
 
 queue_js_file('annotation-types');
 $js = "
 jQuery(document).ready(function () {
-var addNewRequestUrl = '" . admin_url('annotation/types/add-existing-element') . "'
-var addExistingRequestUrl = '" . admin_url('annotation/types/add-existing-element') . "'
-var changeExistingElementUrl = '" . admin_url('annotation/types/change-existing-element') . "'
-Omeka.AnnotationTypes.manageAnnotationTypes(addNewRequestUrl, addExistingRequestUrl, changeExistingElementUrl);
+var addNewRequestUrl = '" . admin_url('annotation/types/add-type-element') . "'
+var addRequestUrl = '" . admin_url('annotation/types/add-type-element') . "'
+var changeElementUrl = '" . admin_url('annotation/types/change-element') . "'
+Omeka.AnnotationTypes.manageAnnotationTypes(addNewRequestUrl, addRequestUrl, changeElementUrl);
 Omeka.AnnotationTypes.enableSorting();
 });
 ";

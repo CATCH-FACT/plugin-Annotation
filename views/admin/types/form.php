@@ -12,6 +12,15 @@
                     'item_type_id' => $annotation_type->item_type_id
                 )
             );
+
+    $dcElements = get_table_options(
+            'Element', null,
+                array(
+                    'element_set_name' => 'Dublin Core',
+                    'sort' => 'alpha',
+                )
+            );
+    $elementsArray['Dublin Core'] = $dcElements['Dublin Core'];
     
 ?>
 <form method='post'>  
@@ -99,71 +108,77 @@
                 <a id="remove-element-link-<?php echo html_escape($annotationElement->id); ?>" href="" class="delete-element"><?php echo __('Remove'); ?></a>
                 <?php endif; ?>
 
-                <?php if ($annotationElement->Tool): ?>
-                <span class='prompt'><?php echo __('Annotation tool:'); ?></span>
-                <strong><?php echo html_escape($annotationElement->Tool->display_name); ?></strong>
-                <?php endif; ?>
-                
-                <span class='prompt'><?php echo __('Output field:'); ?></span>
+
+                <span class='prompt'><?php echo __('Metadata field:'); ?></span>
                 <strong><?php echo html_escape($annotationElement->Element->name); ?></strong>
-                <br>
+
+                <span class='prompt'><?php echo __('Annotation tool:'); ?></span>    
+                <?php 
+                $tool_id = $annotationElement->Tool ? $annotationElement->Tool->id : "";
+                echo $this->formSelect(
+                    "elements[$annotationElement->id][toolid]", $tool_id, //set in controller like english_name
+                    array('class' => 'element-drop-down'), $toolsArray );
+                ?>
+                
+                <hr>
                 <span class='prompt'><?php echo __('Comments'); ?></span>
                 <?php echo $this->formText("elements[$annotationElement->id][prompt]" , $annotationElement->prompt); ?>
                 
                 <?php echo "<hr>";?>
                 
-                <span class='long-text'><?php echo __('Large input field'); ?></span>
+                <span class='prompt'><?php echo __('Large input field'); ?></span>
                 <?php echo $this->formCheckbox("elements[$annotationElement->id][long_text]", null, array('checked'=>$annotationElement->long_text)); ?>
                 
-                <span class='repeated-field'><?php echo __('Repeated values'); ?></span>
+                <span class='prompt'><?php echo __('Repeated values'); ?></span>
                 <?php echo $this->formCheckbox("elements[$annotationElement->id][repeated_field]", null, array('checked'=>$annotationElement->repeated_field)); ?>
 
                 <?php echo "<br>";?>
 
-                <span class='score-slider'><?php echo __('Score slider'); ?></span>
-                <?php echo $this->formCheckbox("elements[$annotationElement->id][score_slider]", null, array('checked'=>$annotationElement->score_slider)); ?>
-                <span class='score-slider'> (when idx available in metadata)</span>
+                <span class='prompt'><?php echo __("Date picker: "); ?></span>
 
-                <?php echo "<br>";?>
-
-                <span class='date-range-picker'><?php echo __("Date picker: "); ?></span>
-
-                <span class='date-picker'><?php echo __('Single date'); ?></span>
+                <span class='prompt'><?php echo __('Single date'); ?></span>
                 <?php echo $this->formCheckbox("elements[$annotationElement->id][date_picker]", null, array('checked'=>$annotationElement->date_picker)); ?>
 
-                <span class='date-range-picker'><?php echo __('Date range'); ?></span>
+                <span class='prompt'><?php echo __('Date range'); ?></span>
                 <?php echo $this->formCheckbox("elements[$annotationElement->id][date_range_picker]", null, array('checked'=>$annotationElement->date_range_picker)); ?>
-                
+
+                <?php echo "<hr>";?>
+
+                <span class='prompt'><?php echo __('Score slider'); ?></span>
+                <?php echo $this->formCheckbox("elements[$annotationElement->id][score_slider]", null, array('checked'=>$annotationElement->score_slider)); ?>
+                <span class=''> (when tool attached and idx available in metadata)</span>
+                                
                 <?php echo "<hr>";?>
                 
-                <span class='auto-complete'><?php echo __('Autocomplete options '); ?></span>
-                <?php echo $this->formCheckbox("elements[$annotationElement->id][autocomplete_on]", null, array('checked'=>$annotationElement->autocomplete_on)); ?>
+                <span class='prompt'><?php echo __('Autocomplete option '); ?></span>
+                <?php echo $this->formCheckbox("elements[$annotationElement->id][autocomplete]", null, 
+                    array('checked'=>$annotationElement->autocomplete, 'class' => 'autocomplete')); ?>
 
                 <?php echo "<br>";?>
-                <span class='auto-complete-element'><?php echo __('Search in element'); ?></span>
+                <span class='prompt'><?php echo __('Search in element'); ?></span>
                 <?php echo $this->formSelect(
-                    $annotationElement->autocomplete_main_id, $annotationElement->autocomplete_main_name, //set in controller like english_name
-                    array('class' => 'existing-element-drop-down'), $elementsArray );
+                    "elements[$annotationElement->id][autocomplete_main_id]", $annotationElement->autocomplete_main_id,
+                    array('class' => 'element-drop-down autoc'), $elementsArray );
                 ?>
 
                 <?php echo "<br>";?>
-                <span class='auto-complete-element'><?php echo __('Extra search element (i.e. text, title)'); ?></span>
+                <span class='prompt'><?php echo __('Extra search element (i.e. text, title)'); ?></span>
                 <?php echo $this->formSelect(
-                    $annotationElement->autocomplete_extra_id, $annotationElement->autocomplete_extra_name, //set in controller like english_name
-                    array('class' => 'existing-element-drop-down'), $elementsArray );
+                    "elements[$annotationElement->id][autocomplete_extra_id]", $annotationElement->autocomplete_extra_id, //set in controller like english_name
+                    array('class' => 'element-drop-down autoc'), $elementsArray );
                 ?>
 
                 <?php echo "<br>";?>
-                <span class='auto-complete-item'><?php echo __('Search in Itemtype'); ?></span>
+                <span class='prompt'><?php echo __('Search in Itemtype'); ?></span>
                 <?php echo $this->formSelect(
-                    $annotationElement->autocomplete_itemtype_id, $annotationElement->autocomplete_itemtype_name, //set in controller like english_name
-                    array('class' => 'existing-element-drop-down'), $elementsArray );
+                    "elements[$annotationElement->id][autocomplete_itemtype_id]", $annotationElement->autocomplete_itemtype_id, //set in controller like english_name
+                    array('class' => 'element-drop-down autoc'), $itemTypeOptions );
                 ?>
                 <?php echo "<br>";?>
-                <span class='auto-complete-collection'><?php echo __('Search in Collection'); ?></span>
+                <span class='prompt'><?php echo __('Search in Collection'); ?></span>
                 <?php echo $this->formSelect(
-                    $annotationElement->autocomplete_collection_id, $annotationElement->autocomplete_collection_name, //set in controller like english_name
-                    array('class' => 'existing-element-drop-down'), $collections );
+                    "elements[$annotationElement->id][autocomplete_collection_id]", $annotationElement->autocomplete_collection_id, //set in controller like english_name
+                    array('class' => 'element-drop-down autoc'), $collections );
                ?>
                 
                 
@@ -193,19 +208,27 @@
                         'elementName' => $element->name,
                         'elementDescription' => $element->description,
                         'elementToolId' => $elementToolId,
-                        'elementOrder' => $elementOrder
+                        'elementOrder' => $elementOrder,
+                        'elementAutocompleteMainId' => $elementAutocompleteMainId,
+                        'elementAutocompleteExtraId' => $elementAutocompleteExtraId,
+                        'elementAutocompleteCollectionId' => $elementAutocompleteCollectionId,
+                        'elementAutocompleteItemtypeId' => $elementAutocompleteItemtypeId
                     )
                 );
                 ?>
                 <?php else: ?>
                 <?php echo $this->action(
-                    'add-existing-type-element', 'annotation-types', null,
+                    'add-type-element', 'annotation-types', null,
                     array(
                         'from_post' => true,
                         'elementTempId' => $elementTempId,
                         'elementToolId' => $elementToolId,
                         'elementId' => $element->id,
-                        'elementOrder' => $elementOrder
+                        'elementOrder' => $elementOrder,
+                        'elementAutocompleteMainId' => $elementAutocompleteMainId,
+                        'elementAutocompleteExtraId' => $elementAutocompleteExtraId,
+                        'elementAutocompleteCollectionId' => $elementAutocompleteCollectionId,
+                        'elementAutocompleteItemtypeId' => $elementAutocompleteItemtypeId
                     )
                 );
                 ?>
@@ -217,7 +240,7 @@
                     <?php echo __('Add Element'); ?>
                 </div>
                 <div class="drawer-contents">
-                    <button id="add-existing-type-element" name="add-existing-type-element"><?php echo __('Add Element'); ?></button>
+                    <button id="add-type-element" name="add-type-element"><?php echo __('Add Element'); ?></button>
                 </div>
             </li>
         </ul>

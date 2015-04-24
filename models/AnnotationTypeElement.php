@@ -26,6 +26,11 @@ class AnnotationTypeElement extends Omeka_Record_AbstractRecord
     public $score_slider; #add a score slider to restrict annotation values (js)
     public $date_picker; #adds a date picker (js)
     public $date_range_picker; #adds a date range picker (js)
+    public $autocomplete;
+    public $autocomplete_main_id;
+    public $autocomplete_extra_id;
+    public $autocomplete_itemtype_id;
+    public $autocomplete_collection_id;
     
     protected $_related = array('AnnotationType' => 'getType',
                                 'Element'        => 'getElement',

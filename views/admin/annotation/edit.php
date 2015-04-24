@@ -51,7 +51,7 @@ echo $this->partial('annotation-navigation.php');
     
     <h1><?php echo $head['title']; ?></h1>
 
-        <form method="post" action="" id="anootation-form"enctype="multipart/form-data">
+        <form method="post" action="" id="annotation-form"enctype="multipart/form-data">
         
             <fieldset id="annotation-item-metadata">
                 <div class="inputs">
@@ -63,18 +63,10 @@ echo $this->partial('annotation-navigation.php');
                 </div>
                 <div id="annotation-type-form">
 
+                <?php echo $id; ?>
+
                 <?php if (isset($typeForm)): echo $typeForm; endif; ?>
                 </div>
-            </fieldset>
-           
-            <fieldset id="annotation-confirm-submit" <?php if (!isset($typeForm)) { echo 'style="display: none;"'; }?>>
-                <div class="inputs">
-                    <?php $public = isset($_POST['annotation-public']) ? $_POST['annotation-public'] : 0; ?>
-                    <?php echo $this->formCheckbox('annotation-public', $public, null, array('1', '0')); ?>
-                    <?php echo $this->formLabel('annotation-public', __('Make annotated item public.')); ?>
-                </div>
-                <?php echo $this->formSubmit('form-submit', __('Save'), array('class' => 'submitinput')); ?>    
-                <p><?php echo __('You are logged in as: %s', metadata($user, 'name')); ?>
             </fieldset>
            
         </form>

@@ -87,7 +87,7 @@ function autoMultiExternal(element, url) {
                     }));
                 },
                 error: function(data) {
-                    //				    console.log(data);
+                    //   console.log(data);
                     return "None found";
                 }
             });
@@ -145,6 +145,7 @@ function dateTranslator(elementNumber) {
 }
 
 jQuery(document).ready(function() {
+    console.log("autocompleter added");
     server = "http://bookstore.ewi.utwente.nl/afact/";
 //    server = "http://127.0.0.1/testing/resting/";
     autocompleteAdd(     "43", server + "identifier.json?style=list&code=");        //identificatie code helper

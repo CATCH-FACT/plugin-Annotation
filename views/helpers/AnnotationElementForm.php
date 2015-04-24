@@ -39,13 +39,10 @@ class Annotation_View_Helper_AnnotationElementForm extends Omeka_View_Helper_Ele
         $this->_record = $record;
         
         // Filter the components of the element form display
-//        $labelComponent = $that->_getLabelComponent();
-//        $inputsComponent = $that->_getInputsComponent($extraFieldCount);
-
         //generating the input fields
         $inputsComponent = $this->_displayFormFields($extraFieldCount);
-//        $inputsComponent = $that->_getInputsComponent($extraFieldCount);
-        
+        $labelComponent = $that->_getfieldLabel();
+//        $labelComponent = $that->_getLabelComponent();        
 //        $descriptionComponent = $that->_getDescriptionComponent();
 //        $commentComponent = $that->_getCommentComponent();
         $addInputComponent = $this->view->formSubmit('add_element_' . $that->_annotationTypeElement['element_id'], 
@@ -60,7 +57,7 @@ class Annotation_View_Helper_AnnotationElementForm extends Omeka_View_Helper_Ele
 //                                                              'data-bind' => "click: annotate(" . $that->_annotationTypeElement['element_id'] . ")")); //knockout system
                                                               
         $components = array(
-//            'label' => $labelComponent,
+            'label' => $labelComponent,
             'inputs' => $inputsComponent,
 //            'description' => $descriptionComponent,
 //            'comment' => $commentComponent,
@@ -88,7 +85,8 @@ class Annotation_View_Helper_AnnotationElementForm extends Omeka_View_Helper_Ele
         $html = $divWrap ? '<div class="field" id="element-' . html_escape($that->_annotationTypeElement->element_id) . '">' : '';
 
         $html .= '<div class="eight columns alpha">';
-        $html .= "<label>" . $this->_getFieldInputLabel() . "</label>";
+        $html .= $this->_getLabelTooltip();
+//        $html .= "<label>" . $this->_getFieldInputLabel() . ' <img style="width:20px;height:20px;vertical-align:middle" src="' . img("info-icon.png") . '" alt="info" title="' . $this->_getFieldLabel() . '" /></label>';
         //only add annotation button if a tool is specified
         $html .= $this->_annotationTypeElement->tool_id ? $components['add_annotation'] : "";
         //$html .= $that->_annotationTypeElement->tool_id ? $components['add_annotation'] : "";
@@ -107,10 +105,17 @@ class Annotation_View_Helper_AnnotationElementForm extends Omeka_View_Helper_Ele
 
         return $html;
     }
+
+    protected function _getLabelTooltip(){
+        $htmlr = "<label>";
+        $htmlr .= $this->_getFieldInputLabel();
+        $htmlr .= ' <img class="masterTooltip" style="width:15px;height:15px;vertical-align:middle" src="' . img("info-icon.png") . '" alt="info" title="' . $this->_getFieldLabel() . '" />';
+        $htmlr .= '</label>';
+        return $htmlr;
+    }
     
     
-    // most important thing
-    // check if simplevocab
+    // creates the input fields
     protected function _displayFormFields($extraFieldCount = null){
         $fieldCount = $this->_getFormFieldCount() + (int) $extraFieldCount;
         $html = '';
@@ -210,29 +215,7 @@ class Annotation_View_Helper_AnnotationElementForm extends Omeka_View_Helper_Ele
 //        return "Elements[".$this->_annotationTypeElement->element_id."][$index]";
     }
     
-    /**
-     * Filter the element input.
-     * 
-     * @param array $components
-     * @param array $args
-     * @return array
-     */
-    public function simpleVocabFilterElementInput($components, $args)
-    {
-        _log("----- filtering element input in simpleVocab plugin filterElementInput");
-        $simpleVocabTerm = get_db()->getTable('SimpleVocabTerm')->findByElementId($args['element']->id);
-        $terms = explode("\n", $simpleVocabTerm->terms);
-        $selectTerms = array('' => 'Select Below') + array_combine($terms, $terms);
-        $components['input'] = get_view()->formSelect(
-            $args['input_name_stem'] . '[text]', 
-            $args['value'], 
-            array('style' => 'width: 300px;'), 
-            $selectTerms
-        );
-        $components['html_checkbox'] = false;
-        return $components;
-    }
-    
+    // checks if simplevocab is installed
     protected function _displayFormInput($inputNameStem, $value, $options=array())
     {
         
@@ -265,22 +248,23 @@ class Annotation_View_Helper_AnnotationElementForm extends Omeka_View_Helper_Ele
             return $html;
         }
 
-        $datepickertype = 'textinput';
-        $datepickertype .= $this->_annotationTypeElement->date_range_picker ? ' date_range_picker' : '';
-        $datepickertype .= $this->_annotationTypeElement->date_picker ? ' date_picker' : '';
+        $classtype = 'textinput';
+        $classtype .= $this->_annotationTypeElement->date_range_picker ? ' date_range_picker' : '';
+        $classtype .= $this->_annotationTypeElement->date_picker ? ' date_picker' : '';
+        $classtype .= $this->_annotationTypeElement->autocomplete ? ' autocomplete' : '';
 
         if($this->_annotationTypeElement->long_text) {
             $html = $this->view->formTextarea(
                 $inputNameStem . '[text]',
                 $value,
-                array('element-name'=>$this->_element->name, 'class'=>'textinput', 'rows'=>15, 'cols'=>120));
+                array('element-name'=>$this->_element->name, 'class'=> $classtype, 'rows'=>15, 'cols'=>120));
         }
         else{
             $html = $this->view->formText(
             $inputNameStem . '[text]',
             $value,
             array('element-name'=>$this->_element->name, 
-                'class'=> $datepickertype,
+                'class'=> $classtype,
                 'style' => 'width: 250px; font-size:16px; margin-left:3px;')
                 );
         }

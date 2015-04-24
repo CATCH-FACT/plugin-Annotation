@@ -61,32 +61,32 @@ Omeka.Elements = {};
         });
     };
 
-
     /**
      * Send an AJAX request to update a <div class="field"> that contains all
-     * the form inputs for an element.
+     * the form inputs for an element. 
+     *
+     * Fill it with metadata from a webservice.
      *
      * @param {jQuery} fieldDiv
      * @param {Object} params Parameters to pass to AJAX URL.
      * @param {string} elementFormPartialUri AJAX URL.
+     * @param {string} elementFormPartialUriTool AJAX URL to retrieve tool properties.
+     * @param {Object} this is a datastructure that contains the values of the document (to supply the webapplication with)
      * @param {string} recordType Current record type.
      * @param {string} recordId Current record ID.
+     * @param {Object} this is a knockout model contains some values like sliders etc
      */
     Omeka.Elements.elementFormFillRequest = function (fieldDiv, params, elementFormPartialUri, elementFormPartialUriTool, allFields, recordType, recordId, model) {
         
         var annotationValues = [""];
         var elementId = fieldDiv.attr('id').replace(/element-/, '');
-//        var toolId = fieldDiv.attr('tool-id');
         recordId = typeof recordId !== 'undefined' ? recordId : 0;
         
         params.element_id = elementId;
         params.record_id = recordId;
         params.record_type = recordType;
 
-        console.log("fillrequest");
-        console.log(elementFormPartialUrlTool);
-        console.log(fieldDiv);
-
+        //adding the existing filled in metadata fields to the parameters to re-render them later
         for (var i = 0; i < annotationValues.length; i++) {
             params["Elements[" + elementId + "][" + i + "][text]"] = annotationValues[i];
         }
@@ -97,13 +97,8 @@ Omeka.Elements = {};
             type: 'POST',
             dataType: 'json',
             data: params,
-//            data: {tool_id: toolId}, //nodig?
             success: function (toolResponse) {
-//                console.log("TOOL AJAX CALL tool succes");
-//                console.log(toolResponse);
-//                console.log(toolResponse.command);
-//                console.log(toolResponse.post_arguments);
-                
+                console.log(toolResponse);
                 if (toolResponse.post_arguments != ""){
                     var post_arguments = JSON.parse(toolResponse.post_arguments);
                     for (var attrname in post_arguments) { allFields[attrname] = JSON.stringify(post_arguments[attrname]); }
@@ -165,7 +160,7 @@ Omeka.Elements = {};
                             dataType: 'html',
                             data: params,
                             success: function (response) {
-                                console.log("AJAX CALL response: element fill");
+//                                console.log("AJAX CALL response: element fill");
                                 fieldDiv.find('textarea').each(function () {
                                     tinyMCE.execCommand('mceRemoveControl', false, this.id);
                                 });
@@ -180,6 +175,82 @@ Omeka.Elements = {};
     };
 
 
+    Omeka.Elements.makeElementInformationTooltips = function (){
+        jQuery('.masterTooltip').hover(function(){
+                // Hover over code
+                var title = jQuery(this).attr('title');
+                jQuery(this).data('tipText', title).removeAttr('title');
+                jQuery('<p class="tooltip"></p>')
+                .text(title)
+                .appendTo('body')
+                .fadeIn('fast');
+        }, function() {
+                // Hover out code
+                jQuery(this).attr('title', jQuery(this).data('tipText'));
+                jQuery('.tooltip').remove();
+        }).mousemove(function(e) {
+                var mousex = e.pageX + 20; //Get X coordinates
+                var mousey = e.pageY + 10; //Get Y coordinates
+                jQuery('.tooltip')
+                .css({ top: mousey, left: mousex })
+        });
+    };
+
+    /**
+     * Set up autocomplete for tags field.
+     *
+     * @param {string} inputSelector Selector for input to autocomplete on.
+     * @param {string} tagChoicesUrl Autocomplete JSON URL.
+     */
+    Omeka.Elements.autocompleteChoices = function (inputSelector, autocompleteChoicesUrl, elementFormElementUrl) {
+        
+        var fieldSelector = 'div.field';
+        var fieldDiv = inputSelector.parents(fieldSelector);
+        var elementId = fieldDiv.attr('id').replace(/element-/, '');
+        autocompleteChoicesOptions = {};
+        
+        //fetch the autocomplete options from elementFormElementUrl (all element data)
+        $.ajax({
+            url: elementFormElementUrl,
+            type: 'POST',
+            dataType: 'json',
+//            data: autocompleteChoicesOptions,
+            success: function (response) {
+//                console.log($(response));
+                $(response).each( function () {
+                    console.log(this.element_id);
+//
+                    autocompleteChoicesOptions[this.element_id] = this;
+                })
+                
+                //add an autocompleter to the inputSelector
+                $(inputSelector).autocomplete({
+                    source: function (request, response) {
+                        console.log(request);
+                        console.log(autocompleteChoicesOptions);
+                        console.log(elementId);
+                        console.log(autocompleteChoicesOptions[elementId]);
+                        autocompleteChoicesOptions[elementId]["term"] = request.term;
+                        $.getJSON(autocompleteChoicesUrl,
+                            autocompleteChoicesOptions[elementId],
+                            function (data) {
+                                console.log(data);
+                                response(data);
+                            }
+                        );
+                    },
+                    focus: function () {
+                        return false;
+                    },
+                    select: function (event, ui) {
+                        jQuery(inputSelector).val(ui.item.value);
+                        return false;
+                    }
+                });
+            }
+        });
+    };
+
     /**
      * Set up add/remove element buttons for ElementText inputs.
      *
@@ -187,8 +258,9 @@ Omeka.Elements = {};
      * @param {string} elementFormPartialUrl AJAX URL for form inputs.
      * @param {string} recordType Current record type.
      * @param {string} recordId Current record ID.
+     * @param {Object} this is a knockout model contains some values like sliders etc
      */
-    Omeka.Elements.makeElementControls = function (element, elementFormPartialUrl, recordType, recordId, model) {
+    Omeka.Elements.makeElementControls = function (element, elementFormPartialUrl, autocompleteChoicesUrl, recordType, recordId, model) {
         console.log("element control turned on");
 //        console.log(element);               //<- whole document
 //        console.log(elementFormPartialUrl); //what element-form to load
@@ -220,9 +292,20 @@ Omeka.Elements = {};
             }
         });
 
-        //get all date pickers
+        //get all date pickers fields
         var daterangepickers = jQuery(".date_range_picker");
         var datepickers = jQuery(".date_picker");
+        //get all sliders fields
+        var sliders = jQuery(".slider");
+        //get all autocomplete fields
+        var autocomplete = jQuery(".autocomplete");
+        
+        autocomplete.each(function() {
+            console.log($(this));
+            elementFormElementUrl = elementFormPartialUrl + "-element";
+            Omeka.Elements.autocompleteChoices($(this), autocompleteChoicesUrl, elementFormElementUrl);
+//            Omeka.Elements.elementFormFillRequest(fieldDiv, {add: '1'}, elementFormPartialUrlNoadd, elementFormPartialUrlTool, allFields, recordType, recordId, model);
+        });
 
         daterangepickers.each(function() {
 
@@ -444,8 +527,6 @@ Omeka.Elements = {};
         	});
         });
         
-        //get all sliders
-        var sliders = jQuery(".slider");
         //set each slider again (based on model)
         sliders.each(function() {
             var value = parseInt($(this).text(), 10), availableTotal = 400;
@@ -473,11 +554,10 @@ Omeka.Elements = {};
                 }
             });
         });
-
+        
         // When a generate metadata button is clicked, make an AJAX request based on the specified toolhat is connected to the field.
         context.find(annotationSelector).click(function (event) {
             event.preventDefault(); 
-//            annotationValues = ["ja", "nee"];
             var fieldDiv = $(this).parents(fieldSelector);
             annotationSelector = '.annotate-element';
 
@@ -493,8 +573,6 @@ Omeka.Elements = {};
             elementFormPartialUrlTool = elementFormPartialUrl + "-tool";
             //we need the whole document (to send data values to the webapps)
             Omeka.Elements.elementFormFillRequest(fieldDiv, {add: '1'}, elementFormPartialUrlNoadd, elementFormPartialUrlTool, allFields, recordType, recordId, model);
-//            setTimeout(function(){ Omeka.Elements.elementFormFillRequest(fieldDiv, {add: '1'}, elementFormPartialUrlNoadd, elementFormPartialUrlTool, allFields, recordType, recordId)}, 200);
-            
         });
 
         // When an add button is clicked, make an AJAX request to add another input.

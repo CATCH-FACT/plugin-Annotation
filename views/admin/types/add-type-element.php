@@ -1,8 +1,10 @@
 <li class="element">
+    <a href="" class="delete-element"><?php echo __('Remove'); ?></a>
     <div class="sortable-item">
         <?php
+        $collections = get_db()->getTable('Collection')->findPairsForSelectForm();
+        $collections = array('' => 'Select a Collection') + $collections;
         
-#        $toolsArray = get_table_options('AnnotationTool');
         $toolsArray = get_db()->getTable('AnnotationTool')->findElementsForSelect();
         
         $elementsArray = get_table_options(
@@ -26,12 +28,12 @@
         echo "<span class='input'>" . __('Metadata field:') . "</span>";
         echo $this->formSelect(
             $element_id_name, $element_id_value,
-            array('class' => 'existing-element-drop-down'), $elementsArray );
+            array('class' => 'element-drop-down'), $elementsArray );
 
         echo "<span class='tool'>" . __('Tool:') . "</span>";
         echo $this->formSelect(
             $element_tool_name, $element_tool_value,
-            array('class' => 'existing-element-drop-down'), $toolsArray );
+            array('class' => 'element-drop-down'), $toolsArray );
         echo "<br>";
 
         echo "<span class='comments'>" . __("Comments:") . "</span>";
@@ -56,36 +58,34 @@
         echo "<span class='long-text'>" . __('Date range picker') . "</span>";
         echo $this->formCheckbox($element_daterangepicker_name, null);
 
-        echo "<hr>";?>
-         
-         <span class='auto-complete'><?php echo __('Autocomplete options '); ?></span>
-         <?php echo $this->formCheckbox($element_autocomplete_on_name)); ?>
+        echo "<hr>";
 
-         <?php echo "<br>";?>
-         <span class='auto-complete-element'><?php echo __('Search in element'); ?></span>
-         <?php echo $this->formSelect(
-             $element_autocomplete_main_id, $element_autocomplete_main_name, //set in controller like english_name
-             array('class' => 'existing-element-drop-down'), $elementsArray );
-         ?>
+        echo "<span class='auto-complete'>" . __('Autocomplete options ') . "</span>";
+        echo $this->formCheckbox($element_autocomplete_name, null);
 
-         <?php echo "<br>";?>
-         <span class='auto-complete-element'><?php echo __('Extra search element (i.e. text, title)'); ?></span>
-         <?php echo $this->formSelect(
-             $element_autocomplete_extra_id, $element_autocomplete_extra_name, //set in controller like english_name
-             array('class' => 'existing-element-drop-down'), $elementsArray );
-         ?>
+        echo "<br>";
+        echo "<span class='auto-complete-element'>" . __('Search in element') . "</span>";
+        echo $this->formSelect(
+            $element_autocomplete_main_name, $element_autocomplete_main_value,
+            array('class' => 'element-drop-down'), $elementsArray );
 
-         <?php echo "<br>";?>
-         <span class='auto-complete-item'><?php echo __('Search in Itemtype'); ?></span>
-         <?php echo $this->formSelect(
-             $element_autocomplete_main_id, $element_autocomplete_main_name, //set in controller like english_name
-             array('class' => 'existing-element-drop-down'), $elementsArray );
-         ?>
-         <?php echo "<br>";?>
-         <span class='auto-complete-collection'><?php echo __('Search in Collection'); ?></span>
-         <?php echo $this->formSelect(
-             $element_autocomplete_collection_id, $element_autocomplete_collection_name, //set in controller like english_name
-             array('class' => 'existing-element-drop-down'), $collections );
+        echo "<br>";
+        echo "<span class='auto-complete-element'>" . __('Extra search element (i.e. text, title)') . "</span>";
+        echo $this->formSelect(
+            $element_autocomplete_extra_name, $element_autocomplete_extra_value, //set in controller like english_name
+            array('class' => 'element-drop-down'), $elementsArray );
+            
+        echo "<br>";
+        echo "<span class='auto-complete-item'>" . __('Search in Itemtype') . "</span>";
+        echo $this->formSelect(
+            $element_autocomplete_itemtype_name, $element_autocomplete_itemtype_value, //set in controller like english_name
+            array('class' => 'element-drop-down'), $elementsArray );
+
+        echo "<br>";
+        echo "<span class='auto-complete-collection'>" . __('Search in Collection') . "</span>";
+        echo $this->formSelect(
+            $element_autocomplete_collection_name, $element_autocomplete_collection_value, //set in controller like english_name
+            array('class' => 'element-drop-down'), $collections );
         
         echo $this->formHidden(
             $element_order_name, $element_order_value,
@@ -93,7 +93,6 @@
         );
         
         ?>
-        <a href="" class="delete-element"><?php echo __('Remove'); ?></a>
     </div>
     <div class="drawer-contents"></div>
 </li>

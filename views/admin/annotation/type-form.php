@@ -2,15 +2,10 @@
 <?php echo js_tag('annotation-elements'); ?>
 <?php echo js_tag('tabs'); ?>
 <?php echo js_tag('items'); ?>
+
 <script type="text/javascript" charset="utf-8">
 //<![CDATA[
 // TinyMCE hates document.ready.
-
-var model = new DocumentModel();
-ko.applyBindings(model);
-
-console.log("model.slider_values");
-console.log(model.slider_values);
 
 jQuery(window).load(function () {
     
@@ -34,15 +29,19 @@ jQuery(window).load(function () {
     Omeka.Items.changeItemType(<?php echo js_escape(url("items/change-type")) ?><?php if ($id = metadata('item', 'id')) echo ', '.$id; ?>);
 });
 
-jQuery(document).bind('omeka:elementformload', function (event) {
-    //adding control events to buttons like "add input" and 
-
-    console.log("knockout model loaded?");
-    console.log(model);
-    console.log(model.slider_values);
+jQuery(document).bind('omeka:elementformload', function (event) { //
+    //adding control events to buttons like "add input" and "autocomplete" and "datepicker selector"
+    //each time an element load form even has taken place.
     
-    Omeka.Elements.makeElementControls(event.target, <?php echo js_escape(url('annotation/annotation/element-form')); ?>,'Item'<?php if ($id = metadata('item', 'id')) echo ', '.$id; ?>, null, model);
-    //adding HTML control
+    elementFormPartialUrl = <?php echo js_escape(url('annotation/annotation/element-form')); ?>;
+    autocompleteChoicesUrl = <?php echo js_escape(url('annotation/annotation/autocomplete')); ?>;
+    recordType = 'Item'<?php if ($id = metadata('item', 'id')) echo ', '.$id; ?>;
+    recordId = null;
+    
+    Omeka.Elements.makeElementControls(event.target, elementFormPartialUrl, autocompleteChoicesUrl, recordType, recordId, model);
+    Omeka.Elements.makeElementInformationTooltips();
+        
+    //NOT adding HTML control
 //    Omeka.Elements.enableWysiwyg(event.target);
 });
 //]]>
@@ -137,32 +136,32 @@ fire_plugin_hook('annotation_type_form', array('type'=>$type, 'view'=>$this));
 <?php endif; ?>
 <br>
 <section class="three columns omega">
-<div id="save" class="panel">
-    <?php echo $this->formSubmit('form-submit', __('Add Item'), array('class' => 'submit big green button')); ?>    
+    <div id="save" class="panel">
+        <?php echo $this->formSubmit('form-submit', __('Add Item'), array('class' => 'submit big green button')); ?>    
 
-    <div id="public-featured">
-        <?php if ( is_allowed('Items', 'makePublic') ): ?>
-            <div class="public">
-                <label for="public"><?php echo __('Public'); ?>:</label> 
-                <?php echo $this->formCheckbox('annotation-public', $type->public, null, array('1', '0')); ?>
-                <label for="finished"><?php echo __('Completed'); ?>:</label> 
-                <?php echo $this->formCheckbox('annotation-finished', $type->finished, null, array('1', '0')); ?>
-            </div>
-        <?php endif; ?>
-    </div>
-
-    <div id="collection-form" class="field">
-        <?php echo $this->formLabel('collection-id', __('Collection'));?>
-        <div class="inputs">
-            <?php 
-                echo $this->formSelect(
-                'collection_id',
-                $type->collection_id,
-                array('id' => 'collection-id'),
-                get_table_options('Collection')
-            );?>
+        <div id="public-featured">
+            <?php if ( is_allowed('Items', 'makePublic') ): ?>
+                <div class="public">
+                    <label for="public"><?php echo __('Public'); ?>:</label> 
+                    <?php echo $this->formCheckbox('annotation-public', $type->public, null, array('1', '0')); ?>
+                    <label for="finished"><?php echo __('Completed'); ?>:</label> 
+                    <?php echo $this->formCheckbox('annotation-finished', $type->finished, null, array('1', '0')); ?>
+                </div>
+            <?php endif; ?>
         </div>
+
+        <div id="collection-form" class="field">
+            <?php echo $this->formLabel('collection-id', __('Collection'));?>
+            <div class="inputs">
+                <?php 
+                    echo $this->formSelect(
+                    'collection_id',
+                    $type->collection_id,
+                    array('id' => 'collection-id'),
+                    get_table_options('Collection')
+                );?>
+            </div>
+        </div>
+        <?php fire_plugin_hook("admin_items_panel_fields", array('view'=>$this, 'record'=>$item)); ?>
     </div>
-    <?php fire_plugin_hook("admin_items_panel_fields", array('view'=>$this, 'record'=>$item)); ?>
-</div>
 </section>

@@ -12,17 +12,17 @@ $typeName = html_escape($annotation_type->display_name);
 queue_css_file('annotation-type-form');
 
 $addNewTypeRequestUrl = admin_url('annotation/types/add-new-type-element');
-$addExistingTypeRequestUrl = admin_url('annotation/types/add-existing-type-element');
-$changeExistingtypeElementUrl = admin_url('annotation/types/change-existing-type-element'); 
+$addTypeRequestUrl = admin_url('annotation/types/add-type-element');
+$changetypeElementUrl = admin_url('annotation/types/change-type-element'); 
 
 queue_js_file('annotation-types');
 
 $js = "
     jQuery(document).ready(function () {
         var addNewTypeRequestUrl = '" . admin_url('annotation/types/add-new-type-element') . "'
-        var addExistingTypeRequestUrl = '" . admin_url('annotation/types/add-existing-type-element') . "'
-        var changeExistingTypeElementUrl = '" . admin_url('annotation/types/change-existing-type-element') . "'
-        Omeka.AnnotationTypes.manageAnnotationTypes(addNewTypeRequestUrl, addExistingTypeRequestUrl, changeExistingTypeElementUrl);
+        var addTypeRequestUrl = '" . admin_url('annotation/types/add-type-element') . "'
+        var changeTypeElementUrl = '" . admin_url('annotation/types/change-type-element') . "'
+        Omeka.AnnotationTypes.manageAnnotationTypes(addNewTypeRequestUrl, addTypeRequestUrl, changeTypeElementUrl);
         Omeka.AnnotationTypes.enableSorting();
     });                
     ";

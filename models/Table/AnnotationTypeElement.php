@@ -16,6 +16,11 @@
 class Table_AnnotationTypeElement extends Omeka_Db_Table
 {
     
+    public function findByAutocomplete()
+    {
+        return $this->findBySql('autocomplete = ?', array(1));
+    }
+    
     /**
      * Retrieves AnnotationTypeElements associated with the given type.
      *
