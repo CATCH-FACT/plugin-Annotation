@@ -27,26 +27,59 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
         $sorting = $this->_getParam('sorting');
         if (!$sorting) $sorting = "ASC";
         $this->_helper->db->setDefaultModelName('ElementText');
+
         $tagText = "rood";
         if (empty($tagText)) {
             $this->_helper->json(array());
         }
-        $sql_query = "SELECT _advanced_0.text
+
+        $sql_query = "SELECT `items`.`id`, `_advanced_0`.`text`
                         FROM `omeka_items` AS `items`
                         INNER JOIN `omeka_collections` AS `collections` ON items.collection_id = collections.id
                         INNER JOIN `omeka_item_types` AS `item_types` ON items.item_type_id = item_types.id
                         INNER JOIN `omeka_element_texts` AS `_advanced_0` ON _advanced_0.record_id = items.id 
                         AND _advanced_0.record_type = 'Item' ";
+
         $sql_query .= $element_id ? "AND _advanced_0.element_id = " . $element_id . " ": " ";
+//        $sql_query .= $element_xtra_id ? "OR _advanced_0.element_id = " . $element_xtra_id . ") ": ") ";
+
         $sql_query .= $collection_id ? "AND (collections.id = '" . $collection_id . "') " : " ";
         $sql_query .= $itemtype_id ? "AND (item_types.id = '" . $itemtype_id . "') " : " ";
         $sql_query .= "AND (_advanced_0.text LIKE ? ) ";
         $sql_query .= "GROUP BY `items`.`id` ORDER BY `_advanced_0`.`text` ";
         $sql_query .= $sorting . " LIMIT 15";
         
-        $table = $this->_helper->db->getTable()->fetchCol($sql_query, array('%' . $searchText . '%'));
+        $results = $this->_helper->db->getTable()->fetchPairs($sql_query, array('%' . $searchText . '%'));
         
-        $this->_helper->json($table);
+//        print_r($results);
+        
+        if ((count($results) > 0) && $element_xtra_id){
+            foreach ($results as $id=>$val){
+                $subquery = "SELECT * 
+                            FROM  `omeka_element_texts` 
+                            WHERE  `record_id` = " . $id . "
+                            AND `element_id` = " . $element_xtra_id . "
+                            LIMIT 0 , 1";
+//                print $subquery;
+                $subresults = $this->_helper->db->getTable()->fetchAll($subquery);
+//                print_r($subresults[0]["text"]);
+                $row = array();
+                $row['label'] = $val;
+                $row['value'] = $subresults[0]['text'];
+                $response[] = $row;
+            }
+        }
+        else{
+            foreach ($results as $id=>$val){
+                $row = array();
+                $row['label'] = $val;
+                $row['value'] = "";
+                $response[] = $row;
+            }
+        }
+
+        
+        $this->_helper->json($response);
     }
     
     

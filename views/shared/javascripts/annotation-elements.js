@@ -98,7 +98,7 @@ Omeka.Elements = {};
             dataType: 'json',
             data: params,
             success: function (toolResponse) {
-                console.log(toolResponse);
+//                console.log(toolResponse);
                 if (toolResponse.post_arguments != ""){
                     var post_arguments = JSON.parse(toolResponse.post_arguments);
                     for (var attrname in post_arguments) { allFields[attrname] = JSON.stringify(post_arguments[attrname]); }
@@ -117,16 +117,23 @@ Omeka.Elements = {};
                         //dig to the right leaf                        
                         var jsonxml_value_node = toolResponse.jsonxml_value_node.split(".");
                         var node = response;
+                        
+//                        console.log(node);
+                        
                         for (var i = 0; i < jsonxml_value_node.length; i++) {
                             node = node[jsonxml_value_node[i]];
                         }
-//                        console.log(node);
                         
                         //make separate fields when the returned response node is an array
                         //but when slidebar and idx: order set and concat based on score
                         if( Object.prototype.toString.call( node ) === '[object Array]' ) {
-                            if (toolResponse.jsonxml_idx_sub_node in node[0]){ //idx nodes present
-                                var sliders = jQuery("#slide_element_41");
+//                            console.log(Object.prototype.toString.call( node[0] ));
+                            if( Object.prototype.toString.call( node[0] ) === '[object String]' ) {
+                                for (var i = 0; i < node.length; i++) {
+                                    params["Elements[" + elementId + "][" + i + "][text]"] = node[i];
+                                }
+                            }
+                            else if (toolResponse.jsonxml_idx_sub_node in node[0]){ //idx nodes present
                                 var slider_value = jQuery("#span_element_" + elementId).text();
                                 
                                 node.sort(function(a,b){return b.score - a.score;});
@@ -160,7 +167,6 @@ Omeka.Elements = {};
                             dataType: 'html',
                             data: params,
                             success: function (response) {
-//                                console.log("AJAX CALL response: element fill");
                                 fieldDiv.find('textarea').each(function () {
                                     tinyMCE.execCommand('mceRemoveControl', false, this.id);
                                 });
@@ -214,27 +220,17 @@ Omeka.Elements = {};
             url: elementFormElementUrl,
             type: 'POST',
             dataType: 'json',
-//            data: autocompleteChoicesOptions,
             success: function (response) {
-//                console.log($(response));
                 $(response).each( function () {
-                    console.log(this.element_id);
-//
                     autocompleteChoicesOptions[this.element_id] = this;
                 })
-                
                 //add an autocompleter to the inputSelector
                 $(inputSelector).autocomplete({
                     source: function (request, response) {
-                        console.log(request);
-                        console.log(autocompleteChoicesOptions);
-                        console.log(elementId);
-                        console.log(autocompleteChoicesOptions[elementId]);
                         autocompleteChoicesOptions[elementId]["term"] = request.term;
                         $.getJSON(autocompleteChoicesUrl,
                             autocompleteChoicesOptions[elementId],
                             function (data) {
-                                console.log(data);
                                 response(data);
                             }
                         );
@@ -243,10 +239,15 @@ Omeka.Elements = {};
                         return false;
                     },
                     select: function (event, ui) {
-                        jQuery(inputSelector).val(ui.item.value);
+                        jQuery(inputSelector).val(ui.item.label);
                         return false;
                     }
-                });
+                }).data( "ui-autocomplete" )._renderItem = function( ul, item ) { //alternative rendering
+                      return $( "<li>" )
+                            .data( "ui-autocomplete-item", item )
+                            .append( "<a><b>" + item.label + "</b>" +  (item.value ? ": " + item.value : "") + "</a>" )
+                            .appendTo( ul );
+                    };
             }
         });
     };
@@ -258,14 +259,9 @@ Omeka.Elements = {};
      * @param {string} elementFormPartialUrl AJAX URL for form inputs.
      * @param {string} recordType Current record type.
      * @param {string} recordId Current record ID.
-     * @param {Object} this is a knockout model contains some values like sliders etc
+     * @param {Object} model is a knockout model contains some values like sliders etc
      */
     Omeka.Elements.makeElementControls = function (element, elementFormPartialUrl, autocompleteChoicesUrl, recordType, recordId, model) {
-        console.log("element control turned on");
-//        console.log(element);               //<- whole document
-//        console.log(elementFormPartialUrl); //what element-form to load
-//        console.log(recordType);            //to load an Item? / File? / collection?
-//        console.log(recordId);              //
         var annotationSelector = '.annotate-element';
         var addSelector = '.add-element';
         var removeSelector = '.remove-element';
@@ -273,8 +269,6 @@ Omeka.Elements = {};
         var inputBlockSelector = 'div.input-block';
         var context = $(element);
         var fields;
-
-//        console.log(context);
 
         if (context.is(fieldSelector)) {
             fields = context;
@@ -301,7 +295,6 @@ Omeka.Elements = {};
         var autocomplete = jQuery(".autocomplete");
         
         autocomplete.each(function() {
-            console.log($(this));
             elementFormElementUrl = elementFormPartialUrl + "-element";
             Omeka.Elements.autocompleteChoices($(this), autocompleteChoicesUrl, elementFormElementUrl);
 //            Omeka.Elements.elementFormFillRequest(fieldDiv, {add: '1'}, elementFormPartialUrlNoadd, elementFormPartialUrlTool, allFields, recordType, recordId, model);
@@ -538,7 +531,7 @@ Omeka.Elements = {};
             $(this).siblings(".slidervalue").text(model.slider_values()[elementId]);
 
             $(this).empty().slider({
-                value: model.slider_values()[elementId],
+                value: model.slider_values()[elementId], //take the value from the KO model
                 min: 0,
                 max: 100,
                 range: "max",
@@ -569,8 +562,8 @@ Omeka.Elements = {};
                 }
             })
 
-            elementFormPartialUrlNoadd = elementFormPartialUrl + "-noadd";
-            elementFormPartialUrlTool = elementFormPartialUrl + "-tool";
+            elementFormPartialUrlNoadd = elementFormPartialUrl + "-noadd"; //url for empty elementFormPartial
+            elementFormPartialUrlTool = elementFormPartialUrl + "-tool"; //url for retrieving tool info
             //we need the whole document (to send data values to the webapps)
             Omeka.Elements.elementFormFillRequest(fieldDiv, {add: '1'}, elementFormPartialUrlNoadd, elementFormPartialUrlTool, allFields, recordType, recordId, model);
         });

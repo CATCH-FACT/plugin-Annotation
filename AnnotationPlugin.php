@@ -529,10 +529,29 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
             "extreme_terms":
             {
                 "not_allowed":[
-                    "cock", "cocks", "lul", "pik", "piemel", "piemels", "kut", "neuk", "neuken", "rampetampen", "beffen", "dildo", "dildo\'s", "vibrator", "vibrators", "masturberen", "masturbatie", "vingeren", "kloten", "kloot", "hoer", "hoeren", "bordeel", "bordelen", "temeier", "verkracht", "verkrachten", "pedo", "pedofiel", "homo", "homo\'s", "cock sucker", "homofiel", "faggot", "faggots", "castreren", "castratie", "tampeloerus", "sperma", "fist", "fuck", "plompzakken", "pis", "pissen", "gemecht", "gemacht", "cum", "bdsm", " sm ", "masochisme", "sadisme", "bondage", "bruinwerk", "bruinwerker", "flikkers", "orgie", "sodom", "dp ", "deep throat", "tieten", "druiper", "herpes", "soa", "klaarkomen", "orgasme", "travestiet", "memmen", "godverdomme", "kanker", "tering", "tyfus", "hoer", "mongool", "debiel", "jostie", "klootzak", "nazi", "nikker", "neger", "neger.", "nigger", "niggers", "vuile turk", "kutmarokkaan", "spleetoog", "spleetogen", "jappen", "roodhuiden", "roodhuid", "zwartjoekel", "zwartje", "zandneger", "zandnegers", "spaghettivreter", "spaghettivreters", "chink", "chicks", "olijfkakker", "olijfkakkers", "Hitler", "dom blond", "dom blondje", "optieften", "optyfen", "opgetieft", "opgetyft", "opzouten", "opkankeren", "opgekankerd", "oprotten", "opgerot", "Parkinson"
+                    "cock", "cocks", "lul", "pik", "piemel", "piemels", "kut", "neuk", "neuken", "rampetampen", "beffen", "dildo", "dildo\'s", "vibrator", 
+                    "vibrators", "masturberen", "masturbatie", "vingeren", "kloten", "kloot", "hoer", "hoeren", "bordeel", "bordelen", "temeier", "verkracht", 
+                    "verkrachten", "pedo", "pedofiel", "homo", "homo\'s", "cock sucker", "homofiel", "faggot", "faggots", "castreren", "castratie", "tampeloerus", 
+                    "sperma", "fist", "fuck", "plompzakken", "pis", "pissen", "gemecht", "gemacht", "cum", "bdsm", " sm ", "masochisme", "sadisme", "bondage", 
+                    "bruinwerk", "bruinwerker", "flikkers", "orgie", "sodom", "dp ", "deep throat", "tieten", "druiper", "herpes", "soa", "klaarkomen", "orgasme", 
+                    "travestiet", "memmen", "godverdomme", "kanker", "tering", "tyfus", "hoer", "mongool", "debiel", "jostie", "klootzak", "nazi", "nikker", "neger", 
+                    "neger.", "nigger", "niggers", "vuile turk", "kutmarokkaan", "spleetoog", "spleetogen", "jappen", "roodhuiden", "roodhuid", "zwartjoekel", "zwartje", 
+                    "zandneger", "zandnegers", "spaghettivreter", "spaghettivreters", "chink", "chicks", "olijfkakker", "olijfkakkers", "Hitler", "dom blond", 
+                    "dom blondje", "optieften", "optyfen", "opgetieft", "opgetyft", "opzouten", "opkankeren", "opgekankerd", "oprotten", "opgerot", "Parkinson"
                 ], 
                 "combinatory":[
-                    "trekken", "rukken", "naaien", "pompen", "paal", "castreren", "castratie", "zeik", "stront", "zaad", "sperma", "fist", "fuck", "pis", "naaien", "tongzoen", "gemecht", "gemacht", "pijpen", "sadisme", "binden", "bindt vast", "naad", "spleet", "poot", "poten", "kont", "reet", "ballen", "spuit", "fluit", "bevredigen", "tongen", "Tongzoen", "flikker", "godverdomme", "kanker", "tering", "tyfus", "hoer", "schijt", "stront", "kak", "mongool", ".mongool", "debiel", "jostie", "klootzak", "nazi", "nikker", "neger", "spleetoog", "jappen", "roodhuiden", "roodhuid", "spleetogen", "zwartjoekel", "Turk", "Turk", "Turken", "Marokkaan", "Marokkanen", "Antilliaan", "Antillianen", "Surinamer", "Surinamers", "mocro", "mocro\'s", "jood", "joden", "luie", "vuile", "smerige", "dief", "dieven", "crimineel", "criminelen", "stelen", "steelt", "fiets", "kliko", "vuilnisbelt", "afval", "moordenaar", "gevangenis", "Nederlander", "Belg", "Duitser", "buitenlander", "allochtoon", "allochtonen", "dom", "vies", "verkrachting", "werkloos", "ww", "GAK", "moe", "uitkering", "zwartjoekel", "zwartje", "gore", "sodemieter", "gastarbeider", "gas", "concentratiekamp", "douche", "Hitler", "Ethiopië", "triatlon", "hardlopen", "rennen", "wijf", "keuken", "mokkel", "slet", ".slet", "aanrecht", "ketting", "dom blond", "koning", "prins", "vuilnisbakken", "vuilnisbak", "vuilnis", "optieften", "optyfen", "opzouten", "opkankeren", "oprotten", "zakkenvuller", "belasting", "Juliana", "Bernhard", "Beatrix", "Claus", "Willem-Alexander", "Maxima", "president", "Amalia", "Mabel", "depressie", "God", "Allah", "Mohammed", "pedo", "varken", "ziek", "sex", "gas", "mongool", ".mongool"
+                    "trekken", "rukken", "naaien", "pompen", "paal", "castreren", "castratie", "zeik", "stront", "zaad", "sperma", "fist", "fuck", "pis", "naaien", 
+                    "tongzoen", "gemecht", "gemacht", "pijpen", "sadisme", "binden", "bindt vast", "naad", "spleet", "poot", "poten", "kont", "reet", "ballen", 
+                    "spuit", "fluit", "bevredigen", "tongen", "Tongzoen", "flikker", "godverdomme", "kanker", "tering", "tyfus", "hoer", "schijt", "stront", "kak", 
+                    "mongool", ".mongool", "debiel", "jostie", "klootzak", "nazi", "nikker", "neger", "spleetoog", "jappen", "roodhuiden", "roodhuid", "spleetogen", 
+                    "zwartjoekel", "Turk", "Turk", "Turken", "Marokkaan", "Marokkanen", "Antilliaan", "Antillianen", "Surinamer", "Surinamers", "mocro", "mocro\'s", 
+                    "jood", "joden", "luie", "vuile", "smerige", "dief", "dieven", "crimineel", "criminelen", "stelen", "steelt", "fiets", "kliko", "vuilnisbelt", 
+                    "afval", "moordenaar", "gevangenis", "Nederlander", "Belg", "Duitser", "buitenlander", "allochtoon", "allochtonen", "dom", "vies", "verkrachting", 
+                    "werkloos", "ww", "GAK", "moe", "uitkering", "zwartjoekel", "zwartje", "gore", "sodemieter", "gastarbeider", "gas", "concentratiekamp", "douche", 
+                    "Hitler", "Ethiopië", "triatlon", "hardlopen", "rennen", "wijf", "keuken", "mokkel", "slet", ".slet", "aanrecht", "ketting", "dom blond", "koning", 
+                    "prins", "vuilnisbakken", "vuilnisbak", "vuilnis", "optieften", "optyfen", "opzouten", "opkankeren", "oprotten", "zakkenvuller", "belasting", 
+                    "Juliana", "Bernhard", "Beatrix", "Claus", "Willem-Alexander", "Maxima", "president", "Amalia", "Mabel", "depressie", "God", "Allah", "Mohammed", 
+                    "pedo", "varken", "ziek", "sex", "gas", "mongool", ".mongool"
                 ]
             }
         }'; //send a list of extreme words?
@@ -985,7 +1004,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->date_range_picker = false;
         $textElement->autocomplete = true;           //automplete, yes please
         $textElement->autocomplete_main_id = 43;        //look in identifiers
-        $textElement->autocomplete_extra_id = 50;       //and search in titles (and show titles as well?)
+        $textElement->autocomplete_extra_id = 50;       //and show the titles (and show titles as well?)
         $textElement->autocomplete_itemtype_id = false; //dont' restrict to certain item type
         $textElement->autocomplete_collection_id = 3;   //but only look in collection verhaaltypen
         $textElement->save();
@@ -1004,7 +1023,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->date_range_picker = false;
         $textElement->autocomplete = true;              //automplete, yes please
         $textElement->autocomplete_main_id = 43;        //look in identifiers
-        $textElement->autocomplete_extra_id = 50;       //and search in titles
+        $textElement->autocomplete_extra_id = 50;       //and show the titles
         $textElement->autocomplete_itemtype_id = false; //dont' restrict to certain item type
         $textElement->autocomplete_collection_id = 3;   //but only look in collection verhaaltypen
         $textElement->save();

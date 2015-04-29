@@ -2,6 +2,9 @@
     <a href="" class="delete-element"><?php echo __('Remove'); ?></a>
     <div class="sortable-item">
         <?php
+        $itemTypeOptions = get_db()->getTable('AnnotationType')->getPossibleItemTypes();
+        $itemTypeOptions = array('' => 'Select an Item Type') + $itemTypeOptions;
+        
         $collections = get_db()->getTable('Collection')->findPairsForSelectForm();
         $collections = array('' => 'Select a Collection') + $collections;
         
@@ -79,7 +82,7 @@
         echo "<span class='auto-complete-item'>" . __('Search in Itemtype') . "</span>";
         echo $this->formSelect(
             $element_autocomplete_itemtype_name, $element_autocomplete_itemtype_value, //set in controller like english_name
-            array('class' => 'element-drop-down'), $elementsArray );
+            array('class' => 'element-drop-down'), $itemTypeOptions );
 
         echo "<br>";
         echo "<span class='auto-complete-collection'>" . __('Search in Collection') . "</span>";

@@ -40,11 +40,12 @@ function autoMultiAdd(element, url) {
                 dataType: "json",
                 success: function(data) {
                     response(jQuery.map(data.data,
-                    function(item) {
-                        return {
-                            fields: getFields(item)
+                        function(item) {
+                            return {
+                                fields: getFields(item)
+                            }
                         }
-                    }));
+                    ));
                 },
                 error: function(data) {
                     return "None found";
