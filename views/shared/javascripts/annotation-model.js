@@ -14,9 +14,7 @@ function DocumentModel(){
         
     this.text = ko.observable("");
     this.summary = ko.observable();
-
     this.tags = ko.observable("");
-
     this.entities = ko.observable("");
 
     // intermediate results from automatic processes
@@ -29,7 +27,7 @@ function DocumentModel(){
     this.updateSlidervalues = function(){
     }
 
-    // actions
+/*    // actions
     this.updatesummary = function() {
         // steps:
 
@@ -60,6 +58,7 @@ function DocumentModel(){
     }.bind(this);
 
     this.createsummary = function() {
+        console.log("why is this executing?");
         $.ajax({
             url: this.service_url + "/summary",
             type: 'POST',
@@ -119,7 +118,7 @@ function DocumentModel(){
         t = t.trim();
         this.entities(t);
     }.bind(this);
-
+*/
     this.detecttags = function() {
     $.ajax({
         url: this.service_url + "/keywords",

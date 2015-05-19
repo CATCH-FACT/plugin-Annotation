@@ -37,7 +37,7 @@ var model = new DocumentModel();
 ko.applyBindings(model);
 
 // <![CDATA[
-enableAnnotationAjaxForm(<?php echo js_escape(url($annotationPath.'/annotation/type-form')); ?>);
+//enableAnnotationAjaxForm(<?php echo js_escape(url($annotationPath.'/annotation/type-form')); ?>);
 // ]]>
 </script>
 
@@ -45,31 +45,6 @@ enableAnnotationAjaxForm(<?php echo js_escape(url($annotationPath.'/annotation/t
 echo $this->partial('annotation-navigation.php');
 
 ?>
-<div id="primary">
-<?php $user = current_user(); ?>
-<?php echo flash(); ?>
-    
-    <h1><?php echo $head['title']; ?></h1>
 
-        <form method="post" action="" id="annotation-form"enctype="multipart/form-data">
-        
-            <fieldset id="annotation-item-metadata">
-                <div class="inputs">
-                    <label for="annotation-type"><?php echo __("What type of item do you want to annotate?"); ?></label>
-                    <?php $options = get_table_options('AnnotationType'); ?>
-                    <?php $typeId = isset($type) ? $type->id : '' ; ?>
-                    <?php echo $this->formSelect( 'annotation_type', $typeId, array('multiple' => false, 'id' => 'annotation-type') , $options); ?>
-                    <input type="submit" name="submit-type" id="submit-type" value="Select" />
-                </div>
-                <div id="annotation-type-form">
-
-                <?php echo $id; ?>
-
-                <?php if (isset($typeForm)): echo $typeForm; endif; ?>
-                </div>
-            </fieldset>
-           
-        </form>
-</div>
 
 <?php echo foot();?>

@@ -33,9 +33,9 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         'admin_items_show_sidebar',
         'admin_items_browse_detailed_each',
         'item_browse_sql',
-        'before_save_item',
+//        'before_save_item',
         'after_delete_item',
-        'admin_items_browse_simple_each',
+//        'admin_items_browse_simple_each',
         'initialize'
     );
 
@@ -125,7 +125,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
 //        echo link_to_item(__('Annotate'), array('class' => 'annotate'), 'annotate-existing');
         echo '&nbsp&middot&nbsp';
         echo '</li><li style="display: inline-block;">';
-        echo link_to_item(__('Clone'), array('class' => 'annotate'), 'clone-existing');
+        echo '<a href="' . url('annotation/clone/id/' . $item->id) . '">' . __('Clone') . '</a>';
         echo '</li></ul>';
 //        echo '<ul class="action-links"><li><a href="/vb2.2.2/admin/items/clone-confirm/72290" class="clone-confirm">clonen</a></li></ul>';
 //        echo "<ul><li>test</li><ul>";
@@ -281,7 +281,12 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         
         $acl->addResource('Annotation_Annotation');
         $acl->allow(array('super', 'admin', 'contributor'), 'Annotation_Annotation');
-        $acl->allow(null, 'Annotation_Annotation', array('add', 'doannotation', 'element-form-noadd', 'element-form-element', 'element-form-tool', 'element-form', "tag-form", "type-form", "autocomplete"));
+        $acl->allow(null, 'Annotation_Annotation', array('add', 'doannotation', 'element-form-noadd', 'element-form-element', 'element-form-tool', 
+                                                        'element-form', 'save-form', "tag-form", "type-form", "autocomplete"));
+
+        $acl->addResource('Annotation_Clone');
+        $acl->allow(null, 'Annotation_Clone', array('clone', 'cloned'));
+
         
         $acl->addResource('Annotation_Annotators');
         $acl->allow(null, 'Annotation_Annotators');
@@ -327,9 +332,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
                         array('module'     => 'annotation',
                               'controller' => 'annotation',
                               'action'     => 'annotate')));
-                
         }
-        
         
         if(is_admin_theme()){
             $router->addRoute('annotationAdmin',
@@ -339,10 +342,11 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
                           'action' => 'index')));
 
             $router->addRoute('cloneAdmin',
-                new Zend_Controller_Router_Route('clone/:controller/:action/*',
+                new Zend_Controller_Router_Route('annotation/clone/:action/*',
                     array('module' => 'annotation',
                           'controller' => 'clone',
                           'action' => 'clone')));
+
 
         }
     }
@@ -402,7 +406,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         _log("==== Appending routes to simple vocab");
         $routes[] = array('module' => 'annotation',
                           'controller' => 'annotation',
-                          'actions' => array('add', 'doannotation', 'element-form-noadd', 'element-form-tool', 'element-form', "tag-form", "type-form"));
+                          'actions' => array('add', 'doannotation', 'element-form-noadd', 'element-form-tool', 'element-form', "tag-form", "type-form", "save-form"));
         return $routes;
     }
 
@@ -511,6 +515,15 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $aType->file_permissions = 'Allowed';
         $aType->save();
 
+        $bType = new AnnotationType;
+        $bType->item_type_id = 18;
+        $bType->collection_id = 1;
+        $bType->display_name = 'Testverhaal';
+        $bType->file_permissions = 'Allowed';
+        $bType->tags_tool_id = 8;
+        $bType->save();
+
+
         $storyType = new AnnotationType;
         $storyType->item_type_id = 18;
         $storyType->collection_id = 1;
@@ -545,7 +558,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
                     "spuit", "fluit", "bevredigen", "tongen", "Tongzoen", "flikker", "godverdomme", "kanker", "tering", "tyfus", "hoer", "schijt", "stront", "kak", 
                     "mongool", ".mongool", "debiel", "jostie", "klootzak", "nazi", "nikker", "neger", "spleetoog", "jappen", "roodhuiden", "roodhuid", "spleetogen", 
                     "zwartjoekel", "Turk", "Turk", "Turken", "Marokkaan", "Marokkanen", "Antilliaan", "Antillianen", "Surinamer", "Surinamers", "mocro", "mocro\'s", 
-                    "jood", "joden", "luie", "vuile", "smerige", "dief", "dieven", "crimineel", "criminelen", "stelen", "steelt", "fiets", "kliko", "vuilnisbelt", 
+                    "jood", "joods", "joden", "luie", "vuile", "smerige", "dief", "dieven", "crimineel", "criminelen", "stelen", "steelt", "fiets", "kliko", "vuilnisbelt", 
                     "afval", "moordenaar", "gevangenis", "Nederlander", "Belg", "Duitser", "buitenlander", "allochtoon", "allochtonen", "dom", "vies", "verkrachting", 
                     "werkloos", "ww", "GAK", "moe", "uitkering", "zwartjoekel", "zwartje", "gore", "sodemieter", "gastarbeider", "gas", "concentratiekamp", "douche", 
                     "Hitler", "Ethiopië", "triatlon", "hardlopen", "rennen", "wijf", "keuken", "mokkel", "slet", ".slet", "aanrecht", "ketting", "dom blond", "koning", 
@@ -608,7 +621,6 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $toolThree->command = "http://bookstore.ewi.utwente.nl:24681/language";
         $toolThree->get_arguments = "";
         $toolThree->post_arguments = "";
-        $toolThree->post_arguments = "";
         $toolThree->output_format = "json";
         $toolThree->jsonxml_value_node = "annotation.language"; 
         $toolThree->jsonxml_score_sub_node = "";
@@ -621,7 +633,6 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $toolFour->description = "Detecteert het subgenre van de tekst";
         $toolFour->command = "http://bookstore.ewi.utwente.nl:24681/subgenre";
         $toolFour->get_arguments = "";
-        $toolFour->post_arguments = "";
         $toolFour->post_arguments = "";
         $toolFour->output_format = "json";
         $toolFour->jsonxml_value_node = "annotation.subgenre"; 
@@ -638,7 +649,6 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $toolFive->command = "http://bookstore.ewi.utwente.nl:24681/summary";
         $toolFive->get_arguments = "";
         $toolFive->post_arguments = "";
-        $toolFive->post_arguments = "";
         $toolFive->output_format = "json";
         $toolFive->jsonxml_value_node = "annotation.summary";
         $toolFive->jsonxml_score_sub_node = "score";
@@ -652,15 +662,78 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $toolSix->command = "http://bookstore.ewi.utwente.nl:24681/keywords";
         $toolSix->get_arguments = "";
         $toolSix->post_arguments = "";
-        $toolSix->post_arguments = "";
         $toolSix->output_format = "json";
         $toolSix->jsonxml_value_node = "annotation.keywords";
         $toolSix->jsonxml_score_sub_node = "score";
         $toolSix->jsonxml_value_sub_node = "keyword";
         $toolSix->jsonxml_idx_sub_node = "";
         $toolSix->save();
+
+        $toolSeven = new AnnotationTool;
+        $toolSeven->display_name = "Named Entities other";
+        $toolSeven->description = "Maakt lijst met named entities zonder locaties";
+        $toolSeven->command = "http://bookstore.ewi.utwente.nl:24681/nerother";
+        $toolSeven->get_arguments = "";
+        $toolSeven->post_arguments = "";
+        $toolSeven->output_format = "json";
+        $toolSeven->jsonxml_value_node = "annotation.entities";
+        $toolSeven->jsonxml_score_sub_node = "score";
+        $toolSeven->jsonxml_value_sub_node = "keyword";
+        $toolSeven->jsonxml_idx_sub_node = "";
+        $toolSeven->save();
+        
+        $toolEight = new AnnotationTool;
+        $toolEight->display_name = "Named Entities locations";
+        $toolEight->description = "Maakt lijst named entities locaties uit de tekst";
+        $toolEight->command = "http://bookstore.ewi.utwente.nl:24681/nerlocations";
+        $toolEight->get_arguments = "";
+        $toolEight->post_arguments = "";
+        $toolEight->output_format = "json";
+        $toolEight->jsonxml_value_node = "annotation.entities";
+        $toolEight->jsonxml_score_sub_node = "score";
+        $toolEight->jsonxml_value_sub_node = "keyword";
+        $toolEight->jsonxml_idx_sub_node = "";
+        $toolEight->save();
         
         //input type elements
+        $textElement = new AnnotationTypeElement;
+        $textElement->type_id = $bType->id;
+        $textElement->element_id = 1;
+        $textElement->prompt = 'Voer de originele tekst in';
+        $textElement->english_name = 'text';
+        $textElement->order = 1;
+        $textElement->tool_id = false;
+        $textElement->score_slider = false;
+        $textElement->long_text = true;
+        $textElement->repeated_field = false;
+        $textElement->date_picker = false;
+        $textElement->date_range_picker = false;
+        $textElement->autocomplete = false;
+        $textElement->autocomplete_main_id = false;
+        $textElement->autocomplete_extra_id = false;
+        $textElement->autocomplete_itemtype_id = false;
+        $textElement->autocomplete_collection_id = false;
+        $textElement->save();
+
+        $textElement = new AnnotationTypeElement;
+        $textElement->type_id = $bType->id;
+        $textElement->element_id = 93;
+        $textElement->prompt = 'De namen van locaties die gevonden kunnen worden in de tekst';
+        $textElement->english_name = 'named entity location';
+        $textElement->order = 28;
+        $textElement->tool_id = 10;                  //add tool when available
+        $textElement->score_slider = false;
+        $textElement->long_text = false;
+        $textElement->repeated_field = true;
+        $textElement->date_picker = false;
+        $textElement->date_range_picker = false;
+        $textElement->autocomplete = true;              //automplete, yes please
+        $textElement->autocomplete_main_id = 93;        //look in identifiers
+        $textElement->autocomplete_extra_id = 0;        //and show the titles
+        $textElement->autocomplete_itemtype_id = 18;    //don't restrict to certain item type
+        $textElement->autocomplete_collection_id = 1;   //but only look in collection volksverhalen
+        $textElement->save();
+
         $textElement = new AnnotationTypeElement;
         $textElement->type_id = $storyType->id;
         $textElement->element_id = 1;
@@ -685,7 +758,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->element_id = 41;
         $textElement->prompt = 'De samenvatting van de tekst';
         $textElement->english_name = 'description';
-        $textElement->order = 1;
+        $textElement->order = 20;
         $textElement->tool_id = $toolDescription->id;
         $textElement->score_slider = true;
         $textElement->long_text = true;
@@ -704,7 +777,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->element_id = 62; //$dcTitleElement->id;
         $textElement->prompt = 'Extreme values in text';
         $textElement->english_name = 'extreme';
-        $textElement->order = 2;
+        $textElement->order = 26;
         $textElement->tool_id = $toolExtreme->id;
         $textElement->score_slider = false;
         $textElement->long_text = false;
@@ -723,7 +796,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->element_id = 61;
         $textElement->prompt = 'Literary text';
         $textElement->english_name = 'literary';
-        $textElement->order = 3;
+        $textElement->order = 25;
         $textElement->tool_id = false;
         $textElement->score_slider = false;
         $textElement->long_text = false;
@@ -739,30 +812,10 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
 
         $textElement = new AnnotationTypeElement;
         $textElement->type_id = $storyType->id;
-        $textElement->element_id = 94; //$dcTitleElement->id;
-        $textElement->tool_id = $toolTwo->id;
-        $textElement->prompt = 'Count words in text';
-        $textElement->english_name = 'word count';
-        $textElement->order = 4;
-        $textElement->tool_id = $toolTwo->id;
-        $textElement->score_slider = false;
-        $textElement->long_text = false;
-        $textElement->repeated_field = false;
-        $textElement->date_picker = false;
-        $textElement->date_range_picker = false;
-        $textElement->autocomplete = false;
-        $textElement->autocomplete_main_id = false;
-        $textElement->autocomplete_extra_id = false;
-        $textElement->autocomplete_itemtype_id = false;
-        $textElement->autocomplete_collection_id = false;
-        $textElement->save();
-        
-        $textElement = new AnnotationTypeElement;
-        $textElement->type_id = $storyType->id;
         $textElement->element_id = 43;
         $textElement->prompt = 'Het identificatienummer';
         $textElement->english_name = 'identifier';
-        $textElement->order = 5;
+        $textElement->order = 8;
         $textElement->tool_id = false;
         $textElement->score_slider = false;
         $textElement->long_text = false;
@@ -781,7 +834,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->element_id = 40;
         $textElement->prompt = 'Voer de datum in';
         $textElement->english_name = 'date';
-        $textElement->order = 6;
+        $textElement->order = 4;
         $textElement->tool_id = false;
         $textElement->score_slider = false;
         $textElement->long_text = false;
@@ -800,7 +853,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->element_id = 60;
         $textElement->prompt = 'De verzamelaar van het verhaal';
         $textElement->english_name = 'collector';
-        $textElement->order = 7;                        
+        $textElement->order = 2;                        
         $textElement->tool_id = false;                  //no tool for auto annotation
         $textElement->score_slider = false;             //we're not making any text
         $textElement->long_text = false;                //a small field will do
@@ -824,7 +877,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->element_id = 39;
         $textElement->prompt = 'De verteller van het verhaal';
         $textElement->english_name = 'creator';
-        $textElement->order = 8;
+        $textElement->order = 3;
         $textElement->tool_id = false;
         $textElement->score_slider = false;
         $textElement->long_text = false;
@@ -838,7 +891,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->autocomplete_collection_id = 4;   //but only look in collection vertellers
         $textElement->save();
 
-        $textElement = new AnnotationTypeElement;
+/*        $textElement = new AnnotationTypeElement;
         $textElement->type_id = $storyType->id;
         $textElement->element_id = 37;
         $textElement->prompt = 'De medewerker die het verhaal in de verhalenbank invoert (overbodig)';
@@ -856,13 +909,13 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->autocomplete_itemtype_id = false;
         $textElement->autocomplete_collection_id = false;
         $textElement->save();
-        
+*/        
         $textElement = new AnnotationTypeElement;
         $textElement->type_id = $storyType->id;
         $textElement->element_id = 50;
         $textElement->prompt = 'De titel van het verhaal';
         $textElement->english_name = 'title';
-        $textElement->order = 10;
+        $textElement->order = 9;
         $textElement->tool_id = false;
         $textElement->score_slider = false;
         $textElement->long_text = false;
@@ -881,7 +934,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->element_id = 48;
         $textElement->prompt = 'De bron van het verhaal';
         $textElement->english_name = 'source';
-        $textElement->order = 11;
+        $textElement->order = 5;
         $textElement->tool_id = false;
         $textElement->score_slider = false;
         $textElement->long_text = false;
@@ -900,7 +953,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->element_id = 51;
         $textElement->prompt = 'Het type bron van het verhaal (keuze)';
         $textElement->english_name = 'type';
-        $textElement->order = 12;
+        $textElement->order = 6;
         $textElement->tool_id = false;
         $textElement->score_slider = false;
         $textElement->long_text = false;
@@ -919,7 +972,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->element_id = 47;
         $textElement->prompt = 'Heeft het Meertens de rechten van dit verhaal?';
         $textElement->english_name = 'rights';
-        $textElement->order = 13;
+        $textElement->order = 7;
         $textElement->tool_id = false;
         $textElement->score_slider = false;
         $textElement->long_text = false;
@@ -938,7 +991,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->element_id = 53;
         $textElement->prompt = 'Overig commentaar of informatie over de tekst, of de manier waarop deze verkregen is.';
         $textElement->english_name = 'commentary';
-        $textElement->order = 14;
+        $textElement->order = 40;
         $textElement->tool_id = false;
         $textElement->score_slider = false;
         $textElement->long_text = true;
@@ -957,7 +1010,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->element_id = 44;
         $textElement->prompt = 'De taal waarin het verhaal verteld is';
         $textElement->english_name = 'language';
-        $textElement->order = 15;
+        $textElement->order = 24;
         $textElement->tool_id = $toolThree->id;
         $textElement->score_slider = false;
         $textElement->long_text = false;
@@ -976,7 +1029,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->element_id = 58;
         $textElement->prompt = 'Het subgenre van het verhaal';
         $textElement->english_name = 'subgenre';
-        $textElement->order = 16;
+        $textElement->order = 22;
         $textElement->tool_id = $toolFour->id;
         $textElement->score_slider = false;
         $textElement->long_text = false;
@@ -995,7 +1048,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->element_id = 49;
         $textElement->prompt = 'Het verhaaltype of verhaaltypen';
         $textElement->english_name = 'subject';
-        $textElement->order = 16;
+        $textElement->order = 21;
         $textElement->tool_id = false;                  //add tool when available
         $textElement->score_slider = false;
         $textElement->long_text = false;
@@ -1014,7 +1067,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->element_id = 52;
         $textElement->prompt = 'De motieven die gevonden kunnen worden in de tekst';
         $textElement->english_name = 'motif';
-        $textElement->order = 16;
+        $textElement->order = 23;
         $textElement->tool_id = false;                  //add tool when available
         $textElement->score_slider = false;
         $textElement->long_text = false;
@@ -1030,10 +1083,86 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         
         $textElement = new AnnotationTypeElement;
         $textElement->type_id = $storyType->id;
+        $textElement->element_id = 63;
+        $textElement->prompt = 'De namen (niet locaties) die gevonden kunnen worden in de tekst';
+        $textElement->english_name = 'named entity';
+        $textElement->order = 27;
+        $textElement->tool_id = 9;                  //add tool when available
+        $textElement->score_slider = false;
+        $textElement->long_text = false;
+        $textElement->repeated_field = true;
+        $textElement->date_picker = false;
+        $textElement->date_range_picker = false;
+        $textElement->autocomplete = true;              //automplete, yes please
+        $textElement->autocomplete_main_id = 63;        //look in identifiers
+        $textElement->autocomplete_extra_id = 0;       //and show the titles
+        $textElement->autocomplete_itemtype_id = 18; //dont' restrict to certain item type
+        $textElement->autocomplete_collection_id = 1;   //but only look in collection volksverhalen
+        $textElement->save();
+        
+        $textElement = new AnnotationTypeElement;
+        $textElement->type_id = $storyType->id;
+        $textElement->element_id = 93;
+        $textElement->prompt = 'De namen van locaties die gevonden kunnen worden in de tekst';
+        $textElement->english_name = 'named entity location';
+        $textElement->order = 28;
+        $textElement->tool_id = 10;                  //add tool when available
+        $textElement->score_slider = false;
+        $textElement->long_text = false;
+        $textElement->repeated_field = true;
+        $textElement->date_picker = false;
+        $textElement->date_range_picker = false;
+        $textElement->autocomplete = true;              //automplete, yes please
+        $textElement->autocomplete_main_id = 93;        //look in identifiers
+        $textElement->autocomplete_extra_id = 0;        //and show the titles
+        $textElement->autocomplete_itemtype_id = 18;    //don't restrict to certain item type
+        $textElement->autocomplete_collection_id = 1;   //but only look in collection volksverhalen
+        $textElement->save();
+
+        $textElement = new AnnotationTypeElement;
+        $textElement->type_id = $storyType->id;
+        $textElement->element_id = 65;
+        $textElement->prompt = 'De hoofdlocatie waar te tekst zich afspeelt, of over gaat';
+        $textElement->english_name = 'place of action';
+        $textElement->order = 29;
+        $textElement->tool_id = false;                  //add tool when available
+        $textElement->score_slider = false;
+        $textElement->long_text = false;
+        $textElement->repeated_field = true;
+        $textElement->date_picker = false;
+        $textElement->date_range_picker = false;
+        $textElement->autocomplete = true;              //automplete, yes please
+        $textElement->autocomplete_main_id = 65;        //look in identifiers
+        $textElement->autocomplete_extra_id = 0;        //and show the titles
+        $textElement->autocomplete_itemtype_id = 18;    //restrict to certain item type
+        $textElement->autocomplete_collection_id = 1;   //but only look in collection volksverhalen
+        $textElement->save();
+
+        $textElement = new AnnotationTypeElement;
+        $textElement->type_id = $storyType->id;
+        $textElement->element_id = 68;
+        $textElement->prompt = 'De kloekecode van waar het verhaal vandaan komt';
+        $textElement->english_name = 'kloeke georeference';
+        $textElement->order = 30;
+        $textElement->tool_id = false;                  //add tool when available
+        $textElement->score_slider = false;
+        $textElement->long_text = false;
+        $textElement->repeated_field = false;
+        $textElement->date_picker = false;
+        $textElement->date_range_picker = false;
+        $textElement->autocomplete = true;              //automplete, yes please
+        $textElement->autocomplete_main_id = 30;        //look in other kloekecodes for now
+        $textElement->autocomplete_extra_id = 0;        //nope
+        $textElement->autocomplete_itemtype_id = 0;     //don't restrict to certain item type
+        $textElement->autocomplete_collection_id = 0;   //no collection
+        $textElement->save();
+        
+        $textElement = new AnnotationTypeElement;
+        $textElement->type_id = $storyType->id;
         $textElement->element_id = 94;
         $textElement->prompt = 'De hoeveelheid woorden in de tekst';
         $textElement->english_name = 'word count';
-        $textElement->order = 17;
+        $textElement->order = 32;
         $textElement->tool_id = $toolCount->id;
         $textElement->score_slider = false;
         $textElement->long_text = false;
@@ -1052,7 +1181,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->element_id = 95;
         $textElement->prompt = 'De klasse van de hoeveelheid woorden in de tekst';
         $textElement->english_name = 'word count group';
-        $textElement->order = 18;
+        $textElement->order = 33;
         $textElement->tool_id = $toolCountclass->id;
         $textElement->score_slider = false;
         $textElement->long_text = false;
@@ -1066,6 +1195,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->autocomplete_collection_id = false;
         $textElement->save();
     }
+    
     
     public function hookBeforeSaveItem($args){
       $item = $args['record'];

@@ -50,6 +50,11 @@ class AnnotationType extends Omeka_Record_AbstractRecord
                 'AnnotationTypeElement', 'type_id', 'Elements');
     }
     
+    public function getTool()
+    {
+        return $this->_db->getTable('AnnotationTool')->find($this->tags_tool_id);
+    }
+    
     /**
      * Get the type elements associated with this type.
      *

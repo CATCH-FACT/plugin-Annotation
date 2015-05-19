@@ -77,6 +77,10 @@ function annotation_element_form($element, $record, $options = array())
     return $html;
 }
 
+function annotation_tag_form($record, $options = array()){
+    return get_view()->annotationTagForm($record, $options);
+}
+
 
 //not really a theme helper
 //returns tool data to element-form-tool.php

@@ -11,6 +11,7 @@
  */
 class Annotation_IndexController extends Omeka_Controller_AbstractActionController
 {
+    
     /**
      * Index action.
      */

@@ -2,7 +2,7 @@
 /**
  * @version $Id$
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
- * @copyright Center for History and New Media, 2010
+ * @copyright Meertens Institute 2015
  * @package Annotation
  */
 
@@ -23,10 +23,6 @@ class Annotation_View_Helper_AnnotationElementForm extends Omeka_View_Helper_Ele
         
         if (isset($options['annotationTypeElement'])){ $this->_annotationTypeElement = $options['annotationTypeElement']; }
         else $this->_element = $element; //JUST IN CASE
-                
-#        print "<pre>";
-#        print_r($that->_annotationTypeElement);
-#        print "</pre>";
 
         $divWrap = isset($options['divWrap']) ? $options['divWrap'] : true;
         $extraFieldCount = isset($options['extraFieldCount']) ? $options['extraFieldCount'] : null;
@@ -42,25 +38,25 @@ class Annotation_View_Helper_AnnotationElementForm extends Omeka_View_Helper_Ele
         //generating the input fields
         $inputsComponent = $this->_displayFormFields($extraFieldCount);
         $labelComponent = $that->_getfieldLabel();
-//        $labelComponent = $that->_getLabelComponent();        
-//        $descriptionComponent = $that->_getDescriptionComponent();
-//        $commentComponent = $that->_getCommentComponent();
+
         $addInputComponent = $this->view->formSubmit('add_element_' . $that->_annotationTypeElement['element_id'], 
                                                     __('Add Input'),
                                                     array('class'=> 'add-element'));
                                                     
-        $addAnnotationComponent = $this->_annotationTypeElement->score_slider ? '<br>Lengte: <span id="' . 'span_element_' . $that->_annotationTypeElement['element_id'] . '" class="slidervalue" data-bind="text: slider_values()[' . $that->_annotationTypeElement['element_id'] . ']">0</span> <br> <div style="width:63%; float:left" id="' . 'slide_element_' . $that->_annotationTypeElement['element_id'] . '" class="slider"></div>' : "";
+        $addAnnotationComponent = $this->_annotationTypeElement->score_slider ? 
+                                    '<br>Lengte: <span id="' . 'span_element_' . $that->_annotationTypeElement['element_id'] . 
+                                    '" class="slidervalue" data-bind="text: slider_values()[' . $that->_annotationTypeElement['element_id'] . 
+                                    ']">0</span> <br> <div style="width:63%; float:left" id="' . 'slide_element_' . 
+                                    $that->_annotationTypeElement['element_id'] . '" class="slider"></div>' : "";
         $addAnnotationComponent .= $this->view->formSubmit('annotate-element_' . $that->_annotationTypeElement['element_id'], 
                                                         __('Determine automatically'),
                                                         array('class'=>'annotate-element',
                                                                 'style'=>"width:28%; background:#0080FF; float:left"));
 //                                                              'data-bind' => "click: annotate(" . $that->_annotationTypeElement['element_id'] . ")")); //knockout system
-                                                              
+
         $components = array(
             'label' => $labelComponent,
             'inputs' => $inputsComponent,
-//            'description' => $descriptionComponent,
-//            'comment' => $commentComponent,
             'add_input' => $addInputComponent,
             'add_annotation' => $addAnnotationComponent,
             'html' => null 
@@ -69,8 +65,9 @@ class Annotation_View_Helper_AnnotationElementForm extends Omeka_View_Helper_Ele
         $elementSetName = $this->_annotationTypeElement->set_name;
         $recordType = get_class($record);
         $filterName = array('AnnotationElementForm', $recordType, $elementSetName, $that->_annotationTypeElement->name);
+        
         $components = apply_filters(
-            $filterName, 
+            $filterName,
             $components,
             array('record' => $record, 
                    'element' => $element, 
@@ -86,12 +83,10 @@ class Annotation_View_Helper_AnnotationElementForm extends Omeka_View_Helper_Ele
 
         $html .= '<div class="eight columns alpha">';
         $html .= $this->_getLabelTooltip();
-//        $html .= "<label>" . $this->_getFieldInputLabel() . ' <img style="width:20px;height:20px;vertical-align:middle" src="' . img("info-icon.png") . '" alt="info" title="' . $this->_getFieldLabel() . '" /></label>';
+
         //only add annotation button if a tool is specified
         $html .= $this->_annotationTypeElement->tool_id ? $components['add_annotation'] : "";
-        //$html .= $that->_annotationTypeElement->tool_id ? $components['add_annotation'] : "";
 
-//        $html .= $components['add_input'];
         $html .= $this->_annotationTypeElement->repeated_field ? $components['add_input'] : "";
         $html .= '</div>'; // Close div
 
@@ -100,8 +95,6 @@ class Annotation_View_Helper_AnnotationElementForm extends Omeka_View_Helper_Ele
         $html .= "</div>\n"; // Close 'inputs' div
 
         $html .= $divWrap ? "</div>\n\n" : ''; // Close 'field' div
-
-//        print_r($that->_annotationTypeElement);
 
         return $html;
     }

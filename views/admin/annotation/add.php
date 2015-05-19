@@ -10,7 +10,6 @@ queue_js_file('annotation-admin-form');
 
 //initiate knockout
 queue_js_file('knockout-3.3.0');
-queue_js_string('console.log("knockout loaded");');
 
 //initiate moment and daterangepicker
 queue_js_file('moment');
@@ -19,7 +18,6 @@ queue_css_file('daterangepicker');
 
 //initiate annotation model
 queue_js_file('annotation-model');
-queue_js_string('console.log("annotation knockout model loaded");');
 
 $annotationPath = 'annotation';
 queue_css_file('form');
@@ -38,6 +36,7 @@ ko.applyBindings(model);
 
 // <![CDATA[
 enableAnnotationAjaxForm(<?php echo js_escape(url($annotationPath.'/annotation/type-form')); ?>);
+enableAnnotationSaveAjaxForm(<?php echo js_escape(url($annotationPath.'/annotation/save-form')); ?>);
 // ]]>
 </script>
 
@@ -51,7 +50,7 @@ echo $this->partial('annotation-navigation.php');
     
     <h1><?php echo $head['title']; ?></h1>
 
-        <form method="post" action="" id="anootation-form"enctype="multipart/form-data">
+        <form method="post" action="" id="annotation-form"enctype="multipart/form-data">
         
             <fieldset id="annotation-item-metadata">
                 <div class="inputs">
@@ -61,22 +60,20 @@ echo $this->partial('annotation-navigation.php');
                     <?php echo $this->formSelect( 'annotation_type', $typeId, array('multiple' => false, 'id' => 'annotation-type') , $options); ?>
                     <input type="submit" name="submit-type" id="submit-type" value="Select" />
                 </div>
-                <div id="annotation-type-form">
+            </fieldset>
 
-                <?php if (isset($typeForm)): echo $typeForm; endif; ?>
+            <section class="seven columns alpha" id="edit-form">
+                <div id="annotation-type-form">
+                    <?php if (isset($typeForm)): echo $typeForm; endif; ?>
                 </div>
-            </fieldset>
-           
-            <fieldset id="annotation-confirm-submit" <?php if (!isset($typeForm)) { echo 'style="display: none;"'; }?>>
-                <div class="inputs">
-                    <?php $public = isset($_POST['annotation-public']) ? $_POST['annotation-public'] : 0; ?>
-                    <?php echo $this->formCheckbox('annotation-public', $public, null, array('1', '0')); ?>
-                    <?php echo $this->formLabel('annotation-public', __('Make annotated item public.')); ?>
+            </section>
+            
+            <section class="three columns omega">
+                <div id="save" class="panel">
+                    <?php if (isset($saveForm)): echo $saveForm; endif; ?>
                 </div>
-                <?php echo $this->formSubmit('form-submit', __('Save'), array('class' => 'submitinput')); ?>    
-                <p><?php echo __('You are logged in as: %s', metadata($user, 'name')); ?>
-            </fieldset>
-           
+            </section>
+
         </form>
 </div>
 

@@ -51,8 +51,6 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
         
         $results = $this->_helper->db->getTable()->fetchPairs($sql_query, array('%' . $searchText . '%'));
         
-//        print_r($results);
-        
         if ((count($results) > 0) && $element_xtra_id){
             foreach ($results as $id=>$val){
                 $subquery = "SELECT * 
@@ -77,7 +75,6 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
                 $response[] = $row;
             }
         }
-
         
         $this->_helper->json($response);
     }
@@ -93,6 +90,7 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
             _log($_GET['annotation_type']);
             $this->_setupAnnotateSubmit($_GET['annotation_type']);
             $this->view->typeForm = $this->view->render('annotation/type-form.php');
+            $this->view->saveForm = $this->view->render('annotation/save-form.php');
         }
         $this->_forward('add');
     }
@@ -103,12 +101,16 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
         
         $record = $this->_helper->db->findById();
         
+//        parent::editAction();
+        
+        print "<pre>";
         print_r($record);
+        print "</pre>";
         
         //$type = array("id" => 1);
         
-        $this->view->typeForm = $this->view->render('annotation/type-form.php');
-        
+//        $this->view->typeForm = $this->view->render('annotation/type-form.php');
+//        $this->view->saveForm = $this->view->render('annotation/save-form.php');
         $this->view->assign(compact('id', 'type'));
         
 //        parent::editAction();
@@ -164,8 +166,6 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
     public function addAction()
     {
 
-        _log("Annotation action started");
-
         if ($this->_processForm($_POST)) {
             $this->_helper->flashMessenger("Data accepted. Pre-annotated Item created.", 'success');
             $route = $this->getFrontController()->getRouter()->getCurrentRouteName();
@@ -179,11 +179,11 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
             } else if ($defaultType = get_option('annotation_default_type')) {
                 $typeId = $defaultType;
             }
-            _log("type_id" . $typeId);
             if ($typeId) {
                 if($user = current_user()) {
                     $this->_setupAnnotateSubmit($typeId);
                     $this->view->typeForm = $this->view->render('annotation/type-form.php');
+                    $this->view->saveForm = $this->view->render('annotation/save-form.php');
                 }
             }
 
@@ -211,17 +211,29 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
         $this->_setupAnnotateSubmit($_POST['annotation_type']);
     }
 
+    /**
+     * Action for AJAX request from annotate form.
+     */
+    public function saveFormAction()
+    {
+        $this->_setupAnnotateSubmit($_POST['annotation_type']);
+    }
+
+
     protected function set_view_variables_for_form(){
         $elementId = (int)$_POST['element_id'];
         $recordType = $_POST['record_type'];
         $recordId  = (int)$_POST['record_id'];
-          
+        $annotationId  = (int)$_POST['annotation_id'];
+
         // Re-index the element form posts so that they are displayed in the correct order
         // when one is removed.
         $_POST['Elements'][$elementId] = array_merge($_POST['Elements'][$elementId]);
 
         $element = $this->_helper->db->getTable('Element')->find($elementId);
-        $annotationTypeElement = $this->_helper->db->getTable('AnnotationTypeElement')->findByElementId($elementId);
+        
+        $annotationTypeElement = $this->_helper->db->getTable('AnnotationTypeElement')->findByElementIdAndAnnotationId($elementId, $annotationId); //specifically the annotation ID
+        
         $record = $this->_helper->db->getTable($recordType)->find($recordId);
 
         if (!$record) {
@@ -351,10 +363,10 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
                 return false;
             }
 
-            $itemMetadata = array('public'       => false,
-                                  'featured'     => false,
-                                  'item_type_id' => $itemTypeId);
-            
+            $itemMetadata = array('item_type_id' => $itemTypeId);
+                                  
+            $itemMetadata['featured'] = (int) $post['annotation-featured'];
+            $itemMetadata['public'] = (int) $post['annotation-public'];
             $itemMetadata['collection_id'] = (int) $post['collection_id'];
             
             $fileMetadata = $this->_processFileUpload($annotationType);
@@ -388,12 +400,12 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
             $this->_addElementTextsToItem($item, $post['Elements']);
             // Allow plugins to deal with the inputs they may have added to the form.
             fire_plugin_hook('annotation_save_form', array('annotationType'=>$annotationType,'item'=>$item, 'post'=>$post));
+            
             $item->save();
             
             $this->temp_item = $item;
             
             $this->_linkItemToAnnotatedItem($item, $annotator, $post); 
-//            $this->_sendEmailNotifications($user->email, $item); //goed idee (voor trage sessies)
             return true;
         }
         return false;
@@ -476,67 +488,4 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
         return true;
     }
     
-    /**
-     * Send an email notification to the user who annotated the Item.
-     * 
-     * This email will appear to have been sent from the address specified via
-     * the 'annotation_email_sender' option.
-     * 
-     * @param string $email Address to send to.
-     * @param Item $item Item that was annotated via the form.
-     * @return void
-     * @todo Update for new Annotation
-     */
-    protected function _sendEmailNotifications($toEmail, $item)
-    {
-        $fromAddress = get_option('annotation_email_sender');
-        $siteTitle = get_option('site_title');
-
-        $this->view->item = $item;
-    
-        //If this field is empty, don't send the email
-        if (!empty($fromAddress)) {
-            $annotatorMail = new Zend_Mail;
-            $body = "<p>" .  __("Thank you for your annotation to %s", get_option('site_title')) . "</p>";
-            $body .= "<p>" . __("Your annotation has been accepted and will be preserved in the digital archive. For your records, the permanent URL for your annotation is noted at the end of this email. Please note that annotations may not appear immediately on the website while they await processing by project staff.") . "</p>";
-	        $body .= "<p>" . __("Annotation URL (pending review by project staff): %s", record_url($item, 'show', true)) . "</p>";	        
-            $body .= get_option('annotation_simple_email');
-            
-            $annotatorMail->setBodyHtml($body);
-            $annotatorMail->setFrom($fromAddress, __("%s Administrator", $siteTitle ));
-            $annotatorMail->addTo($toEmail);
-            $annotatorMail->setSubject(__("Your %s Annotation", $siteTitle));
-            $annotatorMail->addHeader('X-Mailer', 'PHP/' . phpversion());
-            try {
-                $annotatorMail->send();
-            } catch (Zend_Mail_Exception $e) {
-                _log($e);
-            }
-        }
-  
-        //notify admins who want notification
-        $toAddresses = explode(",", get_option('annotation_email_recipients'));
-        $fromAddress = get_option('administrator_email');
-        
-        foreach ($toAddresses as $toAddress) {
-            if (empty($toAddress)) {
-                continue;
-            }
-            $adminMail = new Zend_Mail;
-            $body = __("A new annotation to %s has been made.", get_option('site_title'));
-            set_theme_base_url('admin');
-            $body .= __("Annotation URL for review: %s", record_url($item, 'show', true));
-            revert_theme_base_url();
-            $adminMail->setBodyText($body);
-            $adminMail->setFrom($fromAddress, "$siteTitle");
-            $adminMail->addTo($toAddress);
-            $adminMail->setSubject(__("New %s Annotation", $siteTitle ));
-            $adminMail->addHeader('X-Mailer', 'PHP/' . phpversion());
-            try {
-                $adminMail->send();
-            } catch (Zend_Mail_Exception $e) {
-                _log($e);
-            }
-        }
-    }
 }

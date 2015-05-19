@@ -1,7 +1,7 @@
 <?php echo js_tag('vendor/tiny_mce/tiny_mce'); ?>
 <?php echo js_tag('annotation-elements'); ?>
+<?php echo js_tag('annotation-items'); ?>
 <?php echo js_tag('tabs'); ?>
-<?php echo js_tag('items'); ?>
 
 <script type="text/javascript" charset="utf-8">
 //<![CDATA[
@@ -12,9 +12,11 @@ jQuery(window).load(function () {
     Omeka.Tabs.initialize();
 
     Omeka.Items.tagDelimiter = <?php echo js_escape(get_option('tag_delimiter')); ?>;
+    //tags other functions
     Omeka.Items.enableTagRemoval();
     Omeka.Items.makeFileWindow();
     Omeka.Items.enableSorting();
+    //tags autocomplete
     Omeka.Items.tagChoices('#tags', <?php echo js_escape(url(array('controller'=>'tags', 'action'=>'autocomplete'), 'default', array(), true)); ?>);
 
 //    Omeka.wysiwyg({
@@ -26,22 +28,24 @@ jQuery(window).load(function () {
     jQuery(document).trigger('omeka:elementformload');
 
     Omeka.Items.enableAddFiles(<?php echo js_escape(__('Add Another File')); ?>);
-    Omeka.Items.changeItemType(<?php echo js_escape(url("items/change-type")) ?><?php if ($id = metadata('item', 'id')) echo ', '.$id; ?>);
+    Omeka.Items.changeItemType(<?php echo js_escape(url("items/change-type")); ?><?php if ($id = metadata('item', 'id')) echo ', '.$id; ?>);
+    
 });
 
 jQuery(document).bind('omeka:elementformload', function (event) { //
     //adding control events to buttons like "add input" and "autocomplete" and "datepicker selector"
     //each time an element load form even has taken place.
-    
+
     elementFormPartialUrl = <?php echo js_escape(url('annotation/annotation/element-form')); ?>;
     autocompleteChoicesUrl = <?php echo js_escape(url('annotation/annotation/autocomplete')); ?>;
-    recordType = 'Item'<?php if ($id = metadata('item', 'id')) echo ', '.$id; ?>;
+    annotationId = <?php echo $type->id; ?>;
+    recordType = 'Item'<?php if ($id = metadata('item', 'id')) echo ', ' . $id; ?>;
     recordId = null;
     
-    Omeka.Elements.makeElementControls(event.target, elementFormPartialUrl, autocompleteChoicesUrl, recordType, recordId, model);
+    Omeka.Elements.makeElementControls(event.target, elementFormPartialUrl, autocompleteChoicesUrl, recordType, recordId, annotationId, model);
     Omeka.Elements.makeElementInformationTooltips();
         
-    //NOT adding HTML control
+    //NOT adding HTML control (should I add it with a setting?)
 //    Omeka.Elements.enableWysiwyg(event.target);
 });
 //]]>
@@ -60,7 +64,6 @@ if ($type->isFileRequired()): $required = true;?>
     </div>
 <?php endif; ?>
 
-
 <?php 
 ############################
 #actual form being generated
@@ -75,7 +78,7 @@ foreach ($type->getUniqueInputTypeElements() as $annotationTypeElement) {
 <br>
 <br>
 
-<div>
+<div id="tags-metadata">
 <?php
 ob_start();
 require 'tag-form.php';
@@ -102,7 +105,7 @@ echo ob_get_clean();
     //<![CDATA[
     jQuery(document).bind('omeka:elementformload', function (event) {
          Omeka.Elements.makeElementControls(event.target, <?php echo js_escape(url('user-profiles/profiles/element-form')); ?>,'UserProfilesProfile'<?php if ($id = metadata($profile, 'id')) echo ', '.$id; ?>, ko);
-         Omeka.Elements.enableWysiwyg(event.target);
+//         Omeka.Elements.enableWysiwyg(event.target);
     });
     //]]>
     </script>
@@ -134,34 +137,3 @@ fire_plugin_hook('annotation_type_form', array('type'=>$type, 'view'=>$this));
 //fire_plugin_hook('contribution_type_form', array('type'=>$type, 'view'=>$this));
 ?>
 <?php endif; ?>
-<br>
-<section class="three columns omega">
-    <div id="save" class="panel">
-        <?php echo $this->formSubmit('form-submit', __('Add Item'), array('class' => 'submit big green button')); ?>    
-
-        <div id="public-featured">
-            <?php if ( is_allowed('Items', 'makePublic') ): ?>
-                <div class="public">
-                    <label for="public"><?php echo __('Public'); ?>:</label> 
-                    <?php echo $this->formCheckbox('annotation-public', $type->public, null, array('1', '0')); ?>
-                    <label for="finished"><?php echo __('Completed'); ?>:</label> 
-                    <?php echo $this->formCheckbox('annotation-finished', $type->finished, null, array('1', '0')); ?>
-                </div>
-            <?php endif; ?>
-        </div>
-
-        <div id="collection-form" class="field">
-            <?php echo $this->formLabel('collection-id', __('Collection'));?>
-            <div class="inputs">
-                <?php 
-                    echo $this->formSelect(
-                    'collection_id',
-                    $type->collection_id,
-                    array('id' => 'collection-id'),
-                    get_table_options('Collection')
-                );?>
-            </div>
-        </div>
-        <?php fire_plugin_hook("admin_items_panel_fields", array('view'=>$this, 'record'=>$item)); ?>
-    </div>
-</section>

@@ -28,6 +28,16 @@
                 );
         $elementsArray['Dublin Core'] = $dcElements['Dublin Core'];
         
+        $autocompleteArray = get_table_options(
+                'Element', null,
+                    array(
+                        'element_set_name' => ElementSet::ITEM_TYPE_NAME,
+                        'sort' => 'alpha'
+                    )
+                );
+        
+        $autocompleteArray['Dublin Core'] = $dcElements['Dublin Core'];
+        
         echo "<span class='input'>" . __('Metadata field:') . "</span>";
         echo $this->formSelect(
             $element_id_name, $element_id_value,
@@ -70,13 +80,13 @@
         echo "<span class='auto-complete-element'>" . __('Search in element') . "</span>";
         echo $this->formSelect(
             $element_autocomplete_main_name, $element_autocomplete_main_value,
-            array('class' => 'element-drop-down'), $elementsArray );
+            array('class' => 'element-drop-down'), $autocompleteArray );
 
         echo "<br>";
         echo "<span class='auto-complete-element'>" . __('Extra search element (i.e. text, title)') . "</span>";
         echo $this->formSelect(
             $element_autocomplete_extra_name, $element_autocomplete_extra_value, //set in controller like english_name
-            array('class' => 'element-drop-down'), $elementsArray );
+            array('class' => 'element-drop-down'), $autocompleteArray );
             
         echo "<br>";
         echo "<span class='auto-complete-item'>" . __('Search in Itemtype') . "</span>";

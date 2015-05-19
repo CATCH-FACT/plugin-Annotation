@@ -22,6 +22,15 @@
             );
     $elementsArray['Dublin Core'] = $dcElements['Dublin Core'];
     
+    $autocompleteArray = get_table_options(
+            'Element', null,
+                array(
+                    'element_set_name' => ElementSet::ITEM_TYPE_NAME,
+                    'sort' => 'alpha'
+                )
+            );
+    
+    $autocompleteArray['Dublin Core'] = $dcElements['Dublin Core'];
 ?>
 <form method='post'>  
 <section class='seven columns alpha'>
@@ -158,14 +167,14 @@
                 <span class='prompt'><?php echo __('Search in element'); ?></span>
                 <?php echo $this->formSelect(
                     "elements[$annotationElement->id][autocomplete_main_id]", $annotationElement->autocomplete_main_id,
-                    array('class' => 'element-drop-down autoc'), $elementsArray );
+                    array('class' => 'element-drop-down autoc'), $autocompleteArray );
                 ?>
 
                 <?php echo "<br>";?>
                 <span class='prompt'><?php echo __('Extra search element (i.e. text, title)'); ?></span>
                 <?php echo $this->formSelect(
                     "elements[$annotationElement->id][autocomplete_extra_id]", $annotationElement->autocomplete_extra_id, //set in controller like english_name
-                    array('class' => 'element-drop-down autoc'), $elementsArray );
+                    array('class' => 'element-drop-down autoc'), $autocompleteArray );
                 ?>
 
                 <?php echo "<br>";?>

@@ -45,7 +45,6 @@ SQL;
     }
 
 
-
     /**
      * Get an array of possible item types for a new annotation type.
      * "Possible types" here means any item type not currently used as the

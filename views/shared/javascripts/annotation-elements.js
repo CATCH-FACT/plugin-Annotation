@@ -1,5 +1,4 @@
 if (!Omeka) {
-    console.log("no omeka js loaded..");
     var Omeka = {};
 }
 
@@ -16,7 +15,7 @@ Omeka.Elements = {};
      * @param {string} recordType Current record type.
      * @param {string} recordId Current record ID.
      */
-    Omeka.Elements.elementFormRequest = function (fieldDiv, params, elementFormPartialUri, recordType, recordId, model) {
+    Omeka.Elements.elementFormRequest = function (fieldDiv, params, elementFormPartialUri, recordType, recordId, annotationId, model) {
         var elementId = fieldDiv.attr('id').replace(/element-/, '');
         
         fieldDiv.find('input, textarea, select').each(function () {
@@ -42,6 +41,7 @@ Omeka.Elements = {};
         params.element_id = elementId;
         params.record_id = recordId;
         params.record_type = recordType;
+        params.annotation_id = annotationId;
 
         $.ajax({
             url: elementFormPartialUri,
@@ -49,9 +49,6 @@ Omeka.Elements = {};
             dataType: 'html',
             data: params, //parameters sent as GET parameters
             success: function (response) {
-                console.log("AJAX CALL response");
-                console.log(params);
-                console.log(response);
                 fieldDiv.find('textarea').each(function () {
                     tinyMCE.execCommand('mceRemoveControl', false, this.id);
                 });
@@ -65,7 +62,10 @@ Omeka.Elements = {};
      * Send an AJAX request to update a <div class="field"> that contains all
      * the form inputs for an element. 
      *
-     * Fill it with metadata from a webservice.
+     * Will try to fill new elements with metadata from a webservice.
+     *
+     * 1. Fetches tool with elementFormPartialUriTool
+     * 2. Use fetched tool to retrieve metadata based on allFields
      *
      * @param {jQuery} fieldDiv
      * @param {Object} params Parameters to pass to AJAX URL.
@@ -76,15 +76,16 @@ Omeka.Elements = {};
      * @param {string} recordId Current record ID.
      * @param {Object} this is a knockout model contains some values like sliders etc
      */
-    Omeka.Elements.elementFormFillRequest = function (fieldDiv, params, elementFormPartialUri, elementFormPartialUriTool, allFields, recordType, recordId, model) {
+    Omeka.Elements.elementFormFillRequest = function (fieldDiv, params, elementFormPartialUri, elementFormPartialUriTool, allFields, recordType, recordId, annotationId, model) {
         
         var annotationValues = [""];
-        var elementId = fieldDiv.attr('id').replace(/element-/, '');
+        var elementId = fieldDiv.attr('id').replace(/element-/, ''); //extracting the element id from the field
         recordId = typeof recordId !== 'undefined' ? recordId : 0;
         
         params.element_id = elementId;
         params.record_id = recordId;
         params.record_type = recordType;
+        params.annotation_id = annotationId;
 
         //adding the existing filled in metadata fields to the parameters to re-render them later
         for (var i = 0; i < annotationValues.length; i++) {
@@ -98,7 +99,7 @@ Omeka.Elements = {};
             dataType: 'json',
             data: params,
             success: function (toolResponse) {
-//                console.log(toolResponse);
+                console.log(toolResponse);
                 if (toolResponse.post_arguments != ""){
                     var post_arguments = JSON.parse(toolResponse.post_arguments);
                     for (var attrname in post_arguments) { allFields[attrname] = JSON.stringify(post_arguments[attrname]); }
@@ -203,10 +204,11 @@ Omeka.Elements = {};
     };
 
     /**
-     * Set up autocomplete for tags field.
+     * Set up autocomplete for all fields with.
      *
      * @param {string} inputSelector Selector for input to autocomplete on.
-     * @param {string} tagChoicesUrl Autocomplete JSON URL.
+     * @param {string} autocompleteChoicesUrl Autocomplete JSON URL.
+     * @param {string} elementFormElementUrl AJAX URL.
      */
     Omeka.Elements.autocompleteChoices = function (inputSelector, autocompleteChoicesUrl, elementFormElementUrl) {
         
@@ -247,7 +249,7 @@ Omeka.Elements = {};
                             .data( "ui-autocomplete-item", item )
                             .append( "<a><b>" + item.label + "</b>" +  (item.value ? ": " + item.value : "") + "</a>" )
                             .appendTo( ul );
-                    };
+                };
             }
         });
     };
@@ -261,7 +263,7 @@ Omeka.Elements = {};
      * @param {string} recordId Current record ID.
      * @param {Object} model is a knockout model contains some values like sliders etc
      */
-    Omeka.Elements.makeElementControls = function (element, elementFormPartialUrl, autocompleteChoicesUrl, recordType, recordId, model) {
+    Omeka.Elements.makeElementControls = function (element, elementFormPartialUrl, autocompleteChoicesUrl, recordType, recordId, annotationId, model) {
         var annotationSelector = '.annotate-element';
         var addSelector = '.add-element';
         var removeSelector = '.remove-element';
@@ -297,7 +299,6 @@ Omeka.Elements = {};
         autocomplete.each(function() {
             elementFormElementUrl = elementFormPartialUrl + "-element";
             Omeka.Elements.autocompleteChoices($(this), autocompleteChoicesUrl, elementFormElementUrl);
-//            Omeka.Elements.elementFormFillRequest(fieldDiv, {add: '1'}, elementFormPartialUrlNoadd, elementFormPartialUrlTool, allFields, recordType, recordId, model);
         });
 
         daterangepickers.each(function() {
@@ -565,14 +566,20 @@ Omeka.Elements = {};
             elementFormPartialUrlNoadd = elementFormPartialUrl + "-noadd"; //url for empty elementFormPartial
             elementFormPartialUrlTool = elementFormPartialUrl + "-tool"; //url for retrieving tool info
             //we need the whole document (to send data values to the webapps)
-            Omeka.Elements.elementFormFillRequest(fieldDiv, {add: '1'}, elementFormPartialUrlNoadd, elementFormPartialUrlTool, allFields, recordType, recordId, model);
+            //model is sent to keep track of slider values
+            Omeka.Elements.elementFormFillRequest(fieldDiv, {add: '1'}, elementFormPartialUrlNoadd, elementFormPartialUrlTool, allFields, recordType, recordId, annotationId, model);
+
+            console.log(recordType);
+            console.log(recordId);
+            console.log(allFields);
+            
         });
 
         // When an add button is clicked, make an AJAX request to add another input.
         context.find(addSelector).click(function (event) {
             event.preventDefault();
             var fieldDiv = $(this).parents(fieldSelector);
-            Omeka.Elements.elementFormRequest(fieldDiv, {add: '1'}, elementFormPartialUrl, recordType, recordId, model);
+            Omeka.Elements.elementFormRequest(fieldDiv, {add: '1'}, elementFormPartialUrl, recordType, recordId, annotationId, model);
         });
 
         // When a remove button is clicked, remove that input from the form.
