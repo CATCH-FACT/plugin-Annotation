@@ -42,8 +42,8 @@ enableAnnotationSaveAjaxForm(<?php echo js_escape(url($annotationPath.'/annotati
 
 <?php
 echo $this->partial('annotation-navigation.php');
-
 ?>
+
 <div id="primary">
 <?php $user = current_user(); ?>
 <?php echo flash(); ?>

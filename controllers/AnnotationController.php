@@ -85,35 +85,12 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
      */
     public function indexAction()
     {
-        _log("Forwarding to annotate.");
         if (isset($_GET['annotation_type'])){
-            _log($_GET['annotation_type']);
             $this->_setupAnnotateSubmit($_GET['annotation_type']);
             $this->view->typeForm = $this->view->render('annotation/type-form.php');
             $this->view->saveForm = $this->view->render('annotation/save-form.php');
         }
         $this->_forward('add');
-    }
-    
-    public function editAction(){
-        $id = $this->getParam('id');
-        $this->_helper->db->setDefaultModelName('Item');
-        
-        $record = $this->_helper->db->findById();
-        
-//        parent::editAction();
-        
-        print "<pre>";
-        print_r($record);
-        print "</pre>";
-        
-        //$type = array("id" => 1);
-        
-//        $this->view->typeForm = $this->view->render('annotation/type-form.php');
-//        $this->view->saveForm = $this->view->render('annotation/save-form.php');
-        $this->view->assign(compact('id', 'type'));
-        
-//        parent::editAction();
     }
     
     public function existingAction(){
@@ -159,6 +136,49 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
         
     }
 
+    public function editAction(){
+
+        $db = $this->_helper->db;
+        
+        $item_id = $this->getParam('id');
+        $item = $db->getTable('Item')->find($item_id);
+        
+        $this->view->item = $item;
+                
+        if ($this->_processForm($_POST)) { //first check if form is posted
+
+            $this->_helper->flashMessenger("Data accepted. Annotated Item created.", 'success');
+            $route = $this->getFrontController()->getRouter()->getCurrentRouteName();
+            $this->_helper->_redirector->gotoRoute(array('action' => 'doannotation'), $route);
+
+        } elseif($item_id) { //if not for posted, check for id in url
+
+            $this->view->item = $item;
+            
+            $typeId = null;
+            if (isset($_POST['annotation_type']) && ($postedType = $_POST['annotation_type'])) {
+                $typeId = $postedType;
+            }
+            if (isset($_POST['item_id']) && ($postedId = $_POST['item_id'])) {
+                $itemId = $postedId;
+            }
+            if ($typeId && $postedId) {
+                if($user = current_user()) {
+                    $this->_setupAnnotateSubmit($typeId, $postedId);
+                    
+                    $this->view->item = $item;
+                    $this->view->typeForm = $this->view->render('annotation/type-form.php');
+                    $this->view->saveForm = $this->view->render('annotation/save-form.php');
+                }
+            }
+            if(isset($this->_profile) && !$this->_profile->exists()) {
+                $this->_helper->flashMessenger($this->_profile->getErrors(), 'error');
+                return;
+            }
+//            $this->view->assign(compact('id', 'record'));
+        }
+    }
+        
     /**
      * Action for main annotation form.
      *  redirect to actual annotation 
@@ -191,7 +211,6 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
                 $this->_helper->flashMessenger($this->_profile->getErrors(), 'error');
                 return;
             }
-
         }
     }
     
@@ -208,7 +227,8 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
      */
     public function typeFormAction()
     {
-        $this->_setupAnnotateSubmit($_POST['annotation_type']);
+        $item_id = isset($_POST['item_id']) ? $_POST['item_id'] : null;
+        $this->_setupAnnotateSubmit($_POST['annotation_type'], $item_id);
     }
 
     /**
@@ -216,7 +236,8 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
      */
     public function saveFormAction()
     {
-        $this->_setupAnnotateSubmit($_POST['annotation_type']);
+        $item_id = isset($_POST['item_id']) ? $_POST['item_id'] : null;
+        $this->_setupAnnotateSubmit($_POST['annotation_type'], $item_id);
     }
 
 
@@ -296,11 +317,15 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
      *
      * @param int $typeId AnnotationType id
      */
-    public function _setupAnnotateSubmit($typeId)
+    public function _setupAnnotateSubmit($typeId, $itemId = null)
     {
+        $db = $this->_helper->db;
         // Override default element form display        
         $this->view->addHelperPath(ANNOTATION_HELPERS_DIR, 'Annotation_View_Helper');
         $item = new Item;
+        if ($itemId){
+            $item = $db->getTable('Item')->find($itemId);
+        }
         $this->view->item = $item;
         
         $type = get_db()->getTable('AnnotationType')->find($typeId);
@@ -487,5 +512,10 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
     {
         return true;
     }
-    
+ 
+ 
+    public function init()
+    {
+        $this->session = new Zend_Session_Namespace('Annotation');
+    }
 }

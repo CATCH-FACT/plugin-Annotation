@@ -12,6 +12,7 @@ function enableAnnotationSaveAjaxForm(url) {
         var form = jQuery('#save');
         // Select element that controls the AJAX form.
         var annotationType = jQuery('#annotation-type');
+        var itemId = jQuery('#item-id');
         // Elements that should be hidden when there is no type form on the page.
         var elementsToHide = jQuery('#save');
         // Duration of hide/show animation.
@@ -27,7 +28,7 @@ function enableAnnotationSaveAjaxForm(url) {
             form.hide(duration, function() {
                 form.empty();
                 if (value != "") {
-                    jQuery.post(url, {annotation_type: value}, function(data) {
+                    jQuery.post(url, {annotation_type: value, item_id: itemId.val()}, function(data) {
                        form.append(data); 
                        form.show(duration, function() {
                            form.trigger('annotation-form-shown');
@@ -52,6 +53,7 @@ function enableAnnotationAjaxForm(url) {
         var form = jQuery('#annotation-type-form');
         // Select element that controls the AJAX form.
         var annotationType = jQuery('#annotation-type');
+        var itemId = jQuery('#item-id');
         // Elements that should be hidden when there is no type form on the page.
         var elementsToHide = jQuery('#annotation-confirm-submit, #annotation-annotator-metadata');
         // Duration of hide/show animation.
@@ -67,7 +69,7 @@ function enableAnnotationAjaxForm(url) {
             form.hide(duration, function() {
                 form.empty();
                 if (value != "") {
-                    jQuery.post(url, {annotation_type: value}, function(data) {
+                    jQuery.post(url, {annotation_type: value, item_id: itemId.val()}, function(data) {
                        form.append(data); 
                        form.show(duration, function() {
                            form.trigger('annotation-form-shown');

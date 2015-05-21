@@ -27,7 +27,7 @@ jQuery(window).load(function () {
     // Must run the element form scripts AFTER reseting textarea ids.
     jQuery(document).trigger('omeka:elementformload');
 
-    Omeka.Items.enableAddFiles(<?php echo js_escape(__('Add Another File')); ?>);
+//    Omeka.Items.enableAddFiles(<?php echo js_escape(__('Add Another File')); ?>);
     Omeka.Items.changeItemType(<?php echo js_escape(url("items/change-type")); ?><?php if ($id = metadata('item', 'id')) echo ', '.$id; ?>);
     
 });
@@ -44,7 +44,8 @@ jQuery(document).bind('omeka:elementformload', function (event) { //
     
     Omeka.Elements.makeElementControls(event.target, elementFormPartialUrl, autocompleteChoicesUrl, recordType, recordId, annotationId, model);
     Omeka.Elements.makeElementInformationTooltips();
-        
+    
+    Omeka.Items.enableAddFiles(<?php echo js_escape(__('Add Another File')); ?>);
     //NOT adding HTML control (should I add it with a setting?)
 //    Omeka.Elements.enableWysiwyg(event.target);
 });
@@ -55,14 +56,6 @@ jQuery(document).bind('omeka:elementformload', function (event) { //
 <p>Please choose an annotation type to continue.</p>
 <?php else: ?>
 <h2>Annotate a <?php echo $type->display_name; ?></h2>
-
-<?php 
-if ($type->isFileRequired()): $required = true;?>
-    <div class="field">
-        <?php echo $this->formLabel('annotated_file', 'Upload a file'); ?>
-        <?php echo $this->formFile('annotated_file', array('class' => 'fileinput')); ?>
-    </div>
-<?php endif; ?>
 
 <?php 
 ############################
@@ -87,13 +80,16 @@ echo ob_get_clean();
 ?>
 </div>
 
-<?php if (!isset($required) && $type->isFileAllowed()):?>
-<div class="field">
-        <?php echo $this->formLabel('annotated_file', __('Upload a file (Optional)')); ?>
-        <br>
-        <?php echo $this->formFile('annotated_file', array('class' => 'fileinput')); ?>
+<div id="files-metadata">
+<?php 
+if (!isset($required) && $type->isFileAllowed()){
+    ob_start();
+    require 'files-form.php';
+    ob_get_contents();
+    echo ob_get_clean();
+}
+?>
 </div>
-<?php endif; ?>
 
 <?php if (current_user()): ?>
     
@@ -133,7 +129,9 @@ echo ob_get_clean();
 <?php endif; ?>
 <?php 
 // Allow other plugins to append to the form (pass the type to allow decisions on a type-by-type basis).
-fire_plugin_hook('annotation_type_form', array('type'=>$type, 'view'=>$this));
+_log("------------------------");
+_log($type->display_name);
+fire_plugin_hook('annotation_type_form', array('type'=>$type, 'view'=>$this, 'item'=>$item));
 //fire_plugin_hook('contribution_type_form', array('type'=>$type, 'view'=>$this));
 ?>
 <?php endif; ?>

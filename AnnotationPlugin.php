@@ -63,8 +63,8 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
      * @return void
      **/
     function filterAdminDashboardPanels($panels){
-//        array_unshift($panels, $this->_addDashboardAnnotationStuff($panels));
-        $panels[1] = $this->_addDashboardAnnotationStuff($panels);
+        array_unshift($panels, $this->_addDashboardAnnotationStuff($panels));
+//        $panels[] = $this->_addDashboardAnnotationStuff($panels);
         return $panels;
     }
 
@@ -73,7 +73,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $db = $this->_db;
         $annotation_types = $db->getTable('AnnotationType')->findAll();
         
-        $zoeken_html = "<H1>" . __("Annotate a new Item") . "</H1><br>";
+        $zoeken_html = "<H1>" . __("Annotation control") . "</H1><br>";
 
         $zoeken_html .= "<H2>" . __("Types to annotate") . "</H2>";
         
@@ -99,11 +99,58 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $zoeken_html .= '    </tbody>';
         $zoeken_html .= '</table>';
         
-        
 
+//        $annotated_items = $db->getTable('AnnotationAnnotatedItem')->findAll();
+        $annotated_items = get_recent_annotated_items(5);
+        $browseHeadings[__('Item')] = null;
+        $browseHeadings[__('Publication Status')] = null;
+        $browseHeadings[__('Date Added')] = 'added';
+        
         $zoeken_html .= "<H2>" . __("Recently annotated Items") . "</H2>";
 
-        $zoeken_html .= "<H2>" . __("") . "</H2>";
+        $zoeken_html .= '<table>';
+        $zoeken_html .= '    <thead id="types-table-head">';
+        $zoeken_html .= '        <tr>';
+        $zoeken_html .= browse_sort_links($browseHeadings, array('link_tag' => 'th scope="col"', 'list_tag' => '')); 
+        $zoeken_html .= '        </tr>';
+        $zoeken_html .= '    </thead>';
+        $zoeken_html .= '    <tbody id="types-table-body">';
+        
+        foreach($annotated_items as $contribItem){
+
+            $item = $contribItem->Item;
+            $annotator = $contribItem->Annotator;
+            if($annotator->id) {
+                $annotatorUrl = url('annotation/annotators/show/id/' . $annotator->id);
+            }
+                
+            if ($item->public) {
+                $status = __('Public');
+            } else {
+                if($contribItem->public) {
+                    $status = __('Needs review');
+                } else {
+                    $status = __('Private annotation');
+                }
+            }
+
+            $zoeken_html .= '<tr>';
+            $zoeken_html .= '    <td>' . link_to($item, 'show', metadata($item, array('Dublin Core', 'Title'))) . '</td>';
+            $zoeken_html .= '        <td>' . $status . '</td>';
+            $zoeken_html .= '        <td>' . format_date(metadata($item, 'added'));
+            if(!is_null($annotator->id)){
+                if($contribItem->anonymous && (is_allowed('Annotation_Items', 'view-anonymous') || $annotator->id == current_user()->id)){
+                    $zoeken_html .= '<span>(' . __('Anonymous') . ')</span>';
+                }
+//                $zoeken_html .= ' <a href=' . $annotatorUrl . '>' . metadata($annotator, 'name') . '</a>';
+                $zoeken_html .= " " . __("by") . " <b>" . metadata($annotator, 'name') . "</b>";
+            }
+            
+            $zoeken_html .= '    </tr>';
+        }
+        
+        $zoeken_html .= '    </tbody>';
+        $zoeken_html .= '</table>';
 
     	return $zoeken_html;
     }
@@ -250,7 +297,6 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $sql = "DROP TABLE IF EXISTS
             `$db->AnnotationType`,
             `$db->AnnotationTypeElement`,
-            `$db->AnnotationManualtypeElement`,
             `$db->AnnotationAnnotator`,
             `$db->AnnotationTool`,
             `$db->AnnotationAnnotatedItem`,
@@ -403,7 +449,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
      */
     public function filterSimpleVocabRoutes($routes)
     {
-        _log("==== Appending routes to simple vocab");
+//        _log("==== Appending routes to simple vocab");
         $routes[] = array('module' => 'annotation',
                           'controller' => 'annotation',
                           'actions' => array('add', 'doannotation', 'element-form-noadd', 'element-form-tool', 'element-form', "tag-form", "type-form", "save-form"));
@@ -529,6 +575,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $storyType->collection_id = 1;
         $storyType->display_name = 'Volksverhaal';
         $storyType->file_permissions = 'Allowed';
+        $storyType->tags_tool_id = 8;
         $storyType->save();
         
         //setting up some tools

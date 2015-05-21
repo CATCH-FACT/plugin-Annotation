@@ -17,6 +17,7 @@ class Annotation_IndexController extends Omeka_Controller_AbstractActionControll
      */
     public function indexAction()
     {
+        $this->redirect('annotation/annotation');
         if(!is_allowed('Annotation_Settings', 'edit')) {
             $this->redirect('annotation/items');
         }

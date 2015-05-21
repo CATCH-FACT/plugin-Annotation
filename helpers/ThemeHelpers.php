@@ -16,6 +16,11 @@
  */
 
 
+function get_recent_annotated_items($num = 10)
+{
+    return get_db()->getTable('AnnotationAnnotatedItem')->findBy(array('sort_field' => 'id', 'sort_dir' => 'd'), $num);
+}
+
 function annotation_admin_header($subsections = array())
 {
     $mainTitle = __('Annotation');

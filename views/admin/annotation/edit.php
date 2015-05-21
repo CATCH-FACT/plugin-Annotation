@@ -10,7 +10,6 @@ queue_js_file('annotation-admin-form');
 
 //initiate knockout
 queue_js_file('knockout-3.3.0');
-queue_js_string('console.log("knockout loaded");');
 
 //initiate moment and daterangepicker
 queue_js_file('moment');
@@ -19,7 +18,6 @@ queue_css_file('daterangepicker');
 
 //initiate annotation model
 queue_js_file('annotation-model');
-queue_js_string('console.log("annotation knockout model loaded");');
 
 $annotationPath = 'annotation';
 queue_css_file('form');
@@ -37,14 +35,47 @@ var model = new DocumentModel();
 ko.applyBindings(model);
 
 // <![CDATA[
-//enableAnnotationAjaxForm(<?php echo js_escape(url($annotationPath.'/annotation/type-form')); ?>);
+enableAnnotationAjaxForm(<?php echo js_escape(url($annotationPath.'/annotation/type-form')); ?>);
+enableAnnotationSaveAjaxForm(<?php echo js_escape(url($annotationPath.'/annotation/save-form')); ?>);
 // ]]>
 </script>
 
 <?php
 echo $this->partial('annotation-navigation.php');
-
 ?>
 
+<div id="primary">
+<?php $user = current_user(); ?>
+<?php echo flash(); ?>
+    
+    <h1><?php echo $head['title']; ?></h1>
+
+        <form method="post" action="" id="annotation-form"enctype="multipart/form-data">
+        
+            <fieldset id="annotation-item-metadata">
+                <div class="inputs">
+                    <label for="annotation-type"><?php echo __("As what would you like to annotate this item?"); ?></label>
+                    <?php $options = get_table_options('AnnotationType'); ?>
+                    <?php $typeId = isset($type) ? $type->id : '' ; ?>
+                    <?php echo $this->formSelect( 'annotation_type', $typeId, array('multiple' => false, 'id' => 'annotation-type') , $options); ?>
+                    <?php echo $this->formHidden("item_id", $item->id, array('size' => 2, 'id' => 'item-id')); ?>
+                    <input type="submit" name="submit-type" id="submit-type" value="Select" />
+                </div>
+            </fieldset>
+        
+            <section class="seven columns alpha" id="edit-form">
+                <div id="annotation-type-form">
+                    <?php if (isset($typeForm)): echo $typeForm; endif; ?>
+                </div>
+            </section>
+            
+            <section class="three columns omega">
+                <div id="save" class="panel">
+                    <?php if (isset($saveForm)): echo $saveForm; endif; ?>
+                </div>
+            </section>
+
+        </form>
+</div>
 
 <?php echo foot();?>
