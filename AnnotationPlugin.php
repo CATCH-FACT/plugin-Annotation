@@ -93,7 +93,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
             $zoeken_html .= "<tr>";
             $zoeken_html .= "<td><strong>" . metadata($type, 'display_name') . " (" . __($type->ItemType->name) . ")</strong></td>";
             $zoeken_html .= "<td><a href='" . url('items/browse/annotated/1/type/' . $type->item_type_id) . "'>" . __("View") . "</a></td>";
-            $zoeken_html .= "<td><a href='" . url('annotation/annotation?annotation_type=' . $type->id) . "' class='add button small green'>" . __("New") . " " . metadata($type, 'display_name') . "</a></td>";
+            $zoeken_html .= "<td><a href='" . url('annotation/annotation?annotation_type=' . $type->id) . "' class='add button green'>" . __("New") . " " . metadata($type, 'display_name') . "</a></td>";
             $zoeken_html .= "</tr>";
         }
         $zoeken_html .= '    </tbody>';
