@@ -6,10 +6,15 @@
  * @package Annotation
  */
 
+
 $annotationTypeElements = $annotation_type->AnnotationTypeElements;
 
 $typeName = html_escape($annotation_type->display_name);
 queue_css_file('annotation-type-form');
+
+
+
+
 
 $addNewTypeRequestUrl = admin_url('annotation/types/add-new-type-element');
 $addTypeRequestUrl = admin_url('annotation/types/add-type-element');
@@ -25,7 +30,7 @@ $js = "
         Omeka.AnnotationTypes.manageAnnotationTypes(addNewTypeRequestUrl, addTypeRequestUrl, changeTypeElementUrl);
         Omeka.AnnotationTypes.enableSorting();
     });                
-    ";
+";
 queue_js_string($js);
 queue_css_file('annotation-type-form');
 annotation_admin_header(array(__('Types'), __("Edit") . " &ldquo;$typeName&rdquo;"));
@@ -37,7 +42,7 @@ echo $this->partial('annotation-navigation.php');
 
 <div id="primary">
     <?php echo flash(); ?>
-    <?php  include 'form.php'; ?>
+    <?php include 'form.php'; ?>
 </div>
 
 <?php echo foot(); ?>

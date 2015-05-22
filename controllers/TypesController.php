@@ -93,10 +93,10 @@ class Annotation_TypesController extends Omeka_Controller_AbstractActionControll
         $elementEnglishName = $stem . '[english_name]';
 
         $elementAutocompleteName = $stem . '[autocomplete]';
-        $elementAutocompleteMainName = $stem . '[autocomplete_main]';
-        $elementAutocompleteExtraName = $stem . '[autocomplete_extra]';
-        $elementAutocompleteItemtypeName = $stem . '[autocomplete_itemtype]';
-        $elementAutocompleteCollectionName = $stem . '[autocomplete_collection]';
+        $elementAutocompleteMainName = $stem . '[autocomplete_main_id]';
+        $elementAutocompleteExtraName = $stem . '[autocomplete_extra_id]';
+        $elementAutocompleteItemtypeName = $stem . '[autocomplete_itemtype_id]';
+        $elementAutocompleteCollectionName = $stem . '[autocomplete_collection_id]';
 //        $elementAutocompleteId = $stem . '[element_autocomplete]';
 //        $elementAutocompleteMainId = $stem . '[element_autocomplete_main]';
 //        $elementAutocompleteExtraId = $stem . '[element_autocomplete_extra]';
