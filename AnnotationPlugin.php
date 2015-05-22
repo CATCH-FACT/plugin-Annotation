@@ -35,7 +35,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         'item_browse_sql',
 //        'before_save_item',
         'after_delete_item',
-//        'admin_items_browse_simple_each',
+        'admin_items_browse_simple_each',
         'initialize'
     );
 
@@ -165,17 +165,13 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
     }
     
     public function hookAdminItemsBrowseSimpleEach($item){
-//        print_r($item['item']);
         $item = get_current_record('item');
         echo '<ul style="margin: 0; padding: 0;"><li style="display: inline-block;">';
-        echo link_to_item(__("Annotate"), $props = array(), $action = 'annotate', $item);
-//        echo link_to_item(__('Annotate'), array('class' => 'annotate'), 'annotate-existing');
-        echo '&nbsp&middot&nbsp';
+        echo '<a style="color:#80BFFF" href="' . url('annotation/annotation/edit/id/' . $item->id) . '">' . __('Annotate') . '</a>';
+/*        echo '&nbsp&middot&nbsp';
         echo '</li><li style="display: inline-block;">';
-        echo '<a href="' . url('annotation/clone/id/' . $item->id) . '">' . __('Clone') . '</a>';
-        echo '</li></ul>';
-//        echo '<ul class="action-links"><li><a href="/vb2.2.2/admin/items/clone-confirm/72290" class="clone-confirm">clonen</a></li></ul>';
-//        echo "<ul><li>test</li><ul>";
+        echo '<a style="color:#80BFFF" href="' . url('annotation/clone/clone/id/' . $item->id) . '">' . __('Clone') . '</a>';
+        echo '</li></ul>';*/
     }
     
     function link_to_item($text = null, $props = array(), $action = 'show', $item = null)

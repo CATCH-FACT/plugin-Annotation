@@ -99,7 +99,7 @@ Omeka.Elements = {};
             dataType: 'json',
             data: params,
             success: function (toolResponse) {
-                console.log(toolResponse);
+//                console.log(toolResponse);
                 if (toolResponse.post_arguments != ""){
                     var post_arguments = JSON.parse(toolResponse.post_arguments);
                     for (var attrname in post_arguments) { allFields[attrname] = JSON.stringify(post_arguments[attrname]); }
@@ -552,8 +552,11 @@ Omeka.Elements = {};
         // When a generate metadata button is clicked, make an AJAX request based on the specified toolhat is connected to the field.
         context.find(annotationSelector).click(function (event) {
             event.preventDefault(); 
+
             var fieldDiv = $(this).parents(fieldSelector);
             annotationSelector = '.annotate-element';
+
+//            console.log(annotationSelector);
 
             //fetch the data from the form to turn into parameter data
             var allFields = {};
@@ -563,15 +566,17 @@ Omeka.Elements = {};
                 }
             })
 
+//            console.log(allFields);
+
             elementFormPartialUrlNoadd = elementFormPartialUrl + "-noadd"; //url for empty elementFormPartial
             elementFormPartialUrlTool = elementFormPartialUrl + "-tool"; //url for retrieving tool info
             //we need the whole document (to send data values to the webapps)
             //model is sent to keep track of slider values
             Omeka.Elements.elementFormFillRequest(fieldDiv, {add: '1'}, elementFormPartialUrlNoadd, elementFormPartialUrlTool, allFields, recordType, recordId, annotationId, model);
 
-            console.log(recordType);
-            console.log(recordId);
-            console.log(allFields);
+//            console.log(recordType);
+//            console.log(recordId);
+//            console.log(allFields);
             
         });
 

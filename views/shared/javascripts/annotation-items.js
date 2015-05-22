@@ -311,7 +311,7 @@ Omeka.Items = {};
      * @param {string} label
      */
     Omeka.Items.enableAddFiles = function (label) {
-        console.log("enablefiles");
+        $('#add-file').remove(); //triggers a lot.
         var filesDiv = $('#files-metadata .files');
 
         var link = $('<a href="#" id="add-file" class="add-file button">' + label + '</a>');
