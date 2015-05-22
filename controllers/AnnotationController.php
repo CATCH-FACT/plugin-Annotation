@@ -24,34 +24,39 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
         $element_xtra_id = $this->_getParam('autocomplete_extra_id');
         $itemtype_id = $this->_getParam('autocomplete_itemtype_id');
         $collection_id = $this->_getParam('autocomplete_collection_id');
-        $sorting = $this->_getParam('sorting');
+        $sorting = $this->_getParam('sorting');         //(to return latest existing ID's for instance)
         if (!$sorting) $sorting = "ASC";
+        $limit = $this->_getParam('limit');         //(to return latest existing ID's for instance)
+        if (!$limit) $limit = "15";
         $this->_helper->db->setDefaultModelName('ElementText');
+        
+        $response = array();
 
-        $tagText = "rood";
+/*        $tagText = "rood";
         if (empty($tagText)) {
             $this->_helper->json(array());
         }
+*/
+        if ($element_xtra_id){
+            $sql_query = "SELECT DISTINCT `items`.`id`, `_advanced_0`.`text`
+                            FROM `omeka_items` AS `items` ";
+            $sql_query .= $collection_id ? "INNER JOIN `omeka_collections` AS `collections` ON items.collection_id = collections.id " : " ";
+            $sql_query .= $itemtype_id ? "INNER JOIN `omeka_item_types` AS `item_types` ON items.item_type_id = item_types.id " : " ";
+            
+            $sql_query .= "INNER JOIN `omeka_element_texts` AS `_advanced_0` ON _advanced_0.record_id = items.id ";
+            $sql_query .= "AND _advanced_0.record_type = 'Item' ";
 
-        $sql_query = "SELECT `items`.`id`, `_advanced_0`.`text`
-                        FROM `omeka_items` AS `items`
-                        INNER JOIN `omeka_collections` AS `collections` ON items.collection_id = collections.id
-                        INNER JOIN `omeka_item_types` AS `item_types` ON items.item_type_id = item_types.id
-                        INNER JOIN `omeka_element_texts` AS `_advanced_0` ON _advanced_0.record_id = items.id 
-                        AND _advanced_0.record_type = 'Item' ";
+            $sql_query .= $element_id ? "AND _advanced_0.element_id = " . $element_id . " ": " ";
+    //        $sql_query .= $element_xtra_id ? "OR _advanced_0.element_id = " . $element_xtra_id . ") ": ") ";
 
-        $sql_query .= $element_id ? "AND _advanced_0.element_id = " . $element_id . " ": " ";
-//        $sql_query .= $element_xtra_id ? "OR _advanced_0.element_id = " . $element_xtra_id . ") ": ") ";
-
-        $sql_query .= $collection_id ? "AND (collections.id = '" . $collection_id . "') " : " ";
-        $sql_query .= $itemtype_id ? "AND (item_types.id = '" . $itemtype_id . "') " : " ";
-        $sql_query .= "AND (_advanced_0.text LIKE ? ) ";
-        $sql_query .= "GROUP BY `items`.`id` ORDER BY `_advanced_0`.`text` ";
-        $sql_query .= $sorting . " LIMIT 15";
+            $sql_query .= $collection_id ? "AND (collections.id = '" . $collection_id . "') " : " ";
+            $sql_query .= $itemtype_id ? "AND (item_types.id = '" . $itemtype_id . "') " : " ";
+            $sql_query .= "AND (_advanced_0.text LIKE ? ) ";
+            $sql_query .= "GROUP BY `items`.`id` ORDER BY `_advanced_0`.`text` ";
+            $sql_query .= $sorting . " LIMIT " . $limit;
         
-        $results = $this->_helper->db->getTable()->fetchPairs($sql_query, array('%' . $searchText . '%'));
+            $results = $this->_helper->db->getTable()->fetchPairs($sql_query, array('%' . $searchText . '%'));
         
-        if ((count($results) > 0) && $element_xtra_id){
             foreach ($results as $id=>$val){
                 $subquery = "SELECT * 
                             FROM  `omeka_element_texts` 
@@ -68,14 +73,33 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
             }
         }
         else{
+            $sql_query = "SELECT DISTINCT `_advanced_0`.`text`
+                            FROM `omeka_items` AS `items` ";
+            $sql_query .= $collection_id ? "INNER JOIN `omeka_collections` AS `collections` ON items.collection_id = collections.id " : " ";
+            $sql_query .= $itemtype_id ? "INNER JOIN `omeka_item_types` AS `item_types` ON items.item_type_id = item_types.id " : " ";
+            
+            $sql_query .= "INNER JOIN `omeka_element_texts` AS `_advanced_0` ON _advanced_0.record_id = items.id ";
+            $sql_query .= "AND _advanced_0.record_type = 'Item' ";
+
+            $sql_query .= $element_id ? "AND _advanced_0.element_id = " . $element_id . " ": " ";
+    //        $sql_query .= $element_xtra_id ? "OR _advanced_0.element_id = " . $element_xtra_id . ") ": ") ";
+
+            $sql_query .= $collection_id ? "AND (collections.id = '" . $collection_id . "') " : " ";
+            $sql_query .= $itemtype_id ? "AND (item_types.id = '" . $itemtype_id . "') " : " ";
+            $sql_query .= "AND (_advanced_0.text LIKE ? ) ";
+            $sql_query .= "GROUP BY `items`.`id` ORDER BY `_advanced_0`.`text` ";
+            $sql_query .= $sorting . " LIMIT " . $limit;
+
+            $results = $this->_helper->db->getTable()->fetchAll($sql_query, array('%' . $searchText . '%'));
+
             foreach ($results as $id=>$val){
                 $row = array();
-                $row['label'] = $val;
+                $row['label'] = $val['text'];
                 $row['value'] = "";
                 $response[] = $row;
             }
         }
-        
+
         $this->_helper->json($response);
     }
     
