@@ -556,12 +556,10 @@ Omeka.Elements = {};
             var fieldDiv = $(this).parents(fieldSelector);
             annotationSelector = '.annotate-element';
 
-//            console.log(annotationSelector);
-
             //fetch the data from the form to turn into parameter data
             var allFields = {};
             $(".textinput").each(function(i, fld){
-                if ($(fld).val()){
+                if ($(fld).val() && $(fld).attr("element-name")){ //other plugin fields should not be used.
                     allFields[$(fld).attr("element-name").toLowerCase()] = $(fld).val();
                 }
             })
