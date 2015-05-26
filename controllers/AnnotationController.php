@@ -183,14 +183,16 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
             if (isset($_POST['annotation_type']) && ($postedType = $_POST['annotation_type'])) {
                 $typeId = $postedType;
             }
+            if ($guessedTypeId = $this->_guessType($item_id)){
+                $typeId = $guessedTypeId;
+                $itemId = $item_id;
+            }
             if (isset($_POST['item_id']) && ($postedId = $_POST['item_id'])) {
                 $itemId = $postedId;
             }
-            if ($typeId && $postedId) {
+            if ($typeId && $itemId) {
                 if($user = current_user()) {
-                    $this->_setupAnnotateSubmit($typeId, $postedId);
-                    
-                    $this->view->item = $item;
+                    $this->_setupAnnotateSubmit($typeId, $itemId);
                     $this->view->typeForm = $this->view->render('annotation/type-form.php');
                     $this->view->saveForm = $this->view->render('annotation/save-form.php');
                 }
@@ -199,10 +201,29 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
                 $this->_helper->flashMessenger($this->_profile->getErrors(), 'error');
                 return;
             }
-//            $this->view->assign(compact('id', 'record'));
         }
     }
-        
+
+    /**
+    * Checks whether there is 1 or more itemtypes in the annotationtypes.
+    * If 1: return it
+    * if none or more: return false
+    */
+    public function _guessType($itemId)
+    {
+        $db = $this->_helper->db;
+        $item = $db->getTable('Item')->find($itemId);
+        $item_type = $item->item_type_id;
+
+        $types = get_db()->getTable('AnnotationType')->findBy(array('item_type_id'=>$item->item_type_id));
+        if (is_array($types)){
+            if (count($types) == 1){
+                return $types[0]->id;
+            }
+        }
+        return false;
+    }
+
     /**
      * Action for main annotation form.
      *  redirect to actual annotation 
@@ -478,7 +499,7 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
 
             $fileMetadata = array(
                 'file_transfer_type' => 'Upload',
-                'files' => 'annotated_file',
+                'files' => 'file',
                 'file_ingest_options' => $options
             );
 

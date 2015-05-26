@@ -129,8 +129,6 @@ if (!isset($required) && $type->isFileAllowed()){
 <?php endif; ?>
 <?php 
 // Allow other plugins to append to the form (pass the type to allow decisions on a type-by-type basis).
-_log("------------------------");
-_log($type->display_name);
 fire_plugin_hook('annotation_type_form', array('type'=>$type, 'view'=>$this, 'item'=>$item));
 //fire_plugin_hook('contribution_type_form', array('type'=>$type, 'view'=>$this));
 ?>
