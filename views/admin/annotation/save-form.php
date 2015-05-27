@@ -3,9 +3,9 @@
         <div id="public-featured">
             <?php if ( is_allowed('Items', 'makePublic') ): ?>
                 <div class="public">
-                    <label for="public"><?php echo __('Public'); ?>:</label> 
+                    <label for="annotation-public"><?php echo __('Public'); ?>:</label> 
                     <?php echo $this->formCheckbox('annotation-public', $item->public, null, array('1', '0')); ?>
-                    <label for="finished"><?php echo __('Completed'); ?>:</label> 
+                    <label for="annotation-finished"><?php echo __('Completed'); ?>:</label> 
                     <?php echo $this->formCheckbox('annotation-finished', $type->finished, null, array('1', '0')); ?>
                 </div>
             <?php endif; ?>

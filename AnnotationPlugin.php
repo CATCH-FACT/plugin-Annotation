@@ -324,7 +324,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $acl->addResource('Annotation_Annotation');
         $acl->allow(array('super', 'admin', 'contributor'), 'Annotation_Annotation');
         $acl->allow(null, 'Annotation_Annotation', array('add', 'doannotation', 'element-form-noadd', 'element-form-element', 'element-form-tool', 
-                                                        'element-form', 'save-form', "tag-form", "type-form", "autocomplete"));
+                                                        'element-form-tagtool', 'element-form', 'save-form', "tag-form", "type-form", "autocomplete"));
 
         $acl->addResource('Annotation_Clone');
         $acl->allow(null, 'Annotation_Clone', array('clone', 'cloned'));

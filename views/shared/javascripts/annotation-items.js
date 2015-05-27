@@ -97,15 +97,15 @@ Omeka.Items = {};
      * @param {string} tag Tag to add buttons for.
      */
     Omeka.Items.addTagElementWithScore = function (tag, score) {
-        var tagLi = $('<li/>');
+        var tagClass = (score < 25) ? "" : "tag-removed";
+        var tagLi = $('<li class="' + tagClass + '"/>');
         tagLi.after(" ");
 
         var undoButton = $('<span class="undo-remove-tag"><a href="#">Undo</a></span>').appendTo(tagLi);
         var deleteButton = $('<span class="remove-tag"><a href="#">Remove</a></span>').appendTo(tagLi);
-        var tagclass = score ? "tag tagscore" + (Math.round(score/10)*10) : "tag";
         
-        tagLi.prepend('<span class="' + tagclass + '">' + tag + '</span>');
-
+        tagLi.prepend('<span class="tag">' + tag + '</span>');
+        
         if($('#all-tags-list').length != 0) {
             $('#all-tags-list').append(tagLi);
         } else {
@@ -147,22 +147,102 @@ Omeka.Items = {};
      * 
      * @param {string} tags Comma-separated tags to be added.
      */
-    Omeka.Items.addTagsFill = function () {
-        var newTags = tags.split(Omeka.Items.tagDelimiter);
-
-        // only add tags from the input box that are new
+    Omeka.Items.addTagsFill = function (elementFormTagToolUrl) {
+        
+        //fetch the data from the form to turn into parameter data
+        var allFields = {};
+        $(".textinput").each(function(i, fld){
+            if ($(fld).val() && $(fld).attr("element-name")){ //other plugin fields should not be used.
+                allFields[$(fld).attr("element-name").toLowerCase()] = $(fld).val();
+            }
+        })
+        
+        params = {annotation_id: annotationId};
+        
+        console.log(allFields);
+        console.log(elementFormTagToolUrl);
+        console.log(params);
+        
         var oldTags = $('.tag-list .tag').map(function () {
             return $.trim(this.text);
         });
+        
+        //fetch tags from app
+        
+        //fetch the necesary tool information
+        $.ajax({
+            url: elementFormTagToolUrl,
+            type: 'POST',
+            dataType: 'json',
+            data: params,
+            success: function (toolResponse) {
+                console.log(toolResponse);
+                if (toolResponse.post_arguments != ""){
+                    var post_arguments = JSON.parse(toolResponse.post_arguments);
+                    for (var attrname in post_arguments) { allFields[attrname] = JSON.stringify(post_arguments[attrname]); }
+                }
+                //if succesfull: use tool to fetch annotation data
+                $.ajax({
+                    url: toolResponse.command,
+                    type: 'POST',
+                    dataType: toolResponse.output_format,
+                    data: allFields,
+                    success: function (response) {
+                        if (response["status"] == "ERROR"){
+                            alert('Error in response from server: ' + response["message"]);
+                            return;
+                        }
+                        
+                        //dig to the right leaf                        
+                        var jsonxml_value_node = toolResponse.jsonxml_value_node.split(".");
+                        var node = response;
 
-        $.each(newTags, function () {
-            var tag = $.trim(this);
-            if (tag && $.inArray(tag, oldTags) === -1) {
-                Omeka.Items.addTagElement(tag);
+//                        console.log(node);
+
+                        for (var i = 0; i < jsonxml_value_node.length; i++) {
+                            node = node[jsonxml_value_node[i]];
+                        }
+
+                        //make separate fields when the returned response node is an array
+                        //but when slidebar and idx: order set and concat based on score
+                        if( Object.prototype.toString.call( node ) === '[object Array]' ) {
+                            if( Object.prototype.toString.call( node[0] ) === '[object String]' ) {
+                                for (var i = 0; i < node.length; i++) {
+                                    var tag = $.trim(node[i]);
+                                    if (tag && $.inArray(tag, oldTags) === -1) {
+                                        Omeka.Items.addTagElement(tag);
+                                    }
+//                                    params["Elements[" + elementId + "][" + i + "][text]"] = node[i];
+                                }
+                            }
+                            else if (toolResponse.jsonxml_score_sub_node in node[0]){ //score nodes present (assume for all)
+
+//                                node.sort(function(a,b){return a[toolResponse.jsonxml_value_sub_node] - b[toolResponse.jsonxml_value_sub_node];});
+                                node.sort(function(a,b){return a.score - b.score;});
+
+                                console.log(node);
+                                
+                                for (var i = 0; i < node.length; i++) {
+                                    if (toolResponse.jsonxml_score_sub_node in node[i]){ 
+                                        var tag = $.trim(node[i][toolResponse.jsonxml_value_sub_node]);
+                                        if (tag && $.inArray(tag, oldTags) === -1) {
+                                            Omeka.Items.addTagElementWithScore(tag, node[i][toolResponse.jsonxml_score_sub_node]);
+                                        }
+                                        
+//                                        params["Elements[" + elementId + "][" + 0 + "][text]"] += sentences[i][toolResponse.jsonxml_value_sub_node] + " ";
+                                    }
+                                }
+                            }
+                            else{ //no idx nodes present
+                                for (var i = 0; i < node.length; i++) {
+                                    params["Elements[" + elementId + "][" + i + "][text]"] = node[i];
+                                }
+                            }
+                        }
+                    }
+                })
             }
         });
-
-        $('#tags').val('');
     };
 
     /**
@@ -223,11 +303,10 @@ Omeka.Items = {};
      * Set up tag remove/undo buttons and adding from tags field.
      *
      */
-    Omeka.Items.enableTagRemoval = function () {
+    Omeka.Items.enableTagRemoval = function (elementFormTagToolUrl) {
         $('#annotate-tags').click(function (event) {
             event.preventDefault();
-            Omeka.Items.addTagsFill();
-//            Omeka.Items.addTags($('#tags').val());
+            Omeka.Items.addTagsFill(elementFormTagToolUrl);
         });
         
         $('#add-tags-button').click(function (event) {

@@ -11,9 +11,12 @@ jQuery(window).load(function () {
     
     Omeka.Tabs.initialize();
 
+    elementFormTagToolUrl = <?php echo js_escape(url('annotation/annotation/element-form-tagtool')); ?>;
+
     Omeka.Items.tagDelimiter = <?php echo js_escape(get_option('tag_delimiter')); ?>;
     //tags other functions
-    Omeka.Items.enableTagRemoval();
+    Omeka.Items.enableTagRemoval(elementFormTagToolUrl);
+    
     Omeka.Items.makeFileWindow();
     Omeka.Items.enableSorting();
     //tags autocomplete

@@ -320,6 +320,16 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
      * Action for AJAX request from type form.
      * element and record are registered here
      */
+    public function elementFormTagtoolAction(){
+        $annotationId  = (int)$_POST['annotation_id'];
+        $annotationType = $this->_helper->db->getTable('AnnotationType')->find($annotationId); //specifically the annotation ID
+        $this->view->assign(compact('annotationType')); //assigning the variables to the view
+    }
+
+    /**
+     * Action for AJAX request from type form.
+     * element and record are registered here
+     */
     public function elementFormElementAction(){
         $annotationTypeElements = $this->_helper->db->getTable('AnnotationTypeElement')->findByAutocomplete();
         $this->view->assign(compact('annotationTypeElements')); //assigning the variables to the view
@@ -438,6 +448,8 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
             $itemMetadata['featured'] = (int) $post['annotation-featured'];
             $itemMetadata['public'] = (int) $post['annotation-public'];
             $itemMetadata['collection_id'] = (int) $post['collection_id'];
+            $itemMetadata['tags'] = "test1,test2";
+            $itemMetadata['tag'] = "test1,test2";
             
             $fileMetadata = $this->_processFileUpload($annotationType);
 
@@ -451,6 +463,9 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
                 $item = new Item();
                 $item->setOwner($user);
                 $item->save();
+                
+                _log(print_r($itemMetadata, true));
+                
                 $item = update_item($item, $itemMetadata, array(), $fileMetadata);
             } catch(Omeka_Validator_Exception $e) {
                 $this->flashValidatonErrors($e);
