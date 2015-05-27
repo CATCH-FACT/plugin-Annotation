@@ -1288,7 +1288,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
             $html = '';
             $name = $annotatedItem->getAnnotator()->name;
             $html .= "<p><strong>" . __("Annotated by:") . "</strong><span class='annotation-annotator'> $name</span></p>";
-
+/*
             $publicMessage = '';
             if(is_allowed($item, 'edit')) {
                 if($annotatedItem->public) {
@@ -1297,7 +1297,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
                     $publicMessage = __("This item cannot be made public.");
                 }
                 $html .= "<p><strong>$publicMessage</strong></p>";
-            }
+            }*/
             return $html;
         }
     }

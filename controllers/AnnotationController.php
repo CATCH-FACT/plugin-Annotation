@@ -169,7 +169,7 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
         
         $this->view->item = $item;
                 
-        if ($this->_processForm($_POST)) { //first check if form is posted
+        if ($this->_processForm($_POST, $item)) { //first check if form is posted
 
             $this->_helper->flashMessenger("Data accepted. Annotated Item created.", 'success');
             $route = $this->getFrontController()->getRouter()->getCurrentRouteName();
@@ -231,7 +231,7 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
     public function addAction()
     {
 
-        if ($this->_processForm($_POST)) {
+        if ($this->_processForm($_POST, false)) {
             $this->_helper->flashMessenger("Data accepted. Pre-annotated Item created.", 'success');
             $route = $this->getFrontController()->getRouter()->getCurrentRouteName();
             $this->_helper->_redirector->gotoRoute(array('action' => 'doannotation'), $route);
@@ -413,7 +413,7 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
      * @param array $post POST array
      * @return bool
      */
-    protected function _processForm($post)
+    protected function _processForm($post, $item)
     {   
         if (!empty($post)) {
             //for the "Simple" configuration, look for the user if exists by email. Log them in.
@@ -443,14 +443,25 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
                 return false;
             }
 
-            $itemMetadata = array('item_type_id' => $itemTypeId);
-                                  
+            $tags = "";
+            $deltags = "";
+
+            $itemMetadata = array(
+                Builder_Item::IS_PUBLIC      => (int) $post['annotation-public'],
+                Builder_Item::IS_FEATURED    => (int) $post['annotation-featured'],
+                Builder_Item::ITEM_TYPE_ID   => $itemTypeId,
+                Builder_Item::COLLECTION_ID  => (int) $post['collection_id'],
+//                Builder_Item::TAGS           => $tags,
+            );
+
+/*            $itemMetadata = array('item_type_id' => $itemTypeId);
+
             $itemMetadata['featured'] = (int) $post['annotation-featured'];
             $itemMetadata['public'] = (int) $post['annotation-public'];
             $itemMetadata['collection_id'] = (int) $post['collection_id'];
             $itemMetadata['tags'] = "test1,test2";
             $itemMetadata['tag'] = "test1,test2";
-            
+*/            
             $fileMetadata = $this->_processFileUpload($annotationType);
 
             // This is a hack to allow the file upload job to succeed
@@ -460,7 +471,7 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
             }
             try {
                 //in case we're doing Simple, create and save the Item so the owner is set, then update with the data
-                $item = new Item();
+                $item = $item ? $item : new Item();
                 $item->setOwner($user);
                 $item->save();
                 
@@ -482,7 +493,9 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
                 $this->_helper->flashMessenger($e->getMessage());
                 return false;
             }
+            $item->deleteElementTexts();
             $this->_addElementTextsToItem($item, $post['Elements']);
+            $this->_addTagsToItem($item, $post);
             // Allow plugins to deal with the inputs they may have added to the form.
             fire_plugin_hook('annotation_save_form', array('annotationType'=>$annotationType,'item'=>$item, 'post'=>$post));
             
@@ -494,6 +507,14 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
             return true;
         }
         return false;
+    }
+
+    protected function _addTagsToItem($item, $post) {
+        // Save/delete the tags.
+        if (array_key_exists('tags-to-add', $post)) {
+            $item->addTags($post['tags-to-add']);
+            $item->deleteTags($post['tags-to-delete']);
+        }
     }
 
     
