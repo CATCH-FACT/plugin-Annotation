@@ -2,9 +2,11 @@
 /**
  * @version $Id$
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
- * @copyright Twente University 2015
+ * @copyright Meertens Institute 2015
  * @package Annotation
  */
+//defined('ANNOTATION_DIRECTORY') or define('ANNOTATION_DIRECTORY', dirname(__FILE__));
+
 
 define('ANNOTATION_PLUGIN_DIR', dirname(__FILE__));
 define('ANNOTATION_HELPERS_DIR', ANNOTATION_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'helpers');
@@ -30,6 +32,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         'define_routes',
         'admin_plugin_uninstall_message',
         'admin_items_search',
+//        'admin_items_show',
         'admin_items_show_sidebar',
         'admin_items_browse_detailed_each',
         'item_browse_sql',
@@ -42,7 +45,8 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
     protected $_filters = array(
         'admin_navigation_main',
         'simple_vocab_routes',
-        'admin_dashboard_panels'
+        'admin_dashboard_panels',
+        'admin_dashboard_stats'
         );
 
     protected $_options = array(
@@ -51,6 +55,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         'annotation_email_recipients',
         'annotation_consent_text',
         'annotation_collection_id',
+        'annotation_incomplete_collection_id',
         'annotation_default_type',
         'annotation_user_profile_type',
         'annotation_simple',
@@ -58,13 +63,41 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
     );
 
     /**
+     * Upgrade the plugin.
+     */
+    public function hookUpgrade($args)
+    {
+        $oldVersion = $args['old_version'];
+        $newVersion = $args['new_version'];
+        $db = $this->_db;
+
+        if (version_compare($oldVersion, '0.2', '<=')) {
+            $sql = "ALTER TABLE `$db->AnnotationTypeElement` ADD `field_scroll` INT UNSIGNED NOT NULL DEFAULT '0'";
+            $db->query($sql, array('other_error', 'error'));
+        }
+    }
+
+    /**
+     * Appends some more stats to the dashboard
+     * 
+     * @return void
+     **/
+    function filterAdminDashboardStats($stats)
+    {   
+        if ($contribution_collection_id = get_option('contribution_collection_id')){
+            $collection = get_record_by_id('Collection', $contribution_collection_id);
+            $stats[] = array(link_to_items_in_collection(metadata($collection, 'total_items'), $props = array(), $action = 'browse', $collectionObj = $collection), __('Unannotated Items'));
+        }
+        return $stats;
+    }
+
+    /**
      * Append search to dashboard
      * 
      * @return void
      **/
     function filterAdminDashboardPanels($panels){
-        array_unshift($panels, $this->_addDashboardAnnotationStuff($panels));
-//        $panels[] = $this->_addDashboardAnnotationStuff($panels);
+        array_unshift($panels, $this->_addDashboardAnnotationStuff($panels)); //pushing the rest down!
         return $panels;
     }
 
@@ -73,48 +106,52 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $db = $this->_db;
         $annotation_types = $db->getTable('AnnotationType')->findAll();
         
-        $zoeken_html = "<H1>" . __("Annotation control") . "</H1><br>";
+        $html = "<H1>" . __("Annotation control") . "</H1><br>";
 
-        $zoeken_html .= "<H2>" . __("Types to annotate") . "</H2>";
+        if ($contribution_collection_id = get_option('contribution_collection_id')){
+            $html .= "<H2>" . __("Existing unannotated Items") . "</H2>";
+            $html .= "<br>";
+            $collection = get_record_by_id('Collection', $contribution_collection_id);
+            $html .= link_to_items_in_collection(__("Unannotated Items Collection: <br>") . metadata($collection, array('Dublin Core', 'Title')) . " (" . metadata($collection, 'total_items') . ")", $props = array(), $action = 'browse', $collectionObj = $collection);
+            $html .= "<br><br>";
+        }
+
+        $html .= "<H2>" . __("New annotation") . "</H2>";
         
-        $zoeken_html .= '<table>';
-        $zoeken_html .= '    <thead id="types-table-head">';
-        $zoeken_html .= "        <tr>";
-        $zoeken_html .= "            <th>" . __("Name") . "</th>";
-        $zoeken_html .= "            <th>" . __("Annotated Items") . "</th>";
-        $zoeken_html .= "            <th>" . __("Annotate a new item") . "</th>";
-        $zoeken_html .= "        </tr>";
-        $zoeken_html .= "    </thead>";
-        $zoeken_html .= '    <tbody id="types-table-body">';
-        
-        //http://127.0.0.1/vb2.2.2/admin/annotation/annotation?annotation_type=2
+        $html .= '<table>';
+        $html .= '    <thead id="types-table-head">';
+        $html .= "        <tr>";
+        $html .= "            <th>" . __("Name") . "</th>";
+        $html .= "            <th>" . __("Annotated Items") . "</th>";
+        $html .= "            <th>" . __("Annotate a new item") . "</th>";
+        $html .= "        </tr>";
+        $html .= "    </thead>";
+        $html .= '    <tbody id="types-table-body">';
         
         foreach ($annotation_types as $type){
-            $zoeken_html .= "<tr>";
-            $zoeken_html .= "<td><strong>" . metadata($type, 'display_name') . " (" . __($type->ItemType->name) . ")</strong></td>";
-            $zoeken_html .= "<td><a href='" . url('items/browse/annotated/1/type/' . $type->item_type_id) . "'>" . __("View") . "</a></td>";
-            $zoeken_html .= "<td><a href='" . url('annotation/annotation?annotation_type=' . $type->id) . "' class='add button green'>" . __("New") . " " . metadata($type, 'display_name') . "</a></td>";
-            $zoeken_html .= "</tr>";
+            $html .= "<tr>";
+            $html .= "<td><strong>" . metadata($type, 'display_name') . " (" . __($type->ItemType->name) . ")</strong></td>";
+            $html .= "<td><a href='" . url('items/browse/annotated/1/type/' . $type->item_type_id) . "'>" . __("View") . "</a></td>";
+            $html .= "<td><a href='" . url('annotation/annotation?annotation_type=' . $type->id) . "' class='add button green'>" . __("New") . ": " . metadata($type, 'display_name') . "</a></td>";
+            $html .= "</tr>";
         }
-        $zoeken_html .= '    </tbody>';
-        $zoeken_html .= '</table>';
+        $html .= '    </tbody>';
+        $html .= '</table>';
         
-
-//        $annotated_items = $db->getTable('AnnotationAnnotatedItem')->findAll();
         $annotated_items = get_recent_annotated_items(5);
         $browseHeadings[__('Item')] = null;
         $browseHeadings[__('Publication Status')] = null;
         $browseHeadings[__('Date Added')] = 'added';
         
-        $zoeken_html .= "<H2>" . __("Recently annotated Items") . "</H2>";
+        $html .= "<H2>" . __("Recently annotated Items") . "</H2>";
 
-        $zoeken_html .= '<table>';
-        $zoeken_html .= '    <thead id="types-table-head">';
-        $zoeken_html .= '        <tr>';
-        $zoeken_html .= browse_sort_links($browseHeadings, array('link_tag' => 'th scope="col"', 'list_tag' => '')); 
-        $zoeken_html .= '        </tr>';
-        $zoeken_html .= '    </thead>';
-        $zoeken_html .= '    <tbody id="types-table-body">';
+        $html .= '<table>';
+        $html .= '    <thead id="types-table-head">';
+        $html .= '        <tr>';
+        $html .= browse_sort_links($browseHeadings, array('link_tag' => 'th scope="col"', 'list_tag' => '')); 
+        $html .= '        </tr>';
+        $html .= '    </thead>';
+        $html .= '    <tbody id="types-table-body">';
         
         foreach($annotated_items as $contribItem){
 
@@ -134,25 +171,25 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
                 }
             }
 
-            $zoeken_html .= '<tr>';
-            $zoeken_html .= '    <td>' . link_to($item, 'show', metadata($item, array('Dublin Core', 'Title'))) . '</td>';
-            $zoeken_html .= '        <td>' . $status . '</td>';
-            $zoeken_html .= '        <td>' . format_date(metadata($item, 'added'));
+            $html .= '<tr>';
+            $html .= '    <td>' . link_to($item, 'show', metadata($item, array('Dublin Core', 'Title'))) . '</td>';
+            $html .= '        <td>' . $status . '</td>';
+            $html .= '        <td>' . format_date(metadata($item, 'added'));
             if(!is_null($annotator->id)){
                 if($contribItem->anonymous && (is_allowed('Annotation_Items', 'view-anonymous') || $annotator->id == current_user()->id)){
-                    $zoeken_html .= '<span>(' . __('Anonymous') . ')</span>';
+                    $html .= '<span>(' . __('Anonymous') . ')</span>';
                 }
-//                $zoeken_html .= ' <a href=' . $annotatorUrl . '>' . metadata($annotator, 'name') . '</a>';
-                $zoeken_html .= " " . __("by") . " <b>" . metadata($annotator, 'name') . "</b>";
+//                $html .= ' <a href=' . $annotatorUrl . '>' . metadata($annotator, 'name') . '</a>';
+                $html .= " " . __("by") . " <b>" . metadata($annotator, 'name') . "</b>";
             }
             
-            $zoeken_html .= '    </tr>';
+            $html .= '    </tr>';
         }
         
-        $zoeken_html .= '    </tbody>';
-        $zoeken_html .= '</table>';
+        $html .= '    </tbody>';
+        $html .= '</table>';
 
-    	return $zoeken_html;
+    	return $html;
     }
 
     public function setUp() 
@@ -166,13 +203,18 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
     
     public function hookAdminItemsBrowseSimpleEach($item){
         $item = get_current_record('item');
-        echo '<ul style="margin: 0; padding: 0;"><li style="display: inline-block;">';
-        echo '<a style="color:#80BFFF" href="' . url('annotation/annotation/edit/id/' . $item->id) . '">' . __('Annotate') . '</a>';
-/*        echo '&nbsp&middot&nbsp';
-        echo '</li><li style="display: inline-block;">';
-        echo '<a style="color:#80BFFF" href="' . url('annotation/clone/clone/id/' . $item->id) . '">' . __('Clone') . '</a>';
-        echo '</li></ul>';*/
+        echo '<ul style="margin: 0; padding: 0;">';
+        echo '  <li style="display: inline-block;">';
+        echo '      <a style="color:#80BFFF" href="' . url('annotation/annotation/edit/id/' . $item->id) . '">' . __('Annotate') . '</a>';
+        echo '  </li>';
+        echo '&nbsp&middot&nbsp';
+
+        echo '  <li style="display: inline-block;">';
+        echo '      <a style="color:#80BFFF" href="' . url('annotation/clone/clone/id/' . $item->id) . '">' . __('Clone') . '</a>';
+        echo '  </li>';
+        echo '</ul>';
     }
+
     
     function link_to_item($text = null, $props = array(), $action = 'show', $item = null)
     {
@@ -220,14 +262,15 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
             `order` INT UNSIGNED NOT NULL,
             `long_text` BOOLEAN DEFAULT FALSE,
             `repeated_field` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
-            `score_slider`  TINYINT(1) UNSIGNED NOT NULL DEFAULT '0', # for: text build-up ()when idx) / annotation threshold (when no idx)
+            `score_slider`  TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',           # for: text build-up ()when idx) / annotation threshold (when no idx)
             `date_range_picker` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
             `date_picker` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
-            `autocomplete` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0', #autocomplete flag
-            `autocomplete_main_id`  INT UNSIGNED NULL,                  #in which element are we going to search?
-            `autocomplete_extra_id`  INT UNSIGNED NULL,                 #maybe some extra field needs to be checked?
-            `autocomplete_itemtype_id`  INT UNSIGNED NULL,              #do we need to restrict to a certain Itemtype?
-            `autocomplete_collection_id`  INT UNSIGNED NULL,            #do we need to restrict to a certain Collection?
+            `autocomplete` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',            #autocomplete flag
+            `autocomplete_main_id` INT UNSIGNED NOT NULL DEFAULT '0',           #in which element are we going to search?
+            `autocomplete_extra_id` INT UNSIGNED NOT NULL DEFAULT '0',          #maybe some extra field needs to be checked?
+            `autocomplete_itemtype_id` INT UNSIGNED NOT NULL DEFAULT '0',       #do we need to restrict to a certain Itemtype?
+            `autocomplete_collection_id` NOT NULL DEFAULT '0',                  #do we need to restrict to a certain Collection?
+            `field_scroll`  NOT NULL DEFAULT '0',                               #an option to let a field scroll during annotation
             PRIMARY KEY (`id`),
             UNIQUE KEY `type_id_element_id` (`type_id`, `element_id`),
             KEY `order` (`order`)
@@ -257,11 +300,11 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
             `get_arguments` VARCHAR(255) NULL,
             `post_arguments` TEXT NULL,
             `output_format` ENUM('raw', 'xml', 'json') NOT NULL,
-            `jsonxml_value_node` VARCHAR(255) NOT NULL, 
+            `jsonxml_value_node` VARCHAR(255) NOT NULL,         #the main node with the values
             `jsonxml_score_node` VARCHAR(255) NULL,
+            `jsonxml_value_sub_node` VARCHAR(255) NULL,         #the if the separate values also are an array
             `jsonxml_score_sub_node` VARCHAR(255) NULL,
-            `jsonxml_value_sub_node` VARCHAR(255) NULL,
-            `jsonxml_idx_sub_node` VARCHAR(255) NULL,
+            `jsonxml_idx_sub_node` VARCHAR(255) NULL,           #the idx node is for the buildup of small texts based on a score slider
             `tag_or_separator` VARCHAR(255) NULL,
             `order` INT UNSIGNED NULL,
             `validated` ENUM('yes', 'no') NULL,
@@ -270,9 +313,10 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $this->_db->query($sql);
 
         $this->_createDefaultAnnotationTypes();
-        set_option('annotation_email_recipients', get_option('administrator_email'));        
+        set_option('annotation_email_recipients', get_option('administrator_email'));
     }
 
+    
 
     //
     public function hookAdminItemsFormItemTypes(){
@@ -299,10 +343,6 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
             `$db->AnnotationAnnotatorField`,
             `$db->AnnotationAnnotatorValue`;";
         $this->_db->query($sql);
-    }
-
-    public function hookUpgrade($args)
-    {
     }
 
     public function hookAdminPluginUninstallMessage()
@@ -488,11 +528,14 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
 
     public function hookAdminItemsShowSidebar($args)
     {
-        
         $htmlBase = $this->_adminBaseInfo($args);
         echo "<div class='panel'>";
         echo "<h4>" . __("Annotation") . "</h4>";
         echo $htmlBase;
+        
+        $item = get_current_record('item');
+        echo '<a href="' . url('annotation/annotation/edit/id/' . $item->id) . '" class="big blue button">' . __('Annotate Item') . '</a>';
+        echo '<a href="' . url('annotation/clone/clone/id/' . $item->id) . '" class="big green button">' . __('Clone') . '</a>';        
         echo "</div>";
     }
 

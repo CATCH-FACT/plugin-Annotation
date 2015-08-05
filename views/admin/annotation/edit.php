@@ -2,9 +2,10 @@
 /**
  * @version $Id$
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
- * @copyright Center for History and New Media, 2010
+ * @copyright Meertens Institute 2015
  * @package Annotation
  */
+
 
 queue_js_file('annotation-admin-form');
 

@@ -2,7 +2,7 @@
 /**
  * @version $Id$
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
- * @copyright 
+ * @copyright Meertens Institute 2015
  * @package Annotation
  */
  
@@ -65,6 +65,7 @@ class Annotation_TypesController extends Omeka_Controller_AbstractActionControll
             $elementAutocompleteExtraId = $this->_getParam('elementAutocompleteExtraId');
             $elementAutocompleteItemtypeId = $this->_getParam('elementAutocompleteItemtypeId');
             $elementAutocompleteCollectionId = $this->_getParam('elementAutocompleteCollectionId');
+            $elementFieldScrollId = $this->_getParam('elementFieldScrollId');
         } else {
             $elementTempId = '' . time();
             $elementId = '';
@@ -77,6 +78,7 @@ class Annotation_TypesController extends Omeka_Controller_AbstractActionControll
             $elementAutocompleteExtraId = '';
             $elementAutocompleteItemtypeId = '';
             $elementAutocompleteCollectionId = '';
+            $elementFieldScrollId = '';
             
         }
     
@@ -97,11 +99,7 @@ class Annotation_TypesController extends Omeka_Controller_AbstractActionControll
         $elementAutocompleteExtraName = $stem . '[autocomplete_extra_id]';
         $elementAutocompleteItemtypeName = $stem . '[autocomplete_itemtype_id]';
         $elementAutocompleteCollectionName = $stem . '[autocomplete_collection_id]';
-//        $elementAutocompleteId = $stem . '[element_autocomplete]';
-//        $elementAutocompleteMainId = $stem . '[element_autocomplete_main]';
-//        $elementAutocompleteExtraId = $stem . '[element_autocomplete_extra]';
-//        $elementAutocompleteItemtypeId = $stem . '[element_autocomplete_itemtype]';
-//        $elementAutocompleteCollectionId = $stem . '[element_autocomplete_collection]';
+        $elementFieldScrollName = $stem . '[field_scroll]';
         
         $item_type_id = $this->_getParam('itemTypeId');
         
@@ -126,12 +124,13 @@ class Annotation_TypesController extends Omeka_Controller_AbstractActionControll
                 'element_autocomplete_extra_name' => $elementAutocompleteExtraName,
                 'element_autocomplete_itemtype_name' =>$elementAutocompleteItemtypeName,
                 'element_autocomplete_collection_name' => $elementAutocompleteCollectionName,
+                'element_field_scroll_name' => $elementFieldScrollName,
                 'element_autocomplete_value' => $elementAutocomplete,
                 'element_autocomplete_main_value' => $elementAutocompleteMainId,
                 'element_autocomplete_extra_value' => $elementAutocompleteExtraId,
                 'element_autocomplete_itemtype_value' =>$elementAutocompleteItemtypeId,
                 'element_autocomplete_collection_value' => $elementAutocompleteCollectionId,
-                                                
+                'element_field_scroll_value' => $elementFieldScrollId,
                 'item_type_id' => $item_type_id 
         ));
     }
@@ -202,6 +201,7 @@ class Annotation_TypesController extends Omeka_Controller_AbstractActionControll
                             $annotationEl->autocomplete_extra_id = $elementInfo['autocomplete_extra_id'];
                             $annotationEl->autocomplete_itemtype_id = $elementInfo['autocomplete_itemtype_id'];
                             $annotationEl->autocomplete_collection_id = $elementInfo['autocomplete_collection_id'];
+                            $annotationEl->field_scroll = $elementInfo['field_scroll'];
                             $annotationEl->type_id = $record->id;
                             $annotationEl->save();
                         }                        
@@ -232,6 +232,7 @@ class Annotation_TypesController extends Omeka_Controller_AbstractActionControll
                             $annotationEl->autocomplete_extra_id = $elementInfo['autocomplete_extra_id'];
                             $annotationEl->autocomplete_itemtype_id = $elementInfo['autocomplete_itemtype_id'];
                             $annotationEl->autocomplete_collection_id = $elementInfo['autocomplete_collection_id'];
+                            $annotationEl->field_scroll = $elementInfo['field_scroll'];
                             $annotationEl->save();
                         }
                     }

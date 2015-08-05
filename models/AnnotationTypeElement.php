@@ -2,7 +2,7 @@
 /**
  * @version $Id$
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
- * @copyright Center for History and New Media, 2010
+ * @copyright Meertens Institute 2015
  * @package Annotation
  * @subpackage Models
  */
@@ -31,6 +31,7 @@ class AnnotationTypeElement extends Omeka_Record_AbstractRecord
     public $autocomplete_extra_id;
     public $autocomplete_itemtype_id;
     public $autocomplete_collection_id;
+    public $field_scroll;
     
     protected $_related = array('AnnotationType' => 'getType',
                                 'Element'        => 'getElement',

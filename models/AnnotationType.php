@@ -2,7 +2,7 @@
 /**
  * @version $Id$
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
- * @copyright Twente University 2015
+ * @copyright Meertens Institute 2015
  * @package Annotation
  * @subpackage Models
  */

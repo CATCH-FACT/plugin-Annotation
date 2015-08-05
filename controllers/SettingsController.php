@@ -2,7 +2,7 @@
 /**
  * @version $Id$
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
- * @copyright Center for History and New Media, 2010
+ * @copyright Meertens Institute 2015
  * @package Annotation
  */
  
@@ -75,7 +75,7 @@ class Annotation_SettingsController extends Omeka_Controller_AbstractActionContr
         $form = new Omeka_Form_Admin(array('type'=>'annotation_settings'));
         
         $collections = get_db()->getTable('Collection')->findPairsForSelectForm();
-        $collections = array('' => __('Do not put annotations in any collection')) + $collections;        
+        $collections = array('' => __('No collection')) + $collections;        
         
         $form->addElementToEditGroup('select', 'annotation_collection_id', array(
             'label'        => __('Annotation Collection'),
@@ -83,6 +83,12 @@ class Annotation_SettingsController extends Omeka_Controller_AbstractActionContr
             'multiOptions' => $collections
         ));
         
+        $form->addElementToEditGroup('select', 'annotation_incomplete_collection_id', array(
+            'label'        => __('Incomplete Items Collection'),
+            'description'  => __('The collection with incomplete Items that have to be Annotated.'),
+            'multiOptions' => $collections
+        ));
+    
         if(plugin_is_active('MetaMetaData')) {
             $form->addElementToEditGroup('checkbox', 'annotation_metametadata', array(
                 'label' => __("Add MetaMetaData for Automatic Annotations"),

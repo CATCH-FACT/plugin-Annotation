@@ -97,7 +97,7 @@ Omeka.Items = {};
      * @param {string} tag Tag to add buttons for.
      */
     Omeka.Items.addTagElementWithScore = function (tag, score) {
-        var tagClass = (score < 25) ? "" : "tag-removed";
+        var tagClass = (score > 25) ? "" : "tag-removed";
         var tagLi = $('<li class="' + tagClass + '"/>');
         tagLi.after(" ");
 
@@ -176,7 +176,7 @@ Omeka.Items = {};
             dataType: 'json',
             data: params,
             success: function (toolResponse) {
-                console.log(toolResponse);
+//                console.log(toolResponse);
                 if (toolResponse.post_arguments != ""){
                     var post_arguments = JSON.parse(toolResponse.post_arguments);
                     for (var attrname in post_arguments) { allFields[attrname] = JSON.stringify(post_arguments[attrname]); }
@@ -220,7 +220,7 @@ Omeka.Items = {};
 //                                node.sort(function(a,b){return a[toolResponse.jsonxml_value_sub_node] - b[toolResponse.jsonxml_value_sub_node];});
                                 node.sort(function(a,b){return a.score - b.score;});
 
-                                console.log(node);
+//                                console.log(node);
                                 
                                 for (var i = 0; i < node.length; i++) {
                                     if (toolResponse.jsonxml_score_sub_node in node[i]){ 
@@ -228,8 +228,6 @@ Omeka.Items = {};
                                         if (tag && $.inArray(tag, oldTags) === -1) {
                                             Omeka.Items.addTagElementWithScore(tag, node[i][toolResponse.jsonxml_score_sub_node]);
                                         }
-                                        
-//                                        params["Elements[" + elementId + "][" + 0 + "][text]"] += sentences[i][toolResponse.jsonxml_value_sub_node] + " ";
                                     }
                                 }
                             }

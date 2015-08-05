@@ -1,4 +1,10 @@
 <?php
+/**
+ * @version $Id$
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt
+ * @copyright Meertens Institute 2015
+ * @package Annotation
+ */
 
 class Annotation_CloneController extends Omeka_Controller_AbstractActionController
 {
@@ -13,11 +19,11 @@ class Annotation_CloneController extends Omeka_Controller_AbstractActionControll
         
         $this->_helper->db->setDefaultModelName('Item');
         
-        $this->session->record = $this->_helper->db->findById($id);
+        $this->session->record = $this->_helper->db->findById($this->session->id);
         
-        $this->session->itemTypeId = $record->item_type_id;
+        $this->session->itemTypeId = $this->session->record->item_type_id;
         
-        $elementsTexts = $record->getAllElementTexts();
+        $elementsTexts = $this->session->record->getAllElementTexts();
         
         $allElements = get_table_options(
                 'Element', null,
@@ -27,13 +33,13 @@ class Annotation_CloneController extends Omeka_Controller_AbstractActionControll
                 );
         $this->session->allElements = $allElements["Itemtype metadata"] + $allElements["Dublin Core"];
 
-        require_once CSV_IMPORT_DIRECTORY . '/forms/CloneForm.php';
+/*        require_once ANNOTATION_FORMS_DIR . '/CloneForm.php';
         $form = new CsvImport_Form_Mapping(array(
             'itemTypeId' => $this->session->itemTypeId,
             'allElements' => $this->session->allElements,
             'record' => $this->session->record
         ));
-        $this->view->form = $form;
+        $this->view->form = $form;/*
         
         //Generate choice form for cloning    
         $this->view->assign(compact('itemTypeId', 'record', 'elementsTexts', 'allElements'));

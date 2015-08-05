@@ -59,6 +59,9 @@
 
         echo "<span class='long-text'>" . __('Repeated value allowed') . "</span>";
         echo $this->formCheckbox($element_repeated_name, null);
+
+        echo "<span class='long-text'>" . __('Scrolling textfield') . "</span>";
+        echo $this->formCheckbox($element_field_scroll_name, null);
         
         echo "<br>";
 

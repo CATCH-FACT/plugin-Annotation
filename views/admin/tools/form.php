@@ -1,4 +1,13 @@
 <?php 
+/*
+`jsonxml_value_node` VARCHAR(255) NOT NULL,         #the main node with the values
+`jsonxml_score_node` VARCHAR(255) NULL,
+`jsonxml_value_sub_node` VARCHAR(255) NULL,         #the if the separate values also are an array
+`jsonxml_score_sub_node` VARCHAR(255) NULL,
+`jsonxml_idx_sub_node` VARCHAR(255) NULL,           
+`tag_or_separator` VARCHAR(255) NULL,
+`validated` ENUM('yes', 'no') NULL,
+*/
 
 queue_js_file('tool-settings');
 
@@ -20,7 +29,7 @@ $toolOutputOptions = array('' => 'Select an Item Type', 'raw' => 'Raw format (li
              <?php echo $this->formText('display_name', $annotation_tool->display_name, array()); ?>
             </div>
         </div>
-     </div>
+    </div>
 
      <div class="field">
          <div class="two columns alpha">
@@ -105,6 +114,30 @@ $toolOutputOptions = array('' => 'Select an Item Type', 'raw' => 'Raw format (li
              <p class="explanation"><?php echo __("The name of the node where the score of the data resides (standard: score). This will get the data from <score>"); ?></p>
              <div class="input-block">
               <?php echo $this->formText('jsonxml_score_node', $annotation_tool->jsonxml_score_node ? $annotation_tool->jsonxml_score_node : "score", array()); ?>
+             </div>
+         </div>
+     </div>
+
+     <div class="field">
+         <div class="two columns alpha">
+             <label><?php echo __("Name of the value SUBnode (if separate return values are in an array)"); ?></label>
+         </div>
+         <div class="inputs five columns omega">
+             <p class="explanation"><?php echo __("The name of the node where the data resides (standard: value). This will get the data from .value. Leave empty when output is normal array"); ?></p>
+             <div class="input-block">
+              <?php echo $this->formText('jsonxml_value_sub_node', $annotation_tool->jsonxml_value_sub_node ? $annotation_tool->jsonxml_value_sub_node : "value" , array()); ?>
+             </div>
+         </div>
+     </div>
+
+     <div class="field">
+         <div class="two columns alpha">
+             <label><?php echo __("Name of the score SUBnode (if separate return values are in an array)"); ?></label>
+         </div>
+         <div class="inputs five columns omega">
+             <p class="explanation"><?php echo __("The name of the node where the score of the data resides (standard: score). This will get the data from .score. Leave empty when output is normal array"); ?></p>
+             <div class="input-block">
+              <?php echo $this->formText('jsonxml_score_sub_node', $annotation_tool->jsonxml_score_sub_node ? $annotation_tool->jsonxml_score_sub_node : "score", array()); ?>
              </div>
          </div>
      </div>

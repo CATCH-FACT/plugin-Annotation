@@ -11,6 +11,8 @@ jQuery(window).load(function () {
     
     Omeka.Tabs.initialize();
 
+    loadImageURL = <?php echo js_escape(img("ajax-loader.gif")); ?>;
+
     elementFormTagToolUrl = <?php echo js_escape(url('annotation/annotation/element-form-tagtool')); ?>;
 
     Omeka.Items.tagDelimiter = <?php echo js_escape(get_option('tag_delimiter')); ?>;
@@ -45,7 +47,7 @@ jQuery(document).bind('omeka:elementformload', function (event) { //
     recordType = 'Item'<?php if ($id = metadata('item', 'id')) echo ', ' . $id; ?>;
     recordId = null;
     
-    Omeka.Elements.makeElementControls(event.target, elementFormPartialUrl, autocompleteChoicesUrl, recordType, recordId, annotationId, model);
+    Omeka.Elements.makeElementControls(event.target, elementFormPartialUrl, autocompleteChoicesUrl, loadImageURL, recordType, recordId, annotationId, model);
     Omeka.Elements.makeElementInformationTooltips();
     
     Omeka.Items.enableAddFiles(<?php echo js_escape(__('Add Another File')); ?>);

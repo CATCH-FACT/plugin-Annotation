@@ -141,6 +141,9 @@
                 <span class='prompt'><?php echo __('Repeated values'); ?></span>
                 <?php echo $this->formCheckbox("elements[$annotationElement->id][repeated_field]", null, array('checked'=>$annotationElement->repeated_field)); ?>
 
+                <span class='prompt'><?php echo __('Scrolling textfield (one per type)'); ?></span>
+                <?php echo $this->formCheckbox("elements[$annotationElement->id][field_scroll]", null, array('checked'=>$annotationElement->field_scroll)); ?>
+
                 <?php echo "<br>";?>
 
                 <span class='prompt'><?php echo __("Date picker: "); ?></span>

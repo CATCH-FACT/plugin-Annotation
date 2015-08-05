@@ -87,13 +87,20 @@ class Annotation_View_Helper_AnnotationElementForm extends Omeka_View_Helper_Ele
         //only add annotation button if a tool is specified
         $html .= $this->_annotationTypeElement->tool_id ? $components['add_annotation'] : "";
 
-        $html .= $this->_annotationTypeElement->repeated_field ? $components['add_input'] : "";
+//        $html .= $this->_annotationTypeElement->repeated_field ? $components['add_input'] : "";
         $html .= '</div>'; // Close div
 
         $html .= '<div class="inputs six columns omega">';
-        $html .= $components['inputs'];
-        $html .= "</div>\n"; // Close 'inputs' div
 
+        $html .= $components['inputs'];
+
+        $html .= '&nbsp';
+
+        $html .= $this->_annotationTypeElement->repeated_field ? $components['add_input'] : "";
+
+        $html .= "</div>\n"; // Close 'inputs' div
+        
+        
         $html .= $divWrap ? "</div>\n\n" : ''; // Close 'field' div
 
         return $html;
@@ -245,6 +252,7 @@ class Annotation_View_Helper_AnnotationElementForm extends Omeka_View_Helper_Ele
         $classtype .= $this->_annotationTypeElement->date_range_picker ? ' date_range_picker' : '';
         $classtype .= $this->_annotationTypeElement->date_picker ? ' date_picker' : '';
         $classtype .= $this->_annotationTypeElement->autocomplete ? ' autocomplete' : '';
+        $classtype .= $this->_annotationTypeElement->field_scroll ? ' field_scroll' : '';
 
         if($this->_annotationTypeElement->long_text) {
             $html = $this->view->formTextarea(
