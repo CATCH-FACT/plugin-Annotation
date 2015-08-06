@@ -252,25 +252,33 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $this->_db->query($sql);
 
         // a table for fields that are automatically annotated
+         #no element_id_in because tool will receive all available form data as json
+         # for: text build-up ()when idx) / annotation threshold (when no idx)
+         #autocomplete flag
+         #in which element are we going to search?
+         #maybe some extra field needs to be checked?
+         #do we need to restrict to a certain Itemtype?
+         #do we need to restrict to a certain Collection?
+         #an option to let a field scroll during annotation
         $sql = "CREATE TABLE IF NOT EXISTS `$db->AnnotationTypeElement` (
             `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
             `type_id` INT UNSIGNED NOT NULL,
-            `element_id` INT UNSIGNED NOT NULL,
-            `tool_id` INT UNSIGNED NULL, #no element id in because tool will receive all available tale data as json
-            `prompt` VARCHAR(255) NOT NULL,
-            `english_name` VARCHAR(255) NOT NULL,
-            `order` INT UNSIGNED NOT NULL,
-            `long_text` BOOLEAN DEFAULT FALSE,
-            `repeated_field` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
-            `score_slider`  TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',           # for: text build-up ()when idx) / annotation threshold (when no idx)
-            `date_range_picker` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
-            `date_picker` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
-            `autocomplete` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',            #autocomplete flag
-            `autocomplete_main_id` INT UNSIGNED NOT NULL DEFAULT '0',           #in which element are we going to search?
-            `autocomplete_extra_id` INT UNSIGNED NOT NULL DEFAULT '0',          #maybe some extra field needs to be checked?
-            `autocomplete_itemtype_id` INT UNSIGNED NOT NULL DEFAULT '0',       #do we need to restrict to a certain Itemtype?
-            `autocomplete_collection_id` NOT NULL DEFAULT '0',                  #do we need to restrict to a certain Collection?
-            `field_scroll`  NOT NULL DEFAULT '0',                               #an option to let a field scroll during annotation
+            `element_id` INT UNSIGNED NOT NULL,                                
+            `tool_id` INT UNSIGNED NULL,                                       
+            `prompt` TEXT NOT NULL,                                            
+            `english_name` VARCHAR(255) NOT NULL,                              
+            `order` INT UNSIGNED NOT NULL,                                     
+            `long_text` BOOLEAN DEFAULT FALSE,                                 
+            `repeated_field` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',         
+            `score_slider`  TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',          
+            `date_range_picker` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',      
+            `date_picker` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',            
+            `autocomplete` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',           
+            `autocomplete_main_id` INT UNSIGNED NOT NULL DEFAULT '0',          
+            `autocomplete_extra_id` INT UNSIGNED NOT NULL DEFAULT '0',         
+            `autocomplete_itemtype_id` INT UNSIGNED NOT NULL DEFAULT '0',      
+            `autocomplete_collection_id` INT UNSIGNED NOT NULL DEFAULT '0',                 
+            `field_scroll`  INT UNSIGNED NOT NULL DEFAULT '0',                              
             PRIMARY KEY (`id`),
             UNIQUE KEY `type_id_element_id` (`type_id`, `element_id`),
             KEY `order` (`order`)
@@ -278,10 +286,11 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $this->_db->query($sql);
         
         // to keep track of items that are annotated
+        #what kind of annotation type was used?
         $sql = "CREATE TABLE IF NOT EXISTS `$db->AnnotationAnnotatedItem` (
             `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
             `item_id` INT UNSIGNED NOT NULL,
-            `annotation_type_id` INT UNSIGNED NOT NULL,   #what kind of annotation type was used?
+            `annotation_type_id` INT UNSIGNED NOT NULL,   
             `finished` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
             `public` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
             `anonymous` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
@@ -291,22 +300,24 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $this->_db->query($sql);
 
         // Definition of webservices that will generate annotation values
+        #the main node with the values
+        #the if the separate values also are an array
+        #the idx node is for the buildup of small texts based on a score slider
         $sql = "CREATE TABLE IF NOT EXISTS `$db->AnnotationTools` (
             `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-#            `tool_type` ENUM('bash', 'web'),
             `display_name` VARCHAR(255) NOT NULL,
             `description` VARCHAR(255) NULL,
             `command` VARCHAR(255) NOT NULL,
             `get_arguments` VARCHAR(255) NULL,
             `post_arguments` TEXT NULL,
             `output_format` ENUM('raw', 'xml', 'json') NOT NULL,
-            `jsonxml_value_node` VARCHAR(255) NOT NULL,         #the main node with the values
-            `jsonxml_score_node` VARCHAR(255) NULL,
-            `jsonxml_value_sub_node` VARCHAR(255) NULL,         #the if the separate values also are an array
-            `jsonxml_score_sub_node` VARCHAR(255) NULL,
-            `jsonxml_idx_sub_node` VARCHAR(255) NULL,           #the idx node is for the buildup of small texts based on a score slider
-            `tag_or_separator` VARCHAR(255) NULL,
-            `order` INT UNSIGNED NULL,
+            `jsonxml_value_node` VARCHAR(255) NOT NULL,         
+            `jsonxml_score_node` VARCHAR(255) NULL,             
+            `jsonxml_value_sub_node` VARCHAR(255) NULL,         
+            `jsonxml_score_sub_node` VARCHAR(255) NULL,         
+            `jsonxml_idx_sub_node` VARCHAR(255) NULL,           
+            `tag_or_separator` VARCHAR(255) NULL,               
+            `order` INT UNSIGNED NULL,                          
             `validated` ENUM('yes', 'no') NULL,
             PRIMARY KEY (`id`)
             ) ENGINE=MyISAM;";
@@ -593,21 +604,27 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $elementTable = $this->_db->getTable('Element');
         
         //setting up some annotation types
-        $aType = new AnnotationType;
-        $aType->item_type_id = 12;
-        $aType->collection_id = 4;
-        $aType->display_name = 'Verteller';
-        $aType->file_permissions = 'Allowed';
-        $aType->save();
+        $vertellerType = new AnnotationType;
+        $vertellerType->item_type_id = 12;
+        $vertellerType->collection_id = 4;
+        $vertellerType->display_name = 'Verteller';
+        $vertellerType->file_permissions = 'Allowed';
+        $vertellerType->save();
 
-        $bType = new AnnotationType;
-        $bType->item_type_id = 18;
-        $bType->collection_id = 1;
-        $bType->display_name = 'Testverhaal';
-        $bType->file_permissions = 'Allowed';
-        $bType->tags_tool_id = 8;
-        $bType->save();
+        //setting up some annotation types
+        $verzamelaarType = new AnnotationType;
+        $verzamelaarType->item_type_id = 12;
+        $verzamelaarType->collection_id = 9;
+        $verzamelaarType->display_name = 'Verzamelaar';
+        $verzamelaarType->file_permissions = 'Allowed';
+        $verzamelaarType->save();
 
+        $verhaaltypeType = new AnnotationType;
+        $verhaaltypeType->item_type_id = 19;
+        $verhaaltypeType->collection_id = 3;
+        $verhaaltypeType->display_name = 'Volksverhaaltype';
+        $verhaaltypeType->file_permissions = 'Allowed';
+        $verhaaltypeType->save();
 
         $storyType = new AnnotationType;
         $storyType->item_type_id = 18;
@@ -616,7 +633,15 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $storyType->file_permissions = 'Allowed';
         $storyType->tags_tool_id = 8;
         $storyType->save();
-        
+
+        $lexType = new AnnotationType;
+        $lexType->item_type_id = 20;
+        $lexType->collection_id = 2;
+        $lexType->display_name = 'Lexicon Item';
+        $lexType->file_permissions = 'Allowed';
+        $lexType->tags_tool_id = 8;
+        $lexType->save();
+                
         //setting up some tools
         $toolExtreme = new AnnotationTool;
         $toolExtreme->display_name = "Extreme waarde detector";
@@ -781,45 +806,20 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $toolEight->jsonxml_idx_sub_node = "";
         $toolEight->save();
         
+        $toolEight = new AnnotationTool;
+        $toolEight->display_name = "Story type";
+        $toolEight->description = "Deze tool bepaalt het verhaaltype";
+        $toolEight->command = "http://bookstore.ewi.utwente.nl:24681/storytype";
+        $toolEight->get_arguments = "";
+        $toolEight->post_arguments = "";
+        $toolEight->output_format = "json";
+        $toolEight->jsonxml_value_node = "annotation.storytypes";
+        $toolEight->jsonxml_score_sub_node = "score";
+        $toolEight->jsonxml_value_sub_node = "storytype";
+        $toolEight->jsonxml_idx_sub_node = "";
+        $toolEight->save();
+        
         //input type elements
-        $textElement = new AnnotationTypeElement;
-        $textElement->type_id = $bType->id;
-        $textElement->element_id = 1;
-        $textElement->prompt = 'Voer de originele tekst in';
-        $textElement->english_name = 'text';
-        $textElement->order = 1;
-        $textElement->tool_id = false;
-        $textElement->score_slider = false;
-        $textElement->long_text = true;
-        $textElement->repeated_field = false;
-        $textElement->date_picker = false;
-        $textElement->date_range_picker = false;
-        $textElement->autocomplete = false;
-        $textElement->autocomplete_main_id = false;
-        $textElement->autocomplete_extra_id = false;
-        $textElement->autocomplete_itemtype_id = false;
-        $textElement->autocomplete_collection_id = false;
-        $textElement->save();
-
-        $textElement = new AnnotationTypeElement;
-        $textElement->type_id = $bType->id;
-        $textElement->element_id = 93;
-        $textElement->prompt = 'De namen van locaties die gevonden kunnen worden in de tekst';
-        $textElement->english_name = 'named entity location';
-        $textElement->order = 28;
-        $textElement->tool_id = 10;                  //add tool when available
-        $textElement->score_slider = false;
-        $textElement->long_text = false;
-        $textElement->repeated_field = true;
-        $textElement->date_picker = false;
-        $textElement->date_range_picker = false;
-        $textElement->autocomplete = true;              //automplete, yes please
-        $textElement->autocomplete_main_id = 93;        //look in identifiers
-        $textElement->autocomplete_extra_id = 0;        //and show the titles
-        $textElement->autocomplete_itemtype_id = 18;    //don't restrict to certain item type
-        $textElement->autocomplete_collection_id = 1;   //but only look in collection volksverhalen
-        $textElement->save();
-
         $textElement = new AnnotationTypeElement;
         $textElement->type_id = $storyType->id;
         $textElement->element_id = 1;
@@ -837,6 +837,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->autocomplete_extra_id = false;
         $textElement->autocomplete_itemtype_id = false;
         $textElement->autocomplete_collection_id = false;
+        $textElement->field_scroll = true;
         $textElement->save();
         
         $textElement = new AnnotationTypeElement;
@@ -856,6 +857,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->autocomplete_extra_id = false;
         $textElement->autocomplete_itemtype_id = false;
         $textElement->autocomplete_collection_id = false;
+        $textElement->field_scroll = false;
         $textElement->save();
         
         $textElement = new AnnotationTypeElement;
@@ -875,6 +877,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->autocomplete_extra_id = false;
         $textElement->autocomplete_itemtype_id = false;
         $textElement->autocomplete_collection_id = false;
+        $textElement->field_scroll = false;
         $textElement->save();
 
         $textElement = new AnnotationTypeElement;
@@ -894,6 +897,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->autocomplete_extra_id = false;
         $textElement->autocomplete_itemtype_id = false;
         $textElement->autocomplete_collection_id = false;
+        $textElement->field_scroll = false;
         $textElement->save();
 
         $textElement = new AnnotationTypeElement;
@@ -913,6 +917,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->autocomplete_extra_id = false;
         $textElement->autocomplete_itemtype_id = false;
         $textElement->autocomplete_collection_id = false;
+        $textElement->field_scroll = false;
         $textElement->save();
 
         $textElement = new AnnotationTypeElement;
@@ -932,6 +937,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->autocomplete_extra_id = false;
         $textElement->autocomplete_itemtype_id = false;
         $textElement->autocomplete_collection_id = false;
+        $textElement->field_scroll = false;
         $textElement->save();
 
         $textElement = new AnnotationTypeElement;
@@ -951,11 +957,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->autocomplete_extra_id = false;    //and nowhere else
         $textElement->autocomplete_itemtype_id = false; //dont' restrict to certain item type
         $textElement->autocomplete_collection_id = 9;   //but only look in collection verzamelaars
-        $textElement->autocomplete = true;
-        $textElement->autocomplete_main_id = 50;
-        $textElement->autocomplete_extra_id = false;
-        $textElement->autocomplete_itemtype_id = false;
-        $textElement->autocomplete_collection_id = 9;
+        $textElement->field_scroll = false;
         $textElement->save();
         
         $textElement = new AnnotationTypeElement;
@@ -975,6 +977,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->autocomplete_extra_id = false;    //and nowhere else
         $textElement->autocomplete_itemtype_id = false; //dont' restrict to certain item type
         $textElement->autocomplete_collection_id = 4;   //but only look in collection vertellers
+        $textElement->field_scroll = false;
         $textElement->save();
 
 /*        $textElement = new AnnotationTypeElement;
@@ -994,6 +997,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->autocomplete_extra_id = false;
         $textElement->autocomplete_itemtype_id = false;
         $textElement->autocomplete_collection_id = false;
+        $textElement->field_scroll = true;
         $textElement->save();
 */        
         $textElement = new AnnotationTypeElement;
@@ -1013,6 +1017,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->autocomplete_extra_id = false;
         $textElement->autocomplete_itemtype_id = false;
         $textElement->autocomplete_collection_id = false;
+        $textElement->field_scroll = false;
         $textElement->save();
         
         $textElement = new AnnotationTypeElement;
@@ -1032,6 +1037,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->autocomplete_extra_id = false;
         $textElement->autocomplete_itemtype_id = false;
         $textElement->autocomplete_collection_id = false;
+        $textElement->field_scroll = false;
         $textElement->save();
 
         $textElement = new AnnotationTypeElement;
@@ -1051,6 +1057,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->autocomplete_extra_id = false;
         $textElement->autocomplete_itemtype_id = false;
         $textElement->autocomplete_collection_id = 1;
+        $textElement->field_scroll = false;
         $textElement->save();
 
         $textElement = new AnnotationTypeElement;
@@ -1070,7 +1077,8 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->autocomplete_extra_id = false;
         $textElement->autocomplete_itemtype_id = false;
         $textElement->autocomplete_collection_id = false;
-        $textElement->save();
+        $textElement->field_scroll = false;
+		$textElement->save();
 
         $textElement = new AnnotationTypeElement;
         $textElement->type_id = $storyType->id;
@@ -1089,6 +1097,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->autocomplete_extra_id = false;
         $textElement->autocomplete_itemtype_id = false;
         $textElement->autocomplete_collection_id = false;
+        $textElement->field_scroll = false;
         $textElement->save();
         
         $textElement = new AnnotationTypeElement;
@@ -1108,6 +1117,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->autocomplete_extra_id = false;
         $textElement->autocomplete_itemtype_id = false;
         $textElement->autocomplete_collection_id = false;
+        $textElement->field_scroll = false;
         $textElement->save();
         
         $textElement = new AnnotationTypeElement;
@@ -1127,6 +1137,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->autocomplete_extra_id = false;
         $textElement->autocomplete_itemtype_id = false;
         $textElement->autocomplete_collection_id = false;
+        $textElement->field_scroll = false;
         $textElement->save();
 
         $textElement = new AnnotationTypeElement;
@@ -1146,6 +1157,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->autocomplete_extra_id = 50;       //and show the titles (and show titles as well?)
         $textElement->autocomplete_itemtype_id = false; //dont' restrict to certain item type
         $textElement->autocomplete_collection_id = 3;   //but only look in collection verhaaltypen
+        $textElement->field_scroll = false;
         $textElement->save();
 
         $textElement = new AnnotationTypeElement;
@@ -1165,6 +1177,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->autocomplete_extra_id = 50;       //and show the titles
         $textElement->autocomplete_itemtype_id = false; //dont' restrict to certain item type
         $textElement->autocomplete_collection_id = 3;   //but only look in collection verhaaltypen
+        $textElement->field_scroll = false;
         $textElement->save();
         
         $textElement = new AnnotationTypeElement;
@@ -1184,6 +1197,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->autocomplete_extra_id = 0;       //and show the titles
         $textElement->autocomplete_itemtype_id = 18; //dont' restrict to certain item type
         $textElement->autocomplete_collection_id = 1;   //but only look in collection volksverhalen
+        $textElement->field_scroll = false;
         $textElement->save();
         
         $textElement = new AnnotationTypeElement;
@@ -1203,6 +1217,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->autocomplete_extra_id = 0;        //and show the titles
         $textElement->autocomplete_itemtype_id = 18;    //don't restrict to certain item type
         $textElement->autocomplete_collection_id = 1;   //but only look in collection volksverhalen
+        $textElement->field_scroll = false;
         $textElement->save();
 
         $textElement = new AnnotationTypeElement;
@@ -1222,6 +1237,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->autocomplete_extra_id = 0;        //and show the titles
         $textElement->autocomplete_itemtype_id = 18;    //restrict to certain item type
         $textElement->autocomplete_collection_id = 1;   //but only look in collection volksverhalen
+        $textElement->field_scroll = false;
         $textElement->save();
 
         $textElement = new AnnotationTypeElement;
@@ -1241,6 +1257,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->autocomplete_extra_id = 0;        //nope
         $textElement->autocomplete_itemtype_id = 0;     //don't restrict to certain item type
         $textElement->autocomplete_collection_id = 0;   //no collection
+        $textElement->field_scroll = false;
         $textElement->save();
         
         $textElement = new AnnotationTypeElement;
@@ -1260,6 +1277,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->autocomplete_extra_id = false;
         $textElement->autocomplete_itemtype_id = false;
         $textElement->autocomplete_collection_id = false;
+        $textElement->field_scroll = false;
         $textElement->save();
         
         $textElement = new AnnotationTypeElement;
@@ -1279,7 +1297,912 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->autocomplete_extra_id = false;
         $textElement->autocomplete_itemtype_id = false;
         $textElement->autocomplete_collection_id = false;
+        $textElement->field_scroll = false;
         $textElement->save();
+        
+//        Volksverhaaltype type elements
+
+        $vvtElement = new AnnotationTypeElement;
+        $vvtElement->type_id = $verhaaltypeType->id;
+        $vvtElement->element_id = 38;
+        $vvtElement->prompt = 'Coverage';
+        $vvtElement->english_name = 'coverage';
+        $vvtElement->order = 6;
+        $vvtElement->tool_id = false;
+        $vvtElement->score_slider = false;
+        $vvtElement->long_text = false;
+        $vvtElement->repeated_field = false;
+        $vvtElement->date_picker = false;
+        $vvtElement->date_range_picker = false;
+        $vvtElement->autocomplete = false;
+        $vvtElement->autocomplete_main_id = false;
+        $vvtElement->autocomplete_extra_id = false;
+        $vvtElement->autocomplete_itemtype_id = false;
+        $vvtElement->autocomplete_collection_id = false;
+        $vvtElement->field_scroll = false;
+        $vvtElement->save();
+        
+        $vvtElement = new AnnotationTypeElement;
+        $vvtElement->type_id = $verhaaltypeType->id;
+        $vvtElement->element_id = 39;
+        $vvtElement->prompt = 'De bedenker van dit verhaaltype';
+        $vvtElement->english_name = 'creator';
+        $vvtElement->order = 5;
+        $vvtElement->tool_id = false;
+        $vvtElement->score_slider = false;
+        $vvtElement->long_text = false;
+        $vvtElement->repeated_field = false;
+        $vvtElement->date_picker = false;
+        $vvtElement->date_range_picker = false;
+        $vvtElement->autocomplete = true;
+        $vvtElement->autocomplete_main_id = 39;
+        $vvtElement->autocomplete_extra_id = false;
+        $vvtElement->autocomplete_itemtype_id = 19;
+        $vvtElement->autocomplete_collection_id = 3;
+        $vvtElement->field_scroll = false;
+        $vvtElement->save();
+        
+        $vvtElement = new AnnotationTypeElement;
+        $vvtElement->type_id = $verhaaltypeType->id;
+        $vvtElement->element_id = 43;
+        $vvtElement->prompt = 'Identificatienummer. Autocomplete is om te kijken of het nummer al bestaat. Kies een nummer dat niet in de lijst voorkomt!';
+        $vvtElement->english_name = 'identifier';
+        $vvtElement->order = 2;
+        $vvtElement->tool_id = false;
+        $vvtElement->score_slider = false;
+        $vvtElement->long_text = false;
+        $vvtElement->repeated_field = false;
+        $vvtElement->date_picker = false;
+        $vvtElement->date_range_picker = false;
+        $vvtElement->autocomplete = true;
+        $vvtElement->autocomplete_main_id = 43;
+        $vvtElement->autocomplete_extra_id = false;
+        $vvtElement->autocomplete_itemtype_id = 19;
+        $vvtElement->autocomplete_collection_id = 3;
+        $vvtElement->field_scroll = false;
+        $vvtElement->save();
+        
+        $vvtElement = new AnnotationTypeElement;
+        $vvtElement->type_id = $verhaaltypeType->id;
+        $vvtElement->element_id = 49;
+        $vvtElement->prompt = 'Subject';
+        $vvtElement->english_name = 'subject';
+        $vvtElement->order = 4;
+        $vvtElement->tool_id = false;
+        $vvtElement->score_slider = false;
+        $vvtElement->long_text = false;
+        $vvtElement->repeated_field = false;
+        $vvtElement->date_picker = false;
+        $vvtElement->date_range_picker = false;
+        $vvtElement->autocomplete = false;
+        $vvtElement->autocomplete_main_id = false;
+        $vvtElement->autocomplete_extra_id = false;
+        $vvtElement->autocomplete_itemtype_id = false;
+        $vvtElement->autocomplete_collection_id = false;
+        $vvtElement->field_scroll = false;
+        $vvtElement->save();
+        
+        $vvtElement = new AnnotationTypeElement;
+        $vvtElement->type_id = $verhaaltypeType->id;
+        $vvtElement->element_id = 50;
+        $vvtElement->prompt = 'Title';
+        $vvtElement->english_name = 'Title';
+        $vvtElement->order = 3;
+        $vvtElement->tool_id = false;
+        $vvtElement->score_slider = false;
+        $vvtElement->long_text = false;
+        $vvtElement->repeated_field = false;
+        $vvtElement->date_picker = false;
+        $vvtElement->date_range_picker = false;
+        $vvtElement->autocomplete = false;
+        $vvtElement->autocomplete_main_id = false;
+        $vvtElement->autocomplete_extra_id = false;
+        $vvtElement->autocomplete_itemtype_id = false;
+        $vvtElement->autocomplete_collection_id = false;
+        $vvtElement->field_scroll = false;
+        $vvtElement->save();
+        
+        $vvtElement = new AnnotationTypeElement;
+        $vvtElement->type_id = $verhaaltypeType->id;
+        $vvtElement->element_id = 52;
+        $vvtElement->prompt = 'Motif';
+        $vvtElement->english_name = 'motif';
+        $vvtElement->order = 7;
+        $vvtElement->tool_id = false;
+        $vvtElement->score_slider = false;
+        $vvtElement->long_text = false;
+        $vvtElement->repeated_field = true;
+        $vvtElement->date_picker = false;
+        $vvtElement->date_range_picker = false;
+        $vvtElement->autocomplete = false;
+        $vvtElement->autocomplete_main_id = false;
+        $vvtElement->autocomplete_extra_id = false;
+        $vvtElement->autocomplete_itemtype_id = false;
+        $vvtElement->autocomplete_collection_id = false;
+        $vvtElement->field_scroll = false;
+        $vvtElement->save();
+        
+        $vvtElement = new AnnotationTypeElement;
+        $vvtElement->type_id = $verhaaltypeType->id;
+        $vvtElement->element_id = 53;
+        $vvtElement->prompt = 'Comments';
+        $vvtElement->english_name = 'comments';
+        $vvtElement->order = 8;
+        $vvtElement->tool_id = false;
+        $vvtElement->score_slider = false;
+        $vvtElement->long_text = true;
+        $vvtElement->repeated_field = true;
+        $vvtElement->date_picker = false;
+        $vvtElement->date_range_picker = false;
+        $vvtElement->autocomplete = false;
+        $vvtElement->autocomplete_main_id = false;
+        $vvtElement->autocomplete_extra_id = false;
+        $vvtElement->autocomplete_itemtype_id = false;
+        $vvtElement->autocomplete_collection_id = false;
+        $vvtElement->field_scroll = false;
+        $vvtElement->save();
+        
+        $vvtElement = new AnnotationTypeElement;
+        $vvtElement->type_id = $verhaaltypeType->id;
+        $vvtElement->element_id = 54;
+        $vvtElement->prompt = 'Combinations';
+        $vvtElement->english_name = 'combinations';
+        $vvtElement->order = 9;
+        $vvtElement->tool_id = false;
+        $vvtElement->score_slider = false;
+        $vvtElement->long_text = false;
+        $vvtElement->repeated_field = true;
+        $vvtElement->date_picker = false;
+        $vvtElement->date_range_picker = false;
+        $vvtElement->autocomplete = false;
+        $vvtElement->autocomplete_main_id = false;
+        $vvtElement->autocomplete_extra_id = false;
+        $vvtElement->autocomplete_itemtype_id = false;
+        $vvtElement->autocomplete_collection_id = false;
+        $vvtElement->field_scroll = false;
+        $vvtElement->save();
+        
+        $vvtElement = new AnnotationTypeElement;
+        $vvtElement->type_id = $verhaaltypeType->id;
+        $vvtElement->element_id = 55;
+        $vvtElement->prompt = 'Original Tale Type';
+        $vvtElement->english_name = 'original Tale Type';
+        $vvtElement->order = 10;
+        $vvtElement->tool_id = false;
+        $vvtElement->score_slider = false;
+        $vvtElement->long_text = false;
+        $vvtElement->repeated_field = false;
+        $vvtElement->date_picker = false;
+        $vvtElement->date_range_picker = false;
+        $vvtElement->autocomplete = false;
+        $vvtElement->autocomplete_main_id = false;
+        $vvtElement->autocomplete_extra_id = false;
+        $vvtElement->autocomplete_itemtype_id = false;
+        $vvtElement->autocomplete_collection_id = false;
+        $vvtElement->field_scroll = false;
+        $vvtElement->save();
+        
+        $vvtElement = new AnnotationTypeElement;
+        $vvtElement->type_id = $verhaaltypeType->id;
+        $vvtElement->element_id = 56;
+        $vvtElement->prompt = 'Category';
+        $vvtElement->english_name = 'category';
+        $vvtElement->order = 11;
+        $vvtElement->tool_id = false;
+        $vvtElement->score_slider = false;
+        $vvtElement->long_text = false;
+        $vvtElement->repeated_field = false;
+        $vvtElement->date_picker = false;
+        $vvtElement->date_range_picker = false;
+        $vvtElement->autocomplete = true;
+        $vvtElement->autocomplete_main_id = 56;
+        $vvtElement->autocomplete_extra_id = false;
+        $vvtElement->autocomplete_itemtype_id = 19;
+        $vvtElement->autocomplete_collection_id = false;
+        $vvtElement->field_scroll = false;
+        $vvtElement->save();
+        
+        $vvtElement = new AnnotationTypeElement;
+        $vvtElement->type_id = $verhaaltypeType->id;
+        $vvtElement->element_id = 57;
+        $vvtElement->prompt = 'Subcategory';
+        $vvtElement->english_name = 'subcategory';
+        $vvtElement->order = 12;
+        $vvtElement->tool_id = false;
+        $vvtElement->score_slider = false;
+        $vvtElement->long_text = false;
+        $vvtElement->repeated_field = false;
+        $vvtElement->date_picker = false;
+        $vvtElement->date_range_picker = false;
+        $vvtElement->autocomplete = true;
+        $vvtElement->autocomplete_main_id = 57;
+        $vvtElement->autocomplete_extra_id = false;
+        $vvtElement->autocomplete_itemtype_id = 19;
+        $vvtElement->autocomplete_collection_id = false;
+        $vvtElement->field_scroll = false;
+        $vvtElement->save();
+        
+        $vvtElement = new AnnotationTypeElement;
+        $vvtElement->type_id = $verhaaltypeType->id;
+        $vvtElement->element_id = 58;
+        $vvtElement->prompt = 'Subgenre';
+        $vvtElement->english_name = 'subgenre';
+        $vvtElement->order = 13;
+        $vvtElement->tool_id = false;
+        $vvtElement->score_slider = false;
+        $vvtElement->long_text = false;
+        $vvtElement->repeated_field = false;
+        $vvtElement->date_picker = false;
+        $vvtElement->date_range_picker = false;
+        $vvtElement->autocomplete = false;
+        $vvtElement->autocomplete_main_id = false;
+        $vvtElement->autocomplete_extra_id = false;
+        $vvtElement->autocomplete_itemtype_id = false;
+        $vvtElement->autocomplete_collection_id = false;
+        $vvtElement->field_scroll = false;
+        $vvtElement->save();
+        
+        $vvtElement = new AnnotationTypeElement;
+        $vvtElement->type_id = $verhaaltypeType->id;
+        $vvtElement->element_id = 59;
+        $vvtElement->prompt = 'Entry Date';
+        $vvtElement->english_name = 'entry Date';
+        $vvtElement->order = 15;
+        $vvtElement->tool_id = false;
+        $vvtElement->score_slider = false;
+        $vvtElement->long_text = false;
+        $vvtElement->repeated_field = false;
+        $vvtElement->date_picker = true;
+        $vvtElement->date_range_picker = false;
+        $vvtElement->autocomplete = false;
+        $vvtElement->autocomplete_main_id = false;
+        $vvtElement->autocomplete_extra_id = false;
+        $vvtElement->autocomplete_itemtype_id = false;
+        $vvtElement->autocomplete_collection_id = false;
+        $vvtElement->field_scroll = false;
+        $vvtElement->save();
+        
+        $vvtElement = new AnnotationTypeElement;
+        $vvtElement->type_id = $verhaaltypeType->id;
+        $vvtElement->element_id = 64;
+        $vvtElement->prompt = 'Literature';
+        $vvtElement->english_name = 'literature';
+        $vvtElement->order = 14;
+        $vvtElement->tool_id = false;
+        $vvtElement->score_slider = false;
+        $vvtElement->long_text = false;
+        $vvtElement->repeated_field = true;
+        $vvtElement->date_picker = false;
+        $vvtElement->date_range_picker = false;
+        $vvtElement->autocomplete = false;
+        $vvtElement->autocomplete_main_id = false;
+        $vvtElement->autocomplete_extra_id = false;
+        $vvtElement->autocomplete_itemtype_id = false;
+        $vvtElement->autocomplete_collection_id = false;
+        $vvtElement->field_scroll = false;
+        $vvtElement->save();
+        
+        //verzamelaar
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 50;
+        $verzamelaarElement->prompt = 'De naam van de verzamelaar. [VOORNAAM ACHTERNAAM]';
+        $verzamelaarElement->english_name = 'title';
+        $verzamelaarElement->order = 1;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = false;
+        $verzamelaarElement->date_picker = false;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = false;
+        $verzamelaarElement->autocomplete_main_id = false;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 84;
+        $verzamelaarElement->prompt = 'Gender';
+        $verzamelaarElement->english_name = 'gender';
+        $verzamelaarElement->order = 2;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = false;
+        $verzamelaarElement->date_picker = false;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = false;
+        $verzamelaarElement->autocomplete_main_id = false;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 32;
+        $verzamelaarElement->prompt = 'In welke plaats deze verzamelaar geboren is';
+        $verzamelaarElement->english_name = 'birthplace';
+        $verzamelaarElement->order = 3;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = false;
+        $verzamelaarElement->date_picker = false;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = false;
+        $verzamelaarElement->autocomplete_main_id = 32;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = 12;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 31;
+        $verzamelaarElement->prompt = 'De geboortedatum van deze verzamelaar';
+        $verzamelaarElement->english_name = 'birth date';
+        $verzamelaarElement->order = 4;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = false;
+        $verzamelaarElement->date_picker = true;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = false;
+        $verzamelaarElement->autocomplete_main_id = false;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 33;
+        $verzamelaarElement->prompt = 'De datum van eventueel overlijden';
+        $verzamelaarElement->english_name = 'death date';
+        $verzamelaarElement->order = 5;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = false;
+        $verzamelaarElement->date_picker = true;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = false;
+        $verzamelaarElement->autocomplete_main_id = false;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 85;
+        $verzamelaarElement->prompt = 'Straatnaam en nummer';
+        $verzamelaarElement->english_name = 'address';
+        $verzamelaarElement->order = 6;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = false;
+        $verzamelaarElement->date_picker = false;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = false;
+        $verzamelaarElement->autocomplete_main_id = false;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 71;
+        $verzamelaarElement->prompt = 'Place of Residence';
+        $verzamelaarElement->english_name = 'place of residence';
+        $verzamelaarElement->order = 7;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = false;
+        $verzamelaarElement->date_picker = false;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = true;
+        $verzamelaarElement->autocomplete_main_id = 71;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 72;
+        $verzamelaarElement->prompt = 'Place of Residence since Date';
+        $verzamelaarElement->english_name = 'place of residence since date';
+        $verzamelaarElement->order = 8;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = false;
+        $verzamelaarElement->date_picker = true;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = false;
+        $verzamelaarElement->autocomplete_main_id = false;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 73;
+        $verzamelaarElement->prompt = 'Previous Place of Residence';
+        $verzamelaarElement->english_name = 'previous place of residence';
+        $verzamelaarElement->order = 9;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = false;
+        $verzamelaarElement->date_picker = false;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = true;
+        $verzamelaarElement->autocomplete_main_id = 71;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 34;
+        $verzamelaarElement->prompt = 'Occupation';
+        $verzamelaarElement->english_name = 'occupation';
+        $verzamelaarElement->order = 10;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = false;
+        $verzamelaarElement->date_picker = false;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = true;
+        $verzamelaarElement->autocomplete_main_id = 34;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 70;
+        $verzamelaarElement->prompt = 'Religion';
+        $verzamelaarElement->english_name = 'religion';
+        $verzamelaarElement->order = 11;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = false;
+        $verzamelaarElement->date_picker = false;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = true;
+        $verzamelaarElement->autocomplete_main_id = 70;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 89;
+        $verzamelaarElement->prompt = 'Privacy Required';
+        $verzamelaarElement->english_name = 'privacy required';
+        $verzamelaarElement->order = 12;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = false;
+        $verzamelaarElement->date_picker = false;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = false;
+        $verzamelaarElement->autocomplete_main_id = false;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 82;
+        $verzamelaarElement->prompt = 'Date Visited';
+        $verzamelaarElement->english_name = 'date visited';
+        $verzamelaarElement->order = 13;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = false;
+        $verzamelaarElement->date_picker = true;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = false;
+        $verzamelaarElement->autocomplete_main_id = false;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 74;
+        $verzamelaarElement->prompt = 'Name Mother';
+        $verzamelaarElement->english_name = 'name mother';
+        $verzamelaarElement->order = 14;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = false;
+        $verzamelaarElement->date_picker = false;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = false;
+        $verzamelaarElement->autocomplete_main_id = false;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 75;
+        $verzamelaarElement->prompt = 'Birthplace Mother';
+        $verzamelaarElement->english_name = 'birthplace mother';
+        $verzamelaarElement->order = 15;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = false;
+        $verzamelaarElement->date_picker = false;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = true;
+        $verzamelaarElement->autocomplete_main_id = 32;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 91;
+        $verzamelaarElement->prompt = 'Birthdate Mother';
+        $verzamelaarElement->english_name = 'birthdate mother';
+        $verzamelaarElement->order = 16;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = false;
+        $verzamelaarElement->date_picker = true;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = false;
+        $verzamelaarElement->autocomplete_main_id = false;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 76;
+        $verzamelaarElement->prompt = 'Occupation Mother';
+        $verzamelaarElement->english_name = 'occupation mother';
+        $verzamelaarElement->order = 17;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = false;
+        $verzamelaarElement->date_picker = false;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = true;
+        $verzamelaarElement->autocomplete_main_id = 34;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 77;
+        $verzamelaarElement->prompt = 'Name Father';
+        $verzamelaarElement->english_name = 'name father';
+        $verzamelaarElement->order = 18;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = false;
+        $verzamelaarElement->date_picker = false;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = false;
+        $verzamelaarElement->autocomplete_main_id = false;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 78;
+        $verzamelaarElement->prompt = 'Birthplace Father';
+        $verzamelaarElement->english_name = 'birthplace father';
+        $verzamelaarElement->order = 19;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = false;
+        $verzamelaarElement->date_picker = false;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = true;
+        $verzamelaarElement->autocomplete_main_id = 32;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 79;
+        $verzamelaarElement->prompt = 'Birthdate Father';
+        $verzamelaarElement->english_name = 'birthdate father';
+        $verzamelaarElement->order = 20;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = false;
+        $verzamelaarElement->date_picker = true;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = false;
+        $verzamelaarElement->autocomplete_main_id = false;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 80;
+        $verzamelaarElement->prompt = 'Het beroep van de vader';
+        $verzamelaarElement->english_name = 'occupation father';
+        $verzamelaarElement->order = 21;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = true;
+        $verzamelaarElement->date_picker = false;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = true;
+        $verzamelaarElement->autocomplete_main_id = 34;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 83;
+        $verzamelaarElement->prompt = 'Overige familie relaties	';
+        $verzamelaarElement->english_name = 'family relations';
+        $verzamelaarElement->order = 22;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = true;
+        $verzamelaarElement->date_picker = false;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = false;
+        $verzamelaarElement->autocomplete_main_id = false;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 90;
+        $verzamelaarElement->prompt = 'Is getrouwd met ...';
+        $verzamelaarElement->english_name = 'married to';
+        $verzamelaarElement->order = 23;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = true;
+        $verzamelaarElement->date_picker = false;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = false;
+        $verzamelaarElement->autocomplete_main_id = false;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 86;
+        $verzamelaarElement->prompt = 'Naam van de partner (bij ongetrouwd)';
+        $verzamelaarElement->english_name = 'name partner';
+        $verzamelaarElement->order = 24;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = true;
+        $verzamelaarElement->date_picker = false;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = false;
+        $verzamelaarElement->autocomplete_main_id = false;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 87;
+        $verzamelaarElement->prompt = 'Geboorteplaats van de partner';
+        $verzamelaarElement->english_name = 'birthplace partner';
+        $verzamelaarElement->order = 25;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = true;
+        $verzamelaarElement->date_picker = false;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = false;
+        $verzamelaarElement->autocomplete_main_id = false;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 92;
+        $verzamelaarElement->prompt = 'Geboortedatum van de partner';
+        $verzamelaarElement->english_name = 'birthdate partner';
+        $verzamelaarElement->order = 26;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = true;
+        $verzamelaarElement->date_picker = true;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = false;
+        $verzamelaarElement->autocomplete_main_id = false;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 88;
+        $verzamelaarElement->prompt = 'Beroep van de partner';
+        $verzamelaarElement->english_name = 'occupation partner';
+        $verzamelaarElement->order = 27;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = true;
+        $verzamelaarElement->date_picker = false;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = true;
+        $verzamelaarElement->autocomplete_main_id = 34;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 53;
+        $verzamelaarElement->prompt = 'Overig commentaar bij deze persoon';
+        $verzamelaarElement->english_name = 'comments';
+        $verzamelaarElement->order = 28;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = true;
+        $verzamelaarElement->repeated_field = true;
+        $verzamelaarElement->date_picker = false;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = false;
+        $verzamelaarElement->autocomplete_main_id = false;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 67;
+        $verzamelaarElement->prompt = 'Het corpus waar deze persoon aan heeft bijgedragen';
+        $verzamelaarElement->english_name = 'corpus';
+        $verzamelaarElement->order = 29;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = true;
+        $verzamelaarElement->date_picker = false;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = false;
+        $verzamelaarElement->autocomplete_main_id = false;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 81;
+        $verzamelaarElement->prompt = 'nummers verslagen b65';
+        $verzamelaarElement->english_name = 'nummers verslagen b65';
+        $verzamelaarElement->order = 30;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = false;
+        $verzamelaarElement->repeated_field = true;
+        $verzamelaarElement->date_picker = false;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = true;
+        $verzamelaarElement->autocomplete_main_id = 81;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
+        $verzamelaarElement = new AnnotationTypeElement;
+        $verzamelaarElement->type_id = $verzamelaarType->id;
+        $verzamelaarElement->element_id = 36;
+        $verzamelaarElement->prompt = 'De bibiolografie van deze persoon';
+        $verzamelaarElement->english_name = 'bibliography';
+        $verzamelaarElement->order = 31;
+        $verzamelaarElement->tool_id = false;
+        $verzamelaarElement->score_slider = false;
+        $verzamelaarElement->long_text = true;
+        $verzamelaarElement->repeated_field = false;
+        $verzamelaarElement->date_picker = false;
+        $verzamelaarElement->date_range_picker = false;
+        $verzamelaarElement->autocomplete = false;
+        $verzamelaarElement->autocomplete_main_id = false;
+        $verzamelaarElement->autocomplete_extra_id = false;
+        $verzamelaarElement->autocomplete_itemtype_id = false;
+        $verzamelaarElement->autocomplete_collection_id = false;
+        $verzamelaarElement->field_scroll = false;
+        $verzamelaarElement->save();
+        
     }
     
     

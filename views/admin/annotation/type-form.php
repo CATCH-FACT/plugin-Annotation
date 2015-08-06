@@ -7,11 +7,11 @@
 //<![CDATA[
 // TinyMCE hates document.ready.
 
+loadImageURL = <?php echo js_escape(img("ajax-loader.gif")); ?>;
+
 jQuery(window).load(function () {
     
     Omeka.Tabs.initialize();
-
-    loadImageURL = <?php echo js_escape(img("ajax-loader.gif")); ?>;
 
     elementFormTagToolUrl = <?php echo js_escape(url('annotation/annotation/element-form-tagtool')); ?>;
 

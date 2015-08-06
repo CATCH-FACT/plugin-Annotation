@@ -95,8 +95,8 @@ class Annotation_View_Helper_AnnotationElementForm extends Omeka_View_Helper_Ele
         $html .= $components['inputs'];
 
         $html .= '&nbsp';
-
-        $html .= $this->_annotationTypeElement->repeated_field ? $components['add_input'] : "";
+    
+        $html .= $this->_annotationTypeElement->repeated_field ? $components['add_input'] : ""; //add button travels along
 
         $html .= "</div>\n"; // Close 'inputs' div
         
