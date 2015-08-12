@@ -634,13 +634,13 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $storyType->tags_tool_id = 8;
         $storyType->save();
 
-        $lexType = new AnnotationType;
-        $lexType->item_type_id = 20;
-        $lexType->collection_id = 2;
-        $lexType->display_name = 'Lexicon Item';
-        $lexType->file_permissions = 'Allowed';
-        $lexType->tags_tool_id = 8;
-        $lexType->save();
+        $lexiconType = new AnnotationType;
+        $lexiconType->item_type_id = 20;
+        $lexiconType->collection_id = 2;
+        $lexiconType->display_name = 'Lexicon Item';
+        $lexiconType->file_permissions = 'Allowed';
+        $lexiconType->tags_tool_id = 8;
+        $lexiconType->save();
                 
         //setting up some tools
         $toolExtreme = new AnnotationTool;
@@ -806,20 +806,21 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $toolEight->jsonxml_idx_sub_node = "";
         $toolEight->save();
         
-        $toolEight = new AnnotationTool;
-        $toolEight->display_name = "Story type";
-        $toolEight->description = "Deze tool bepaalt het verhaaltype";
-        $toolEight->command = "http://bookstore.ewi.utwente.nl:24681/storytype";
-        $toolEight->get_arguments = "";
-        $toolEight->post_arguments = "";
-        $toolEight->output_format = "json";
-        $toolEight->jsonxml_value_node = "annotation.storytypes";
-        $toolEight->jsonxml_score_sub_node = "score";
-        $toolEight->jsonxml_value_sub_node = "storytype";
-        $toolEight->jsonxml_idx_sub_node = "";
-        $toolEight->save();
+        $toolNine = new AnnotationTool;
+        $toolNine->display_name = "Story type";
+        $toolNine->description = "Deze tool bepaalt het verhaaltype";
+        $toolNine->command = "http://bookstore.ewi.utwente.nl:24681/storytype";
+        $toolNine->get_arguments = "";
+        $toolNine->post_arguments = "";
+        $toolNine->output_format = "json";
+        $toolNine->jsonxml_value_node = "annotation.storytypes";
+        $toolNine->jsonxml_score_sub_node = "score";
+        $toolNine->jsonxml_value_sub_node = "storytype";
+        $toolNine->jsonxml_idx_sub_node = "";
+        $toolNine->save();
         
-        //input type elements
+        //input type elements:
+        //Folktale
         $textElement = new AnnotationTypeElement;
         $textElement->type_id = $storyType->id;
         $textElement->element_id = 1;
@@ -923,7 +924,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement = new AnnotationTypeElement;
         $textElement->type_id = $storyType->id;
         $textElement->element_id = 40;
-        $textElement->prompt = 'Voer de datum in';
+        $textElement->prompt = 'Voer de datum in. Over het algemeen de datum van vertellen. Klik 2 datums aan voor een correcte invoer. Als de maand is aangegeven, klik dan de desbetreffende maand aan. Voor fragmenten van jaren of eeuwen, kijk in de selectieboxjes onderaan.';
         $textElement->english_name = 'date';
         $textElement->order = 4;
         $textElement->tool_id = false;
@@ -1143,17 +1144,17 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement = new AnnotationTypeElement;
         $textElement->type_id = $storyType->id;
         $textElement->element_id = 49;
-        $textElement->prompt = 'Het verhaaltype of verhaaltypen';
+        $textElement->prompt = 'Het verhaaltype of verhaaltypen. ATU, AT, Brunvand of TM nummer.';
         $textElement->english_name = 'subject';
         $textElement->order = 21;
-        $textElement->tool_id = false;                  //add tool when available
+        $textElement->tool_id = $toolNine->id;       //add tool when available
         $textElement->score_slider = false;
         $textElement->long_text = false;
         $textElement->repeated_field = true;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
         $textElement->autocomplete = true;           //automplete, yes please
-        $textElement->autocomplete_main_id = 43;        //look in identifiers
+        $textElement->autocomplete_main_id = 43;     //look in identifiers
         $textElement->autocomplete_extra_id = 50;       //and show the titles (and show titles as well?)
         $textElement->autocomplete_itemtype_id = false; //dont' restrict to certain item type
         $textElement->autocomplete_collection_id = 3;   //but only look in collection verhaaltypen
@@ -1301,7 +1302,6 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->save();
         
 //        Volksverhaaltype type elements
-
         $vvtElement = new AnnotationTypeElement;
         $vvtElement->type_id = $verhaaltypeType->id;
         $vvtElement->element_id = 38;
@@ -1362,10 +1362,10 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vvtElement->field_scroll = false;
         $vvtElement->save();
         
-        $vvtElement = new AnnotationTypeElement;
+/*        $vvtElement = new AnnotationTypeElement;
         $vvtElement->type_id = $verhaaltypeType->id;
         $vvtElement->element_id = 49;
-        $vvtElement->prompt = 'Subject';
+        $vvtElement->prompt = 'Het onderwerp van het verhaaltype';
         $vvtElement->english_name = 'subject';
         $vvtElement->order = 4;
         $vvtElement->tool_id = false;
@@ -1381,11 +1381,11 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vvtElement->autocomplete_collection_id = false;
         $vvtElement->field_scroll = false;
         $vvtElement->save();
-        
+*/        
         $vvtElement = new AnnotationTypeElement;
         $vvtElement->type_id = $verhaaltypeType->id;
         $vvtElement->element_id = 50;
-        $vvtElement->prompt = 'Title';
+        $vvtElement->prompt = 'Titel';
         $vvtElement->english_name = 'Title';
         $vvtElement->order = 3;
         $vvtElement->tool_id = false;
@@ -1405,7 +1405,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vvtElement = new AnnotationTypeElement;
         $vvtElement->type_id = $verhaaltypeType->id;
         $vvtElement->element_id = 52;
-        $vvtElement->prompt = 'Motif';
+        $vvtElement->prompt = 'Motief';
         $vvtElement->english_name = 'motif';
         $vvtElement->order = 7;
         $vvtElement->tool_id = false;
@@ -1425,7 +1425,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vvtElement = new AnnotationTypeElement;
         $vvtElement->type_id = $verhaaltypeType->id;
         $vvtElement->element_id = 53;
-        $vvtElement->prompt = 'Comments';
+        $vvtElement->prompt = 'Commentaar';
         $vvtElement->english_name = 'comments';
         $vvtElement->order = 8;
         $vvtElement->tool_id = false;
@@ -1445,7 +1445,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vvtElement = new AnnotationTypeElement;
         $vvtElement->type_id = $verhaaltypeType->id;
         $vvtElement->element_id = 54;
-        $vvtElement->prompt = 'Combinations';
+        $vvtElement->prompt = 'Combinaties';
         $vvtElement->english_name = 'combinations';
         $vvtElement->order = 9;
         $vvtElement->tool_id = false;
@@ -1465,7 +1465,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vvtElement = new AnnotationTypeElement;
         $vvtElement->type_id = $verhaaltypeType->id;
         $vvtElement->element_id = 55;
-        $vvtElement->prompt = 'Original Tale Type';
+        $vvtElement->prompt = 'Origineel verhaaltype';
         $vvtElement->english_name = 'original Tale Type';
         $vvtElement->order = 10;
         $vvtElement->tool_id = false;
@@ -1545,7 +1545,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vvtElement = new AnnotationTypeElement;
         $vvtElement->type_id = $verhaaltypeType->id;
         $vvtElement->element_id = 59;
-        $vvtElement->prompt = 'Entry Date';
+        $vvtElement->prompt = 'Datum van invullen';
         $vvtElement->english_name = 'entry Date';
         $vvtElement->order = 15;
         $vvtElement->tool_id = false;
@@ -1565,7 +1565,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vvtElement = new AnnotationTypeElement;
         $vvtElement->type_id = $verhaaltypeType->id;
         $vvtElement->element_id = 64;
-        $vvtElement->prompt = 'Literature';
+        $vvtElement->prompt = 'Literatuur';
         $vvtElement->english_name = 'literature';
         $vvtElement->order = 14;
         $vvtElement->tool_id = false;
@@ -1606,7 +1606,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement = new AnnotationTypeElement;
         $verzamelaarElement->type_id = $verzamelaarType->id;
         $verzamelaarElement->element_id = 84;
-        $verzamelaarElement->prompt = 'Gender';
+        $verzamelaarElement->prompt = 'Geslacht van de verzamelaar';
         $verzamelaarElement->english_name = 'gender';
         $verzamelaarElement->order = 2;
         $verzamelaarElement->tool_id = false;
@@ -1706,7 +1706,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement = new AnnotationTypeElement;
         $verzamelaarElement->type_id = $verzamelaarType->id;
         $verzamelaarElement->element_id = 71;
-        $verzamelaarElement->prompt = 'Place of Residence';
+        $verzamelaarElement->prompt = 'Woonplaats (ook in geolocatie gedeelte beneden)';
         $verzamelaarElement->english_name = 'place of residence';
         $verzamelaarElement->order = 7;
         $verzamelaarElement->tool_id = false;
@@ -1726,7 +1726,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement = new AnnotationTypeElement;
         $verzamelaarElement->type_id = $verzamelaarType->id;
         $verzamelaarElement->element_id = 72;
-        $verzamelaarElement->prompt = 'Place of Residence since Date';
+        $verzamelaarElement->prompt = 'Woonplaats sinds';
         $verzamelaarElement->english_name = 'place of residence since date';
         $verzamelaarElement->order = 8;
         $verzamelaarElement->tool_id = false;
@@ -1746,7 +1746,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement = new AnnotationTypeElement;
         $verzamelaarElement->type_id = $verzamelaarType->id;
         $verzamelaarElement->element_id = 73;
-        $verzamelaarElement->prompt = 'Previous Place of Residence';
+        $verzamelaarElement->prompt = 'Vorige woonplaats';
         $verzamelaarElement->english_name = 'previous place of residence';
         $verzamelaarElement->order = 9;
         $verzamelaarElement->tool_id = false;
@@ -1766,7 +1766,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement = new AnnotationTypeElement;
         $verzamelaarElement->type_id = $verzamelaarType->id;
         $verzamelaarElement->element_id = 34;
-        $verzamelaarElement->prompt = 'Occupation';
+        $verzamelaarElement->prompt = 'Beroep';
         $verzamelaarElement->english_name = 'occupation';
         $verzamelaarElement->order = 10;
         $verzamelaarElement->tool_id = false;
@@ -1786,7 +1786,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement = new AnnotationTypeElement;
         $verzamelaarElement->type_id = $verzamelaarType->id;
         $verzamelaarElement->element_id = 70;
-        $verzamelaarElement->prompt = 'Religion';
+        $verzamelaarElement->prompt = 'Geloof';
         $verzamelaarElement->english_name = 'religion';
         $verzamelaarElement->order = 11;
         $verzamelaarElement->tool_id = false;
@@ -1806,7 +1806,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement = new AnnotationTypeElement;
         $verzamelaarElement->type_id = $verzamelaarType->id;
         $verzamelaarElement->element_id = 89;
-        $verzamelaarElement->prompt = 'Privacy Required';
+        $verzamelaarElement->prompt = 'Privacy gewenst';
         $verzamelaarElement->english_name = 'privacy required';
         $verzamelaarElement->order = 12;
         $verzamelaarElement->tool_id = false;
@@ -1826,7 +1826,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement = new AnnotationTypeElement;
         $verzamelaarElement->type_id = $verzamelaarType->id;
         $verzamelaarElement->element_id = 82;
-        $verzamelaarElement->prompt = 'Date Visited';
+        $verzamelaarElement->prompt = 'Datum gevisiteerd';
         $verzamelaarElement->english_name = 'date visited';
         $verzamelaarElement->order = 13;
         $verzamelaarElement->tool_id = false;
@@ -1846,7 +1846,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement = new AnnotationTypeElement;
         $verzamelaarElement->type_id = $verzamelaarType->id;
         $verzamelaarElement->element_id = 74;
-        $verzamelaarElement->prompt = 'Name Mother';
+        $verzamelaarElement->prompt = 'Naam moeder (liefst [ACHTERNAAM, VOORNAAM])';
         $verzamelaarElement->english_name = 'name mother';
         $verzamelaarElement->order = 14;
         $verzamelaarElement->tool_id = false;
@@ -1866,7 +1866,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement = new AnnotationTypeElement;
         $verzamelaarElement->type_id = $verzamelaarType->id;
         $verzamelaarElement->element_id = 75;
-        $verzamelaarElement->prompt = 'Birthplace Mother';
+        $verzamelaarElement->prompt = 'Geboorteplaats moeder';
         $verzamelaarElement->english_name = 'birthplace mother';
         $verzamelaarElement->order = 15;
         $verzamelaarElement->tool_id = false;
@@ -1886,7 +1886,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement = new AnnotationTypeElement;
         $verzamelaarElement->type_id = $verzamelaarType->id;
         $verzamelaarElement->element_id = 91;
-        $verzamelaarElement->prompt = 'Birthdate Mother';
+        $verzamelaarElement->prompt = 'Geboortedatum moeder';
         $verzamelaarElement->english_name = 'birthdate mother';
         $verzamelaarElement->order = 16;
         $verzamelaarElement->tool_id = false;
@@ -1906,7 +1906,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement = new AnnotationTypeElement;
         $verzamelaarElement->type_id = $verzamelaarType->id;
         $verzamelaarElement->element_id = 76;
-        $verzamelaarElement->prompt = 'Occupation Mother';
+        $verzamelaarElement->prompt = 'Beroep moeder';
         $verzamelaarElement->english_name = 'occupation mother';
         $verzamelaarElement->order = 17;
         $verzamelaarElement->tool_id = false;
@@ -1926,7 +1926,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement = new AnnotationTypeElement;
         $verzamelaarElement->type_id = $verzamelaarType->id;
         $verzamelaarElement->element_id = 77;
-        $verzamelaarElement->prompt = 'Name Father';
+        $verzamelaarElement->prompt = 'Naam vader';
         $verzamelaarElement->english_name = 'name father';
         $verzamelaarElement->order = 18;
         $verzamelaarElement->tool_id = false;
@@ -1946,7 +1946,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement = new AnnotationTypeElement;
         $verzamelaarElement->type_id = $verzamelaarType->id;
         $verzamelaarElement->element_id = 78;
-        $verzamelaarElement->prompt = 'Birthplace Father';
+        $verzamelaarElement->prompt = 'Geboorteplaats vader';
         $verzamelaarElement->english_name = 'birthplace father';
         $verzamelaarElement->order = 19;
         $verzamelaarElement->tool_id = false;
@@ -1966,7 +1966,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement = new AnnotationTypeElement;
         $verzamelaarElement->type_id = $verzamelaarType->id;
         $verzamelaarElement->element_id = 79;
-        $verzamelaarElement->prompt = 'Birthdate Father';
+        $verzamelaarElement->prompt = 'Geboortedatum vader';
         $verzamelaarElement->english_name = 'birthdate father';
         $verzamelaarElement->order = 20;
         $verzamelaarElement->tool_id = false;
@@ -2006,7 +2006,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement = new AnnotationTypeElement;
         $verzamelaarElement->type_id = $verzamelaarType->id;
         $verzamelaarElement->element_id = 83;
-        $verzamelaarElement->prompt = 'Overige familie relaties	';
+        $verzamelaarElement->prompt = 'Overige familie relaties';
         $verzamelaarElement->english_name = 'family relations';
         $verzamelaarElement->order = 22;
         $verzamelaarElement->tool_id = false;
@@ -2166,7 +2166,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement = new AnnotationTypeElement;
         $verzamelaarElement->type_id = $verzamelaarType->id;
         $verzamelaarElement->element_id = 81;
-        $verzamelaarElement->prompt = 'nummers verslagen b65';
+        $verzamelaarElement->prompt = 'Nummers verslagen b65';
         $verzamelaarElement->english_name = 'nummers verslagen b65';
         $verzamelaarElement->order = 30;
         $verzamelaarElement->tool_id = false;
@@ -2202,7 +2202,848 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->autocomplete_collection_id = false;
         $verzamelaarElement->field_scroll = false;
         $verzamelaarElement->save();
+
+        //verteller
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 50;
+        $vertellerElement->prompt = 'De naam van de verteller. [ACHTERNAAM, VOORNAAM]';
+        $vertellerElement->english_name = 'title';
+        $vertellerElement->order = 1;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = false;
+        $vertellerElement->date_picker = false;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = false;
+        $vertellerElement->autocomplete_main_id = false;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 84;
+        $vertellerElement->prompt = 'Geslacht van de verteller';
+        $vertellerElement->english_name = 'gender';
+        $vertellerElement->order = 2;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = false;
+        $vertellerElement->date_picker = false;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = false;
+        $vertellerElement->autocomplete_main_id = false;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 32;
+        $vertellerElement->prompt = 'In welke plaats deze verteller geboren is';
+        $vertellerElement->english_name = 'birthplace';
+        $vertellerElement->order = 3;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = false;
+        $vertellerElement->date_picker = false;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = false;
+        $vertellerElement->autocomplete_main_id = 32;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = 12;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 31;
+        $vertellerElement->prompt = 'De geboortedatum van deze verteller';
+        $vertellerElement->english_name = 'birth date';
+        $vertellerElement->order = 4;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = false;
+        $vertellerElement->date_picker = true;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = false;
+        $vertellerElement->autocomplete_main_id = false;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 33;
+        $vertellerElement->prompt = 'De datum van eventueel overlijden';
+        $vertellerElement->english_name = 'death date';
+        $vertellerElement->order = 5;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = false;
+        $vertellerElement->date_picker = true;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = false;
+        $vertellerElement->autocomplete_main_id = false;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 85;
+        $vertellerElement->prompt = 'Straatnaam en nummer';
+        $vertellerElement->english_name = 'address';
+        $vertellerElement->order = 6;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = false;
+        $vertellerElement->date_picker = false;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = false;
+        $vertellerElement->autocomplete_main_id = false;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 71;
+        $vertellerElement->prompt = 'Woonplaats (ook via geolocatie functie onderaan)';
+        $vertellerElement->english_name = 'place of residence';
+        $vertellerElement->order = 7;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = false;
+        $vertellerElement->date_picker = false;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = true;
+        $vertellerElement->autocomplete_main_id = 71;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 72;
+        $vertellerElement->prompt = 'Woonplaats sinds';
+        $vertellerElement->english_name = 'place of residence since date';
+        $vertellerElement->order = 8;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = false;
+        $vertellerElement->date_picker = true;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = false;
+        $vertellerElement->autocomplete_main_id = false;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 73;
+        $vertellerElement->prompt = 'Vorige woonplaats';
+        $vertellerElement->english_name = 'previous place of residence';
+        $vertellerElement->order = 9;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = false;
+        $vertellerElement->date_picker = false;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = true;
+        $vertellerElement->autocomplete_main_id = 71;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 34;
+        $vertellerElement->prompt = 'Beroep';
+        $vertellerElement->english_name = 'occupation';
+        $vertellerElement->order = 10;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = false;
+        $vertellerElement->date_picker = false;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = true;
+        $vertellerElement->autocomplete_main_id = 34;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 70;
+        $vertellerElement->prompt = 'Geloof';
+        $vertellerElement->english_name = 'religion';
+        $vertellerElement->order = 11;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = false;
+        $vertellerElement->date_picker = false;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = true;
+        $vertellerElement->autocomplete_main_id = 70;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 89;
+        $vertellerElement->prompt = 'Privacy gewenst';
+        $vertellerElement->english_name = 'privacy required';
+        $vertellerElement->order = 12;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = false;
+        $vertellerElement->date_picker = false;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = false;
+        $vertellerElement->autocomplete_main_id = false;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 82;
+        $vertellerElement->prompt = 'Datum gevisiteerd';
+        $vertellerElement->english_name = 'date visited';
+        $vertellerElement->order = 13;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = false;
+        $vertellerElement->date_picker = true;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = false;
+        $vertellerElement->autocomplete_main_id = false;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 74;
+        $vertellerElement->prompt = 'Naam moeder';
+        $vertellerElement->english_name = 'name mother';
+        $vertellerElement->order = 14;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = false;
+        $vertellerElement->date_picker = false;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = false;
+        $vertellerElement->autocomplete_main_id = false;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 75;
+        $vertellerElement->prompt = 'Geboorteplaats moeder';
+        $vertellerElement->english_name = 'birthplace mother';
+        $vertellerElement->order = 15;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = false;
+        $vertellerElement->date_picker = false;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = true;
+        $vertellerElement->autocomplete_main_id = 32;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 91;
+        $vertellerElement->prompt = 'Geboortedatum Mother';
+        $vertellerElement->english_name = 'birthdate mother';
+        $vertellerElement->order = 16;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = false;
+        $vertellerElement->date_picker = true;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = false;
+        $vertellerElement->autocomplete_main_id = false;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 76;
+        $vertellerElement->prompt = 'Beroep Mother';
+        $vertellerElement->english_name = 'occupation mother';
+        $vertellerElement->order = 17;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = false;
+        $vertellerElement->date_picker = false;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = true;
+        $vertellerElement->autocomplete_main_id = 34;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 77;
+        $vertellerElement->prompt = 'Naam Vader';
+        $vertellerElement->english_name = 'name father';
+        $vertellerElement->order = 18;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = false;
+        $vertellerElement->date_picker = false;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = false;
+        $vertellerElement->autocomplete_main_id = false;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 78;
+        $vertellerElement->prompt = 'Birthplace Father';
+        $vertellerElement->english_name = 'birthplace father';
+        $vertellerElement->order = 19;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = false;
+        $vertellerElement->date_picker = false;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = true;
+        $vertellerElement->autocomplete_main_id = 32;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 79;
+        $vertellerElement->prompt = 'Birthdate Father';
+        $vertellerElement->english_name = 'birthdate father';
+        $vertellerElement->order = 20;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = false;
+        $vertellerElement->date_picker = true;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = false;
+        $vertellerElement->autocomplete_main_id = false;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 80;
+        $vertellerElement->prompt = 'Het beroep van de vader';
+        $vertellerElement->english_name = 'occupation father';
+        $vertellerElement->order = 21;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = true;
+        $vertellerElement->date_picker = false;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = true;
+        $vertellerElement->autocomplete_main_id = 34;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 83;
+        $vertellerElement->prompt = 'Overige familie relaties';
+        $vertellerElement->english_name = 'family relations';
+        $vertellerElement->order = 22;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = true;
+        $vertellerElement->date_picker = false;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = false;
+        $vertellerElement->autocomplete_main_id = false;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 90;
+        $vertellerElement->prompt = 'Is getrouwd met ...';
+        $vertellerElement->english_name = 'married to';
+        $vertellerElement->order = 23;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = true;
+        $vertellerElement->date_picker = false;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = false;
+        $vertellerElement->autocomplete_main_id = false;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 86;
+        $vertellerElement->prompt = 'Naam van de partner (bij ongetrouwd)';
+        $vertellerElement->english_name = 'name partner';
+        $vertellerElement->order = 24;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = true;
+        $vertellerElement->date_picker = false;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = false;
+        $vertellerElement->autocomplete_main_id = false;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 87;
+        $vertellerElement->prompt = 'Geboorteplaats van de partner';
+        $vertellerElement->english_name = 'birthplace partner';
+        $vertellerElement->order = 25;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = true;
+        $vertellerElement->date_picker = false;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = false;
+        $vertellerElement->autocomplete_main_id = false;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 92;
+        $vertellerElement->prompt = 'Geboortedatum van de partner';
+        $vertellerElement->english_name = 'birthdate partner';
+        $vertellerElement->order = 26;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = true;
+        $vertellerElement->date_picker = true;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = false;
+        $vertellerElement->autocomplete_main_id = false;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 88;
+        $vertellerElement->prompt = 'Beroep van de partner';
+        $vertellerElement->english_name = 'occupation partner';
+        $vertellerElement->order = 27;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = true;
+        $vertellerElement->date_picker = false;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = true;
+        $vertellerElement->autocomplete_main_id = 34;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 53;
+        $vertellerElement->prompt = 'Overig commentaar bij deze persoon';
+        $vertellerElement->english_name = 'comments';
+        $vertellerElement->order = 28;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = true;
+        $vertellerElement->repeated_field = true;
+        $vertellerElement->date_picker = false;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = false;
+        $vertellerElement->autocomplete_main_id = false;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 67;
+        $vertellerElement->prompt = 'Het corpus waar deze persoon aan heeft bijgedragen';
+        $vertellerElement->english_name = 'corpus';
+        $vertellerElement->order = 29;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = true;
+        $vertellerElement->date_picker = false;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = false;
+        $vertellerElement->autocomplete_main_id = false;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 81;
+        $vertellerElement->prompt = 'nummers verslagen b65';
+        $vertellerElement->english_name = 'nummers verslagen b65';
+        $vertellerElement->order = 30;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = false;
+        $vertellerElement->repeated_field = true;
+        $vertellerElement->date_picker = false;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = true;
+        $vertellerElement->autocomplete_main_id = 81;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
+
+        $vertellerElement = new AnnotationTypeElement;
+        $vertellerElement->type_id = $vertellerType->id;
+        $vertellerElement->element_id = 36;
+        $vertellerElement->prompt = 'De bibiolografie van deze persoon';
+        $vertellerElement->english_name = 'bibliography';
+        $vertellerElement->order = 31;
+        $vertellerElement->tool_id = false;
+        $vertellerElement->score_slider = false;
+        $vertellerElement->long_text = true;
+        $vertellerElement->repeated_field = false;
+        $vertellerElement->date_picker = false;
+        $vertellerElement->date_range_picker = false;
+        $vertellerElement->autocomplete = false;
+        $vertellerElement->autocomplete_main_id = false;
+        $vertellerElement->autocomplete_extra_id = false;
+        $vertellerElement->autocomplete_itemtype_id = false;
+        $vertellerElement->autocomplete_collection_id = false;
+        $vertellerElement->field_scroll = false;
+        $vertellerElement->save();
         
+        //Lexicon
+        $lexiconElement = new AnnotationTypeElement;
+        $lexiconElement->type_id = $lexiconType->id;
+        $lexiconElement->element_id = 1;
+        $lexiconElement->prompt = 'Voer de originele tekst in';
+        $lexiconElement->english_name = 'text';
+        $lexiconElement->order = 3;
+        $lexiconElement->tool_id = false;
+        $lexiconElement->score_slider = false;
+        $lexiconElement->long_text = true;
+        $lexiconElement->repeated_field = false;
+        $lexiconElement->date_picker = false;
+        $lexiconElement->date_range_picker = false;
+        $lexiconElement->autocomplete = false;
+        $lexiconElement->autocomplete_main_id = false;
+        $lexiconElement->autocomplete_extra_id = false;
+        $lexiconElement->autocomplete_itemtype_id = false;
+        $lexiconElement->autocomplete_collection_id = false;
+        $lexiconElement->field_scroll = true;
+        $lexiconElement->save();
+        
+        $lexiconElement = new AnnotationTypeElement;
+        $lexiconElement->type_id = $lexiconType->id;
+        $lexiconElement->element_id = 39;
+        $lexiconElement->prompt = 'De schrijver van de tekst';
+        $lexiconElement->english_name = 'creator';
+        $lexiconElement->order = 4;
+        $lexiconElement->tool_id = false;
+        $lexiconElement->score_slider = false;
+        $lexiconElement->long_text = false;
+        $lexiconElement->repeated_field = true;
+        $lexiconElement->date_picker = false;
+        $lexiconElement->date_range_picker = false;
+        $lexiconElement->autocomplete = true;              //automplete, yes please
+        $lexiconElement->autocomplete_main_id = 50;        //look in titles
+        $lexiconElement->autocomplete_extra_id = false;    //and nowhere else
+        $lexiconElement->autocomplete_itemtype_id = false; //dont' restrict to certain item type
+        $lexiconElement->autocomplete_collection_id = 4;   //but only look in collection vertellers
+        $lexiconElement->field_scroll = false;
+        $lexiconElement->save();
+
+        $lexiconElement = new AnnotationTypeElement;
+        $lexiconElement->type_id = $lexiconType->id;
+        $lexiconElement->element_id = 50;
+        $lexiconElement->prompt = 'De titel van het verhaal';
+        $lexiconElement->english_name = 'title';
+        $lexiconElement->order = 1;
+        $lexiconElement->tool_id = false;
+        $lexiconElement->score_slider = false;
+        $lexiconElement->long_text = false;
+        $lexiconElement->repeated_field = false;
+        $lexiconElement->date_picker = false;
+        $lexiconElement->date_range_picker = false;
+        $lexiconElement->autocomplete = false;
+        $lexiconElement->autocomplete_main_id = false;
+        $lexiconElement->autocomplete_extra_id = false;
+        $lexiconElement->autocomplete_itemtype_id = false;
+        $lexiconElement->autocomplete_collection_id = false;
+        $lexiconElement->field_scroll = false;
+        $lexiconElement->save();
+
+        $lexiconElement = new AnnotationTypeElement;
+        $lexiconElement->type_id = $lexiconType->id;
+        $lexiconElement->element_id = 53;
+        $lexiconElement->prompt = 'Overig commentaar of informatie over de tekst, of de manier waarop deze verkregen is.';
+        $lexiconElement->english_name = 'commentary';
+        $lexiconElement->order = 6;
+        $lexiconElement->tool_id = false;
+        $lexiconElement->score_slider = false;
+        $lexiconElement->long_text = true;
+        $lexiconElement->repeated_field = true;
+        $lexiconElement->date_picker = false;
+        $lexiconElement->date_range_picker = false;
+        $lexiconElement->autocomplete = false;
+        $lexiconElement->autocomplete_main_id = false;
+        $lexiconElement->autocomplete_extra_id = false;
+        $lexiconElement->autocomplete_itemtype_id = false;
+        $lexiconElement->autocomplete_collection_id = false;
+        $lexiconElement->field_scroll = false;
+        $lexiconElement->save();
+        
+        $lexiconElement = new AnnotationTypeElement;
+        $lexiconElement->type_id = $lexiconType->id;
+        $lexiconElement->element_id = 49;
+        $lexiconElement->prompt = 'Het verhaaltype of verhaaltypen. ATU, AT, Brunvand of TM nummer.';
+        $lexiconElement->english_name = 'subject';
+        $lexiconElement->order = 21;
+        $lexiconElement->tool_id = $toolNine->id;       //add tool when available
+        $lexiconElement->score_slider = false;
+        $lexiconElement->long_text = false;
+        $lexiconElement->repeated_field = true;
+        $lexiconElement->date_picker = false;
+        $lexiconElement->date_range_picker = false;
+        $lexiconElement->autocomplete = true;           //automplete, yes please
+        $lexiconElement->autocomplete_main_id = 43;     //look in identifiers
+        $lexiconElement->autocomplete_extra_id = 50;       //and show the titles (and show titles as well?)
+        $lexiconElement->autocomplete_itemtype_id = false; //dont' restrict to certain item type
+        $lexiconElement->autocomplete_collection_id = 3;   //but only look in collection verhaaltypen
+        $lexiconElement->field_scroll = false;
+        $lexiconElement->save();
+
+        $lexiconElement = new AnnotationTypeElement;
+        $lexiconElement->type_id = $lexiconType->id;
+        $lexiconElement->element_id = 52;
+        $lexiconElement->prompt = 'De motieven die gevonden kunnen worden in de tekst';
+        $lexiconElement->english_name = 'motif';
+        $lexiconElement->order = 23;
+        $lexiconElement->tool_id = false;                  //add tool when available
+        $lexiconElement->score_slider = false;
+        $lexiconElement->long_text = false;
+        $lexiconElement->repeated_field = true;
+        $lexiconElement->date_picker = false;
+        $lexiconElement->date_range_picker = false;
+        $lexiconElement->autocomplete = true;              //automplete, yes please
+        $lexiconElement->autocomplete_main_id = 43;        //look in identifiers
+        $lexiconElement->autocomplete_extra_id = 50;       //and show the titles
+        $lexiconElement->autocomplete_itemtype_id = false; //dont' restrict to certain item type
+        $lexiconElement->autocomplete_collection_id = 3;   //but only look in collection verhaaltypen
+        $lexiconElement->field_scroll = false;
+        $lexiconElement->save();
+        
+        $lexiconElement = new AnnotationTypeElement;
+        $lexiconElement->type_id = $lexiconType->id;
+        $lexiconElement->element_id = 63;
+        $lexiconElement->prompt = 'De namen (niet locaties) die gevonden kunnen worden in de tekst';
+        $lexiconElement->english_name = 'named entity';
+        $lexiconElement->order = 27;
+        $lexiconElement->tool_id = 9;                  //add tool when available
+        $lexiconElement->score_slider = false;
+        $lexiconElement->long_text = false;
+        $lexiconElement->repeated_field = true;
+        $lexiconElement->date_picker = false;
+        $lexiconElement->date_range_picker = false;
+        $lexiconElement->autocomplete = true;              //automplete, yes please
+        $lexiconElement->autocomplete_main_id = 63;        //look in identifiers
+        $lexiconElement->autocomplete_extra_id = 0;       //and show the titles
+        $lexiconElement->autocomplete_itemtype_id = 18; //dont' restrict to certain item type
+        $lexiconElement->autocomplete_collection_id = 1;   //but only look in collection volksverhalen
+        $lexiconElement->field_scroll = false;
+        $lexiconElement->save();
+        
+        $lexiconElement = new AnnotationTypeElement;
+        $lexiconElement->type_id = $lexiconType->id;
+        $lexiconElement->element_id = 93;
+        $lexiconElement->prompt = 'De namen van locaties die gevonden kunnen worden in de tekst';
+        $lexiconElement->english_name = 'named entity location';
+        $lexiconElement->order = 28;
+        $lexiconElement->tool_id = 10;                  //add tool when available
+        $lexiconElement->score_slider = false;
+        $lexiconElement->long_text = false;
+        $lexiconElement->repeated_field = true;
+        $lexiconElement->date_picker = false;
+        $lexiconElement->date_range_picker = false;
+        $lexiconElement->autocomplete = true;              //automplete, yes please
+        $lexiconElement->autocomplete_main_id = 93;        //look in identifiers
+        $lexiconElement->autocomplete_extra_id = 0;        //and show the titles
+        $lexiconElement->autocomplete_itemtype_id = 18;    //don't restrict to certain item type
+        $lexiconElement->autocomplete_collection_id = 1;   //but only look in collection volksverhalen
+        $lexiconElement->field_scroll = false;
+        $lexiconElement->save();
+
+        $lexiconElement = new AnnotationTypeElement;
+        $lexiconElement->type_id = $lexiconType->id;
+        $lexiconElement->element_id = 65;
+        $lexiconElement->prompt = 'De hoofdlocatie waar te tekst zich afspeelt, of over gaat';
+        $lexiconElement->english_name = 'place of action';
+        $lexiconElement->order = 29;
+        $lexiconElement->tool_id = false;                  //add tool when available
+        $lexiconElement->score_slider = false;
+        $lexiconElement->long_text = false;
+        $lexiconElement->repeated_field = true;
+        $lexiconElement->date_picker = false;
+        $lexiconElement->date_range_picker = false;
+        $lexiconElement->autocomplete = true;              //automplete, yes please
+        $lexiconElement->autocomplete_main_id = 65;        //look in identifiers
+        $lexiconElement->autocomplete_extra_id = 0;        //and show the titles
+        $lexiconElement->autocomplete_itemtype_id = 18;    //restrict to certain item type
+        $lexiconElement->autocomplete_collection_id = 1;   //but only look in collection volksverhalen
+        $lexiconElement->field_scroll = false;
+        $lexiconElement->save();
+
+        $lexiconElement = new AnnotationTypeElement;
+        $lexiconElement->type_id = $lexiconType->id;
+        $lexiconElement->element_id = 94;
+        $lexiconElement->prompt = 'De hoeveelheid woorden in de tekst';
+        $lexiconElement->english_name = 'word count';
+        $lexiconElement->order = 32;
+        $lexiconElement->tool_id = $toolCount->id;
+        $lexiconElement->score_slider = false;
+        $lexiconElement->long_text = false;
+        $lexiconElement->repeated_field = false;
+        $lexiconElement->date_picker = false;
+        $lexiconElement->date_range_picker = false;
+        $lexiconElement->autocomplete = false;
+        $lexiconElement->autocomplete_main_id = false;
+        $lexiconElement->autocomplete_extra_id = false;
+        $lexiconElement->autocomplete_itemtype_id = false;
+        $lexiconElement->autocomplete_collection_id = false;
+        $lexiconElement->field_scroll = false;
+        $lexiconElement->save();
+        
+        $lexiconElement = new AnnotationTypeElement;
+        $lexiconElement->type_id = $lexiconType->id;
+        $lexiconElement->element_id = 95;
+        $lexiconElement->prompt = 'De klasse van de hoeveelheid woorden in de tekst';
+        $lexiconElement->english_name = 'word count group';
+        $lexiconElement->order = 33;
+        $lexiconElement->tool_id = $toolCountclass->id;
+        $lexiconElement->score_slider = false;
+        $lexiconElement->long_text = false;
+        $lexiconElement->repeated_field = false;
+        $lexiconElement->date_picker = false;
+        $lexiconElement->date_range_picker = false;
+        $lexiconElement->autocomplete = false;
+        $lexiconElement->autocomplete_main_id = false;
+        $lexiconElement->autocomplete_extra_id = false;
+        $lexiconElement->autocomplete_itemtype_id = false;
+        $lexiconElement->autocomplete_collection_id = false;
+        $lexiconElement->field_scroll = false;
+        $lexiconElement->save();
     }
     
     

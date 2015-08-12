@@ -9,82 +9,71 @@
 class Annotation_CloneController extends Omeka_Controller_AbstractActionController
 {
     
+    public function init()
+    {
+        $this->session = new Zend_Session_Namespace('Annotation');
+        $this->_helper->db->setDefaultModelName('Item');
+    }
+    
     public function cloneAction(){
-        
-        $this->session->testvalue = "*********************************** testvalue 1";
         
 //        $elementTable = get_db()->getTable('Element');
         
-        $this->session->id = $this->getParam('id');
-        
         $this->_helper->db->setDefaultModelName('Item');
+
+        $id = $this->getParam('id');
+
+        $record = $this->_helper->db->findById($id);
         
-        $this->session->record = $this->_helper->db->findById($this->session->id);
+        $itemTypeId = $record->item_type_id;
+
+        $elementsTexts = $record->getAllElementTextsByElement();
         
-        $this->session->itemTypeId = $this->session->record->item_type_id;
+//        _log(print_r($elementsTexts, false));
         
-        $elementsTexts = $this->session->record->getAllElementTexts();
-        
-        $allElements = get_table_options(
+        $this->session->id = $id;
+        $this->session->record = $record;
+        $this->session->itemTypeId = $itemTypeId;
+        $this->session->elementsTexts = $elementsTexts;
+
+        $this->view->assign(compact('itemTypeId', 'record', 'elementsTexts', 'allElements', 'id'));
+
+        $columnNames = get_table_options(
                 'Element', null,
                     array(
                         'sort' => 'alpha',
                     )
                 );
-        $this->session->allElements = $allElements["Itemtype metadata"] + $allElements["Dublin Core"];
+        
+        $this->session->columnNames = $columnNames["Itemtype metadata"] + $columnNames["Dublin Core"];
 
-/*        require_once ANNOTATION_FORMS_DIR . '/CloneForm.php';
-        $form = new CsvImport_Form_Mapping(array(
+        require_once ANNOTATION_FORMS_DIR . '/CloneForm.php';
+        $form = new Annotation_Form_CloneForm(array(
             'itemTypeId' => $this->session->itemTypeId,
-            'allElements' => $this->session->allElements,
+            'columnNames' => $this->session->columnNames,
+            'elementsTexts' => $this->session->elementsTexts,
             'record' => $this->session->record
         ));
-        $this->view->form = $form;/*
         
-        //Generate choice form for cloning    
-        $this->view->assign(compact('itemTypeId', 'record', 'elementsTexts', 'allElements'));
-
+        $this->view->form = $form;
+        
         if (!$this->getRequest()->isPost()) {
             return;
         }
-        
-//        $this->session->id = $id;
-
-        $this->_helper->redirector->goto('cloned'); //after all is ok: redirect to the next step
-
-    }
-    
-    /**
-     * Index action.
-     */
-    public function clonedAction(){
-        
-        _log("***********************************1");
-        _log(print_r($this->getRequest(), true));
-        
-        
-        $post = false;
-        
-        if ($args['post']) {
-            $post = $args['post'];
-            _log(print_r($post, true));
+        if (!$form->isValid($this->getRequest()->getPost())) {
+            $this->_helper->flashMessenger(__('Invalid form input. Please try again.'), 'error');
+            return;
         }
 
-        _log("***********************************");
-        _log(print_r($this->session, true));
-        _log("***********************************");
-        
+        $cloneValues = $this->view->form->getCloneValues();
+
         $user = current_user();
         
         $elementTable = get_db()->getTable('Element');
         
-        $record = $this->_helper->db->findById($this->session->id);
-        
         $itemTypeId = $record->item_type_id;
         $collectionId = $record->collection_id;
 
-        //collect choices from form and generate item
-        
         $tags = $record->getTags();
         
         $itemMetadata = array(
@@ -97,7 +86,6 @@ class Annotation_CloneController extends Omeka_Controller_AbstractActionControll
 
         $fileMetadata = $record->getFiles();
         $itemTypeElements = $record->getItemTypeElements();
-        $elementsTexts = $record->getAllElementTexts();
 
         $new_record = new Item();
         $new_record->setOwner($user);
@@ -105,24 +93,38 @@ class Annotation_CloneController extends Omeka_Controller_AbstractActionControll
 
         $new_record = update_item($new_record, $itemMetadata, array(), $fileMetadata);
 
-        foreach($elementsTexts as $elementName => $element) {
-            $elementTypeId = $element->element_id;
-            $elementType = $elementTable->find($elementTypeId);
-            if (!empty($element['text'])) {
-                _log($element->text);
-                $new_record->addTextForElement($elementType,  $element->text,  $element->html);
+        foreach($cloneValues as $colId => $subIds){
+            foreach($subIds as $id => $value){
+                print $value;
+                $elementType = $elementTable->find($colId);
+                $new_record->addTextForElement($elementType,  $value,  false);
             }
         }
-        
+
         $new_record->save();
+
+        $this->session->unsetAll();
+    
+        $this->view->assign(compact('record', 'new_record'));
+
+        $this->_helper->flashMessenger(__('The Item was succesfully cloned! Press Edit or Annotate to continue editing.'), 'success');
+        $this->_helper->redirector->gotoUrl('/items/show/' . $new_record->id); //after all is ok: redirect to the next step*/
         
-        $this->view->assign(compact('record', 'new_record', 'testvalue'));
     }
     
-    public function init()
-    {
-        $this->session = new Zend_Session_Namespace('Annotation');
-        $this->_helper->db->setDefaultModelName('Item');
+    public function prePrint($identifier, $i){
+        print "<pre>";
+        print_r($identifier);
+        print "<br>";
+        print_r($i);
+        print "</pre>";
     }
-
+    
+    /**
+     * Index action.
+     */
+    public function clonedAction(){
+        
+    }
+    
 }

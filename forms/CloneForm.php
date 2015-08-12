@@ -7,11 +7,13 @@
  * @package CsvImport
  */
 
-class CsvImport_Form_Mapping extends Omeka_Form
+class Annotation_Form_CloneForm extends Omeka_Form
 {
+    
     private $_itemTypeId;
     private $_columnNames = array();
-    private $_columnExamples = array();
+    private $_elementsTexts = array();
+    private $_record;
 
     /**
      * Initialize the form.
@@ -22,72 +24,24 @@ class CsvImport_Form_Mapping extends Omeka_Form
         $this->setAttrib('id', 'clone-mapping');
         $this->setMethod('post'); 
 
-        $elementsByElementSetName = $this->_getElementPairs($this->_itemTypeId);
-        $elementsByElementSetName = array('' => 'Select Below')  + $elementsByElementSetName;
-
-        foreach($elementsTexts as $elementsTextId => $elementsText){
-            $rowSubForm = new Zend_Form_SubForm();
-            $sel = true;
-            if (strlen($elementsText->text) >= 50) $sel = false;
-            $selectElement = $rowSubForm->createElement('checkbox', 'clone');
-            $selectElement->setChecked($sel);
-            $rowSubForm->addElement($selectElement);
-                    
-            echo $this->formCheckbox('clone[' . $elementsText->element_id . ']', $sel, null, array('1', '0'));
-            echo html_escape($allElements[$elementsText->element_id]);
-            echo snippet($elementsText->text, 0, 100);
-            
-            $this->addSubForm($rowSubForm, "row$index");
+        foreach($this->_elementsTexts as $colExampleId => $colExampleValue){
+            foreach($colExampleValue as $aId => $subColExampleValue){
+                $rowSubForm = new Zend_Form_SubForm();
+                $sel = true;
+                if (strlen($colExampleValue[$aId]->text) >= 50) $sel = false; //base on setting in future
+//                if ($colExampleValue[$aId]->text != "Jezus") $sel = false;
+                $selectElement = $rowSubForm->createElement('checkbox', "clone");
+                $selectElement->setChecked($sel);
+                $rowSubForm->addElement($selectElement);
+                $this->_setSubFormDecorators($rowSubForm);
+                $this->addSubForm($rowSubForm, "row$colExampleId id$aId");
+            }
         }
-
         
-        foreach ($this->_columnNames as $index => $colName) {
-            $rowSubForm = new Zend_Form_SubForm();
-            
-            $rowSubForm->addElement('checkbox', 'clone');
-            $this->_setSubFormDecorators($rowSubForm);
-            $this->addSubForm($rowSubForm, "row$index");
-        }
-
         $this->addElement('submit', 'submit',
             array('label' => __('Clone'),
                   'class' => 'submit submit-medium'));
     }
-
-    protected function _getElementIdFromColumnName($columnName, $columnNameDelimiter=':')
-    {
-        $element = $this->_getElementFromColumnName($columnName, $columnNameDelimiter);
-        if ($element) {
-            return $element->id;
-        } else {
-            return null;
-        }
-    }
-    
-    /**
-     * Return the element from the column name
-     *
-     * @param string $columnName The name of the column
-     * @param string $columnNameDelimiter The column name delimiter
-     * @return Element|null The element from the column name
-     */
-    protected function _getElementFromColumnName($columnName, $columnNameDelimiter=':')
-    {
-        $element = null;
-        // $columnNameParts is an array like array('Element Set Name', 'Element Name')
-        if (strlen($columnNameDelimiter) > 0) {
-            if ($columnNameParts = explode($columnNameDelimiter, $columnName)) {
-                if (count($columnNameParts) == 2) {
-                    $elementSetName = trim($columnNameParts[0]);
-                    $elementName = trim($columnNameParts[1]);
-                    $element = get_db()->getTable('Element')
-                                       ->findByElementSetNameAndElementName($elementSetName, $elementName);
-                }
-            }
-        }
-        return $element;
-    }
-
 
     /**
      * Load the default decorators.
@@ -96,10 +50,10 @@ class CsvImport_Form_Mapping extends Omeka_Form
     {
         $this->setDecorators(array(
             array('ViewScript', array(
-                'viewScript' => 'index/map-columns-form.php',
+                'viewScript' => 'clone/clone-fields.php',
                 'itemTypeId' => $this->_itemTypeId,
                 'form' => $this,
-                'columnExamples' => $this->_columnExamples,
+                'columnExamples' => $this->_elementsTexts,
                 'columnNames' => $this->_columnNames,
             )),
         ));
@@ -120,9 +74,9 @@ class CsvImport_Form_Mapping extends Omeka_Form
      * 
      * @param array $columnExamples The array of column examples (which are strings)
      */
-    public function setColumnExamples($columnExamples)
+    public function setElementsTexts($elementsTexts)
     {
-        $this->_columnExamples = $columnExamples;
+        $this->_elementsTexts = $elementsTexts;
     }
 
     /**
@@ -174,58 +128,24 @@ class CsvImport_Form_Mapping extends Omeka_Form
     {
         $this->_automapColumnNamesToElements = (boolean)$flag;
     }
-
+    
+    
     /**
     * Returns array of column maps
     *
     * @return array The array of column maps   
     */
-    public function getColumnMaps()
+    public function getCloneValues()
     {
-        $columnMaps = array();
-        foreach ($this->_columnNames as $key => $colName) {
-            if ($map = $this->_getColumnMap($key, $colName)) {
-                if (is_array($map)) {
-                    $columnMaps = array_merge($columnMaps, $map);
-                } else {
-                    $columnMaps[] = $map;
+        $cloneValues = array();
+        foreach($this->_elementsTexts as $colExampleId => $colExampleValue){
+            foreach($colExampleValue as $aId => $subColExampleValue){
+                if ($values = $this->_getRowValue($colExampleId, $aId, $subColExampleValue)){
+                    $cloneValues[$colExampleId][] = $subColExampleValue->text;
                 }
             }
         }
-        return $columnMaps;
-    }
-
-    /**
-    * Returns whether a subform row contains a tag mapping
-    *
-    * @param int $index The subform row index
-    * @return bool Whether the subform row contains a tag mapping    
-    */
-    protected function _isTagMapped($index)
-    {
-        return $this->getSubForm("row$index")->tags->isChecked();
-    }
-
-    /**
-    * Returns whether a subform row contains a file mapping
-    *
-    * @param int $index The subform row index
-    * @return bool Whether a subform row contains a file mapping    
-    */
-    protected function _isFileMapped($index)
-    {
-        return $this->getSubForm("row$index")->file->isChecked();
-    }
-
-    /**
-    * Returns the element id mapped to the subform row
-    *
-    * @param int $index The subform row index
-    * @return mixed The element id mapped to the subform row   
-    */
-    protected function _getMappedElementId($index)
-    {
-        return $this->_getRowValue($index, 'element');
+        return $cloneValues;
     }
 
     /**
@@ -235,10 +155,11 @@ class CsvImport_Form_Mapping extends Omeka_Form
     * @param string $elementName The element name in the row
     * @return mixed The row element value     
     */
-    protected function _getRowValue($index, $elementName)
+    protected function _getRowValue($index, $aId, $elementName)
     {
-        return $this->getSubForm("row$index")->$elementName->getValue();
+        return $this->getSubForm("row$index id$aId")->clone->isChecked();
     }
+
 
     /**
     * Adds decorators to a subform.
@@ -260,59 +181,5 @@ class CsvImport_Form_Mapping extends Omeka_Form
                       'options' => array('tag' => 'td')),
             ));
         }
-    }
-
-    /**
-     * Get the mappings from one column in the CSV file.
-     *
-     * Some columns can have multiple mappings; these are represented
-     * as an array of maps.
-     *
-     * @param int $index The subform row index
-     * @param string $columnName The name of the CSV file column
-     * @return CsvImport_ColumnMap|array|null A ColumnMap or an array of ColumnMaps
-     */
-    protected function _getColumnMap($index, $columnName)
-    {
-        $columnMap = array();
-
-        if ($this->_isTagMapped($index)) {
-            $columnMap[] = new CsvImport_ColumnMap_Tag($columnName, $this->_tagDelimiter);
-        }
-
-        if ($this->_isFileMapped($index)) {
-            $columnMap[] = new CsvImport_ColumnMap_File($columnName, $this->_fileDelimiter);
-        }
-
-        $elementIds = $this->_getMappedElementId($index);
-        $isHtml = $this->_getRowValue($index, 'html');
-        foreach($elementIds as $elementId) {
-            // Make sure to skip empty mappings
-            if (!$elementId) {
-                continue;
-            }
-            
-            $elementMap = new CsvImport_ColumnMap_Element($columnName, $this->_elementDelimiter);
-            $elementMap->setOptions(array('elementId' => $elementId,
-                                         'isHtml' => $isHtml));
-            $columnMap[] = $elementMap;
-        }
-
-        return $columnMap;
-    }
-    
-    /**
-    * Returns element selection array for an item type or Dublin Core. 
-    * This is used for selecting elements in form dropdowns
-    *
-    * @param int|null $itemTypeId The id of the item type.  
-    * If null, then it only includes Dublin Core elements
-    * @return array
-    */
-    protected function _getElementPairs($itemTypeId=null)
-    {
-        $params = $itemTypeId ? array('item_type_id' => $itemTypeId)
-                              : array('exclude_item_type' => true);
-        return get_db()->getTable('Element')->findPairsForSelectForm($params);
     }
 }
