@@ -76,7 +76,7 @@ foreach ($type->getUniqueInputTypeElements() as $annotationTypeElement) {
 
 <br>
 <br>
-<br>
+<h2><?php echo __("Tags"); ?></h2>
 
 <div id="tags-metadata">
 <?php
@@ -86,6 +86,8 @@ ob_get_contents();
 echo ob_get_clean();
 ?>
 </div>
+
+<h2><?php echo __("Files"); ?></h2>
 
 <div id="files-metadata">
 <?php 
@@ -97,6 +99,10 @@ if (!isset($required) && $type->isFileAllowed()){
 }
 ?>
 </div>
+
+<br>
+<hr>
+<br>
 
 <?php if (current_user()): ?>
     
