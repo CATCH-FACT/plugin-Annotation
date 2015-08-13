@@ -58,6 +58,7 @@ echo $this->partial('annotation-navigation.php');
                     <?php $options = get_table_options('AnnotationType'); ?>
                     <?php $typeId = isset($type) ? $type->id : '' ; ?>
                     <?php echo $this->formSelect( 'annotation_type', $typeId, array('multiple' => false, 'id' => 'annotation-type') , $options); ?>
+                    
                     <input type="submit" name="submit-type" id="submit-type" value="Select" />
                 </div>
             </fieldset>

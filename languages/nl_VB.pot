@@ -1,0 +1,198 @@
+# Translation for the Annotation plugin for Omeka.
+# Copyright (C) 2015 Iwe Muiser University Of Twente
+# This file is distributed under the same license as the Omeka package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Annotation\n"
+"Report-Msgid-Bugs-To: http://github.com/iwemuiser/plugin-Annotation/issues\n"
+"POT-Creation-Date: 2015-08-13 14:04+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.4\n"
+
+msgid "Determine Automatically"
+msgstr ""
+
+msgid "Publication Status"
+msgstr ""
+
+msgid "Needs review"
+msgstr ""
+
+msgid "Private annotation"
+msgstr ""
+
+msgid "Annotate"
+msgstr ""
+
+msgid "Assisted Annotation"
+msgstr ""
+
+msgid "Annotate an Item"
+msgstr ""
+
+msgid "Annotate Item"
+msgstr ""
+
+msgid "Clone"
+msgstr ""
+
+msgid "Your annotations have been updated."
+msgstr ""
+
+msgid "Your annotations has been successfully added."
+msgstr ""
+
+msgid "You must select a type for your annotation."
+msgstr ""
+
+msgid "The Item was succesfully cloned! Press Edit or Annotate to continue editing."
+msgstr ""
+
+msgid "Annotation Collection"
+msgstr ""
+
+msgid "The collection to which annotations will be added. Changes here will only affect new annotations."
+msgstr ""
+
+msgid "Incomplete Items Collection"
+msgstr ""
+
+msgid "The collection with incomplete Items that have to be Annotated."
+msgstr ""
+
+msgid "The tool performs correctly."
+msgstr ""
+
+msgid "The tool does not work."
+msgstr ""
+
+msgid "Annotation"
+msgstr ""
+
+msgid "Getting Started"
+msgstr ""
+
+msgid "Annotation Types"
+msgstr ""
+
+msgid "Annotation Tools"
+msgstr ""
+
+msgid "Submission Settings"
+msgstr ""
+
+msgid "Annotations"
+msgstr ""
+
+msgid "Annotators"
+msgstr ""
+
+msgid "ID"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "Email"
+msgstr ""
+
+msgid "Annotated Items"
+msgstr ""
+
+msgid "You want to clone the following item:"
+msgstr ""
+
+msgid "Cloned"
+msgstr ""
+
+msgid "Clone Item"
+msgstr ""
+
+msgid "Add a new tool"
+msgstr ""
+
+msgid "Tools"
+msgstr ""
+
+msgid "Save Changes"
+msgstr ""
+
+msgid "Metadata field:"
+msgstr ""
+
+msgid "Tool:"
+msgstr ""
+
+msgid "Large text field"
+msgstr ""
+
+msgid "Repeated value allowed"
+msgstr ""
+
+msgid "Scrolling textfield"
+msgstr ""
+
+msgid "Score slider"
+msgstr ""
+
+msgid "Date single picker"
+msgstr ""
+
+msgid "Date range picker"
+msgstr ""
+
+msgid "Autocomplete options"
+msgstr ""
+
+msgid "Search in element"
+msgstr ""
+
+msgid "Extra search element (i.e. text, title)"
+msgstr ""
+
+msgid "Search in Itemtype"
+msgstr ""
+
+msgid "Search in Collection"
+msgstr ""
+
+msgid "Add a new type"
+msgstr ""
+
+msgid "Types"
+msgstr ""
+
+msgid "Add Element"
+msgstr ""
+
+msgid "Publish my annotation on the web."
+msgstr ""
+
+msgid "Terms and Conditions"
+msgstr ""
+
+msgid "I agree to the Terms and Conditions."
+msgstr ""
+
+msgid "Annotation Terms of Service"
+msgstr ""
+
+msgid "Your annotation will show up in the archive once an administrator approves it. Meanwhile, feel free to %s or %s ."
+msgstr ""
+
+msgid "browse the archive"
+msgstr ""
+
+msgid "If you would like to interact with the site further, you can use an account that is ready for you. Visit %s, and request a new password for the email you used"
+msgstr ""
+
+msgid "this page"
+msgstr ""

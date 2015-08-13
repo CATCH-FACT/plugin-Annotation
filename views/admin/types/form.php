@@ -132,6 +132,9 @@
                 <hr>
                 <span class='prompt'><?php echo __('Comments'); ?></span>
                 <?php echo $this->formText("elements[$annotationElement->id][prompt]" , $annotationElement->prompt); ?>
+
+                <span class='prompt'><?php echo __('Html'); ?></span>
+                <?php echo $this->formCheckbox("elements[$annotationElement->id][html]", null, array('checked'=>$annotationElement->html)); ?>
                 
                 <?php echo "<hr>";?>
                 

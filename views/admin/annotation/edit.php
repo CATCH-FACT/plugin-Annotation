@@ -6,7 +6,6 @@
  * @package Annotation
  */
 
-
 queue_js_file('annotation-admin-form');
 
 //initiate knockout

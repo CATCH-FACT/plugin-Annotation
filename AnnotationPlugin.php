@@ -269,6 +269,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
             `english_name` VARCHAR(255) NOT NULL,                              
             `order` INT UNSIGNED NOT NULL,                                     
             `long_text` BOOLEAN DEFAULT FALSE,                                 
+            `html` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',                   
             `repeated_field` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',         
             `score_slider`  TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',          
             `date_range_picker` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',      
@@ -830,6 +831,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->tool_id = false;
         $textElement->score_slider = false;
         $textElement->long_text = true;
+        $textElement->html = false;
         $textElement->repeated_field = false;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
@@ -850,6 +852,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->tool_id = $toolDescription->id;
         $textElement->score_slider = true;
         $textElement->long_text = true;
+        $textElement->html = false;
         $textElement->repeated_field = false;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
@@ -870,6 +873,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->tool_id = $toolExtreme->id;
         $textElement->score_slider = false;
         $textElement->long_text = false;
+        $textElement->html = false;
         $textElement->repeated_field = false;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
@@ -890,6 +894,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->tool_id = false;
         $textElement->score_slider = false;
         $textElement->long_text = false;
+        $textElement->html = false;
         $textElement->repeated_field = false;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
@@ -910,6 +915,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->tool_id = false;
         $textElement->score_slider = false;
         $textElement->long_text = false;
+        $textElement->html = false;
         $textElement->repeated_field = false;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
@@ -930,6 +936,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->tool_id = false;
         $textElement->score_slider = false;
         $textElement->long_text = false;
+        $textElement->html = false;
         $textElement->repeated_field = true;
         $textElement->date_picker = false;
         $textElement->date_range_picker = true;
@@ -950,6 +957,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->tool_id = false;                  //no tool for auto annotation
         $textElement->score_slider = false;             //we're not making any text
         $textElement->long_text = false;                //a small field will do
+        $textElement->html = false;
         $textElement->repeated_field = true;            //there can be multiple collectors
         $textElement->date_picker = false;              //this is no date
         $textElement->date_range_picker = false;        //this is no date
@@ -970,6 +978,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->tool_id = false;
         $textElement->score_slider = false;
         $textElement->long_text = false;
+        $textElement->html = false;
         $textElement->repeated_field = true;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
@@ -990,6 +999,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->tool_id = false;
         $textElement->score_slider = false;
         $textElement->long_text = false;
+        $textElement->html = false;
         $textElement->repeated_field = true;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
@@ -1010,6 +1020,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->tool_id = false;
         $textElement->score_slider = false;
         $textElement->long_text = false;
+        $textElement->html = false;
         $textElement->repeated_field = false;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
@@ -1030,6 +1041,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->tool_id = false;
         $textElement->score_slider = false;
         $textElement->long_text = false;
+        $textElement->html = false;
         $textElement->repeated_field = true;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
@@ -1050,6 +1062,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->tool_id = false;
         $textElement->score_slider = false;
         $textElement->long_text = false;
+        $textElement->html = false;
         $textElement->repeated_field = true;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
@@ -1070,6 +1083,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->tool_id = false;
         $textElement->score_slider = false;
         $textElement->long_text = false;
+        $textElement->html = false;
         $textElement->repeated_field = false;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
@@ -1090,6 +1104,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->tool_id = false;
         $textElement->score_slider = false;
         $textElement->long_text = true;
+        $textElement->html = false;
         $textElement->repeated_field = true;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
@@ -1110,6 +1125,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->tool_id = $toolThree->id;
         $textElement->score_slider = false;
         $textElement->long_text = false;
+        $textElement->html = false;
         $textElement->repeated_field = true;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
@@ -1130,6 +1146,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->tool_id = $toolFour->id;
         $textElement->score_slider = false;
         $textElement->long_text = false;
+        $textElement->html = false;
         $textElement->repeated_field = true;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
@@ -1150,6 +1167,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->tool_id = $toolNine->id;       //add tool when available
         $textElement->score_slider = false;
         $textElement->long_text = false;
+        $textElement->html = false;
         $textElement->repeated_field = true;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
@@ -1170,6 +1188,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->tool_id = false;                  //add tool when available
         $textElement->score_slider = false;
         $textElement->long_text = false;
+        $textElement->html = false;
         $textElement->repeated_field = true;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
@@ -1190,6 +1209,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->tool_id = 9;                  //add tool when available
         $textElement->score_slider = false;
         $textElement->long_text = false;
+        $textElement->html = false;
         $textElement->repeated_field = true;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
@@ -1210,6 +1230,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->tool_id = 10;                  //add tool when available
         $textElement->score_slider = false;
         $textElement->long_text = false;
+        $textElement->html = false;
         $textElement->repeated_field = true;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
@@ -1230,6 +1251,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->tool_id = false;                  //add tool when available
         $textElement->score_slider = false;
         $textElement->long_text = false;
+        $textElement->html = false;
         $textElement->repeated_field = true;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
@@ -1250,6 +1272,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->tool_id = false;                  //add tool when available
         $textElement->score_slider = false;
         $textElement->long_text = false;
+        $textElement->html = false;
         $textElement->repeated_field = false;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
@@ -1270,6 +1293,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->tool_id = $toolCount->id;
         $textElement->score_slider = false;
         $textElement->long_text = false;
+        $textElement->html = false;
         $textElement->repeated_field = false;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
@@ -1290,6 +1314,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $textElement->tool_id = $toolCountclass->id;
         $textElement->score_slider = false;
         $textElement->long_text = false;
+        $textElement->html = false;
         $textElement->repeated_field = false;
         $textElement->date_picker = false;
         $textElement->date_range_picker = false;
@@ -1311,6 +1336,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vvtElement->tool_id = false;
         $vvtElement->score_slider = false;
         $vvtElement->long_text = false;
+        $vvtElement->html = false;
         $vvtElement->repeated_field = false;
         $vvtElement->date_picker = false;
         $vvtElement->date_range_picker = false;
@@ -1331,6 +1357,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vvtElement->tool_id = false;
         $vvtElement->score_slider = false;
         $vvtElement->long_text = false;
+        $vvtElement->html = false;
         $vvtElement->repeated_field = false;
         $vvtElement->date_picker = false;
         $vvtElement->date_range_picker = false;
@@ -1351,6 +1378,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vvtElement->tool_id = false;
         $vvtElement->score_slider = false;
         $vvtElement->long_text = false;
+        $vvtElement->html = false;
         $vvtElement->repeated_field = false;
         $vvtElement->date_picker = false;
         $vvtElement->date_range_picker = false;
@@ -1371,6 +1399,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vvtElement->tool_id = false;
         $vvtElement->score_slider = false;
         $vvtElement->long_text = false;
+        $vvtElement->html = false;
         $vvtElement->repeated_field = false;
         $vvtElement->date_picker = false;
         $vvtElement->date_range_picker = false;
@@ -1391,6 +1420,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vvtElement->tool_id = false;
         $vvtElement->score_slider = false;
         $vvtElement->long_text = false;
+        $vvtElement->html = false;
         $vvtElement->repeated_field = false;
         $vvtElement->date_picker = false;
         $vvtElement->date_range_picker = false;
@@ -1411,6 +1441,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vvtElement->tool_id = false;
         $vvtElement->score_slider = false;
         $vvtElement->long_text = false;
+        $vvtElement->html = false;
         $vvtElement->repeated_field = true;
         $vvtElement->date_picker = false;
         $vvtElement->date_range_picker = false;
@@ -1431,6 +1462,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vvtElement->tool_id = false;
         $vvtElement->score_slider = false;
         $vvtElement->long_text = true;
+        $vvtElement->html = false;
         $vvtElement->repeated_field = true;
         $vvtElement->date_picker = false;
         $vvtElement->date_range_picker = false;
@@ -1451,6 +1483,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vvtElement->tool_id = false;
         $vvtElement->score_slider = false;
         $vvtElement->long_text = false;
+        $vvtElement->html = false;
         $vvtElement->repeated_field = true;
         $vvtElement->date_picker = false;
         $vvtElement->date_range_picker = false;
@@ -1471,6 +1504,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vvtElement->tool_id = false;
         $vvtElement->score_slider = false;
         $vvtElement->long_text = false;
+        $vvtElement->html = false;
         $vvtElement->repeated_field = false;
         $vvtElement->date_picker = false;
         $vvtElement->date_range_picker = false;
@@ -1491,6 +1525,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vvtElement->tool_id = false;
         $vvtElement->score_slider = false;
         $vvtElement->long_text = false;
+        $vvtElement->html = false;
         $vvtElement->repeated_field = false;
         $vvtElement->date_picker = false;
         $vvtElement->date_range_picker = false;
@@ -1511,6 +1546,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vvtElement->tool_id = false;
         $vvtElement->score_slider = false;
         $vvtElement->long_text = false;
+        $vvtElement->html = false;
         $vvtElement->repeated_field = false;
         $vvtElement->date_picker = false;
         $vvtElement->date_range_picker = false;
@@ -1531,6 +1567,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vvtElement->tool_id = false;
         $vvtElement->score_slider = false;
         $vvtElement->long_text = false;
+        $vvtElement->html = false;
         $vvtElement->repeated_field = false;
         $vvtElement->date_picker = false;
         $vvtElement->date_range_picker = false;
@@ -1551,6 +1588,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vvtElement->tool_id = false;
         $vvtElement->score_slider = false;
         $vvtElement->long_text = false;
+        $vvtElement->html = false;
         $vvtElement->repeated_field = false;
         $vvtElement->date_picker = true;
         $vvtElement->date_range_picker = false;
@@ -1571,6 +1609,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vvtElement->tool_id = false;
         $vvtElement->score_slider = false;
         $vvtElement->long_text = false;
+        $vvtElement->html = false;
         $vvtElement->repeated_field = true;
         $vvtElement->date_picker = false;
         $vvtElement->date_range_picker = false;
@@ -1592,6 +1631,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = false;
         $verzamelaarElement->date_picker = false;
         $verzamelaarElement->date_range_picker = false;
@@ -1612,6 +1652,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = false;
         $verzamelaarElement->date_picker = false;
         $verzamelaarElement->date_range_picker = false;
@@ -1632,6 +1673,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = false;
         $verzamelaarElement->date_picker = false;
         $verzamelaarElement->date_range_picker = false;
@@ -1652,6 +1694,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = false;
         $verzamelaarElement->date_picker = true;
         $verzamelaarElement->date_range_picker = false;
@@ -1672,6 +1715,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = false;
         $verzamelaarElement->date_picker = true;
         $verzamelaarElement->date_range_picker = false;
@@ -1692,6 +1736,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = false;
         $verzamelaarElement->date_picker = false;
         $verzamelaarElement->date_range_picker = false;
@@ -1712,6 +1757,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = false;
         $verzamelaarElement->date_picker = false;
         $verzamelaarElement->date_range_picker = false;
@@ -1732,6 +1778,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = false;
         $verzamelaarElement->date_picker = true;
         $verzamelaarElement->date_range_picker = false;
@@ -1752,6 +1799,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = false;
         $verzamelaarElement->date_picker = false;
         $verzamelaarElement->date_range_picker = false;
@@ -1772,6 +1820,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = false;
         $verzamelaarElement->date_picker = false;
         $verzamelaarElement->date_range_picker = false;
@@ -1792,6 +1841,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = false;
         $verzamelaarElement->date_picker = false;
         $verzamelaarElement->date_range_picker = false;
@@ -1812,6 +1862,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = false;
         $verzamelaarElement->date_picker = false;
         $verzamelaarElement->date_range_picker = false;
@@ -1832,6 +1883,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = false;
         $verzamelaarElement->date_picker = true;
         $verzamelaarElement->date_range_picker = false;
@@ -1852,6 +1904,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = false;
         $verzamelaarElement->date_picker = false;
         $verzamelaarElement->date_range_picker = false;
@@ -1872,6 +1925,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = false;
         $verzamelaarElement->date_picker = false;
         $verzamelaarElement->date_range_picker = false;
@@ -1892,6 +1946,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = false;
         $verzamelaarElement->date_picker = true;
         $verzamelaarElement->date_range_picker = false;
@@ -1912,6 +1967,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = false;
         $verzamelaarElement->date_picker = false;
         $verzamelaarElement->date_range_picker = false;
@@ -1932,6 +1988,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = false;
         $verzamelaarElement->date_picker = false;
         $verzamelaarElement->date_range_picker = false;
@@ -1952,6 +2009,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = false;
         $verzamelaarElement->date_picker = false;
         $verzamelaarElement->date_range_picker = false;
@@ -1972,6 +2030,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = false;
         $verzamelaarElement->date_picker = true;
         $verzamelaarElement->date_range_picker = false;
@@ -1992,6 +2051,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = true;
         $verzamelaarElement->date_picker = false;
         $verzamelaarElement->date_range_picker = false;
@@ -2012,6 +2072,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = true;
         $verzamelaarElement->date_picker = false;
         $verzamelaarElement->date_range_picker = false;
@@ -2032,6 +2093,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = true;
         $verzamelaarElement->date_picker = false;
         $verzamelaarElement->date_range_picker = false;
@@ -2052,6 +2114,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = true;
         $verzamelaarElement->date_picker = false;
         $verzamelaarElement->date_range_picker = false;
@@ -2072,6 +2135,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = true;
         $verzamelaarElement->date_picker = false;
         $verzamelaarElement->date_range_picker = false;
@@ -2092,6 +2156,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = true;
         $verzamelaarElement->date_picker = true;
         $verzamelaarElement->date_range_picker = false;
@@ -2112,6 +2177,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = true;
         $verzamelaarElement->date_picker = false;
         $verzamelaarElement->date_range_picker = false;
@@ -2132,6 +2198,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = true;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = true;
         $verzamelaarElement->date_picker = false;
         $verzamelaarElement->date_range_picker = false;
@@ -2152,6 +2219,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = true;
         $verzamelaarElement->date_picker = false;
         $verzamelaarElement->date_range_picker = false;
@@ -2172,6 +2240,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = false;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = true;
         $verzamelaarElement->date_picker = false;
         $verzamelaarElement->date_range_picker = false;
@@ -2192,6 +2261,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $verzamelaarElement->tool_id = false;
         $verzamelaarElement->score_slider = false;
         $verzamelaarElement->long_text = true;
+        $verzamelaarElement->html = false;
         $verzamelaarElement->repeated_field = false;
         $verzamelaarElement->date_picker = false;
         $verzamelaarElement->date_range_picker = false;
@@ -2213,6 +2283,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = false;
         $vertellerElement->date_picker = false;
         $vertellerElement->date_range_picker = false;
@@ -2233,6 +2304,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = false;
         $vertellerElement->date_picker = false;
         $vertellerElement->date_range_picker = false;
@@ -2253,6 +2325,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = false;
         $vertellerElement->date_picker = false;
         $vertellerElement->date_range_picker = false;
@@ -2273,6 +2346,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = false;
         $vertellerElement->date_picker = true;
         $vertellerElement->date_range_picker = false;
@@ -2293,6 +2367,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = false;
         $vertellerElement->date_picker = true;
         $vertellerElement->date_range_picker = false;
@@ -2313,6 +2388,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = false;
         $vertellerElement->date_picker = false;
         $vertellerElement->date_range_picker = false;
@@ -2333,6 +2409,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = false;
         $vertellerElement->date_picker = false;
         $vertellerElement->date_range_picker = false;
@@ -2353,6 +2430,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = false;
         $vertellerElement->date_picker = true;
         $vertellerElement->date_range_picker = false;
@@ -2373,6 +2451,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = false;
         $vertellerElement->date_picker = false;
         $vertellerElement->date_range_picker = false;
@@ -2393,6 +2472,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = false;
         $vertellerElement->date_picker = false;
         $vertellerElement->date_range_picker = false;
@@ -2413,6 +2493,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = false;
         $vertellerElement->date_picker = false;
         $vertellerElement->date_range_picker = false;
@@ -2433,6 +2514,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = false;
         $vertellerElement->date_picker = false;
         $vertellerElement->date_range_picker = false;
@@ -2453,6 +2535,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = false;
         $vertellerElement->date_picker = true;
         $vertellerElement->date_range_picker = false;
@@ -2473,6 +2556,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = false;
         $vertellerElement->date_picker = false;
         $vertellerElement->date_range_picker = false;
@@ -2493,6 +2577,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = false;
         $vertellerElement->date_picker = false;
         $vertellerElement->date_range_picker = false;
@@ -2513,6 +2598,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = false;
         $vertellerElement->date_picker = true;
         $vertellerElement->date_range_picker = false;
@@ -2533,6 +2619,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = false;
         $vertellerElement->date_picker = false;
         $vertellerElement->date_range_picker = false;
@@ -2553,6 +2640,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = false;
         $vertellerElement->date_picker = false;
         $vertellerElement->date_range_picker = false;
@@ -2573,6 +2661,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = false;
         $vertellerElement->date_picker = false;
         $vertellerElement->date_range_picker = false;
@@ -2593,6 +2682,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = false;
         $vertellerElement->date_picker = true;
         $vertellerElement->date_range_picker = false;
@@ -2613,6 +2703,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = true;
         $vertellerElement->date_picker = false;
         $vertellerElement->date_range_picker = false;
@@ -2633,6 +2724,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = true;
         $vertellerElement->date_picker = false;
         $vertellerElement->date_range_picker = false;
@@ -2653,6 +2745,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = true;
         $vertellerElement->date_picker = false;
         $vertellerElement->date_range_picker = false;
@@ -2673,6 +2766,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = true;
         $vertellerElement->date_picker = false;
         $vertellerElement->date_range_picker = false;
@@ -2693,6 +2787,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = true;
         $vertellerElement->date_picker = false;
         $vertellerElement->date_range_picker = false;
@@ -2713,6 +2808,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = true;
         $vertellerElement->date_picker = true;
         $vertellerElement->date_range_picker = false;
@@ -2733,6 +2829,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = true;
         $vertellerElement->date_picker = false;
         $vertellerElement->date_range_picker = false;
@@ -2753,6 +2850,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = true;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = true;
         $vertellerElement->date_picker = false;
         $vertellerElement->date_range_picker = false;
@@ -2773,6 +2871,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = true;
         $vertellerElement->date_picker = false;
         $vertellerElement->date_range_picker = false;
@@ -2793,6 +2892,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = false;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = true;
         $vertellerElement->date_picker = false;
         $vertellerElement->date_range_picker = false;
@@ -2813,6 +2913,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $vertellerElement->tool_id = false;
         $vertellerElement->score_slider = false;
         $vertellerElement->long_text = true;
+        $vertellerElement->html = false;
         $vertellerElement->repeated_field = false;
         $vertellerElement->date_picker = false;
         $vertellerElement->date_range_picker = false;
@@ -2834,6 +2935,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $lexiconElement->tool_id = false;
         $lexiconElement->score_slider = false;
         $lexiconElement->long_text = true;
+        $lexiconElement->html = false;
         $lexiconElement->repeated_field = false;
         $lexiconElement->date_picker = false;
         $lexiconElement->date_range_picker = false;
@@ -2854,6 +2956,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $lexiconElement->tool_id = false;
         $lexiconElement->score_slider = false;
         $lexiconElement->long_text = false;
+        $lexiconElement->html = true;                       //Lexicon items can be styled
         $lexiconElement->repeated_field = true;
         $lexiconElement->date_picker = false;
         $lexiconElement->date_range_picker = false;
@@ -2874,6 +2977,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $lexiconElement->tool_id = false;
         $lexiconElement->score_slider = false;
         $lexiconElement->long_text = false;
+        $lexiconElement->html = false;
         $lexiconElement->repeated_field = false;
         $lexiconElement->date_picker = false;
         $lexiconElement->date_range_picker = false;
@@ -2894,6 +2998,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $lexiconElement->tool_id = false;
         $lexiconElement->score_slider = false;
         $lexiconElement->long_text = true;
+        $lexiconElement->html = false;
         $lexiconElement->repeated_field = true;
         $lexiconElement->date_picker = false;
         $lexiconElement->date_range_picker = false;
@@ -2914,6 +3019,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $lexiconElement->tool_id = $toolNine->id;       //add tool when available
         $lexiconElement->score_slider = false;
         $lexiconElement->long_text = false;
+        $lexiconElement->html = false;
         $lexiconElement->repeated_field = true;
         $lexiconElement->date_picker = false;
         $lexiconElement->date_range_picker = false;
@@ -2934,6 +3040,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $lexiconElement->tool_id = false;                  //add tool when available
         $lexiconElement->score_slider = false;
         $lexiconElement->long_text = false;
+        $lexiconElement->html = false;
         $lexiconElement->repeated_field = true;
         $lexiconElement->date_picker = false;
         $lexiconElement->date_range_picker = false;
@@ -2954,6 +3061,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $lexiconElement->tool_id = 9;                  //add tool when available
         $lexiconElement->score_slider = false;
         $lexiconElement->long_text = false;
+        $lexiconElement->html = false;
         $lexiconElement->repeated_field = true;
         $lexiconElement->date_picker = false;
         $lexiconElement->date_range_picker = false;
@@ -2974,6 +3082,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $lexiconElement->tool_id = 10;                  //add tool when available
         $lexiconElement->score_slider = false;
         $lexiconElement->long_text = false;
+        $lexiconElement->html = false;
         $lexiconElement->repeated_field = true;
         $lexiconElement->date_picker = false;
         $lexiconElement->date_range_picker = false;
@@ -2994,6 +3103,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $lexiconElement->tool_id = false;                  //add tool when available
         $lexiconElement->score_slider = false;
         $lexiconElement->long_text = false;
+        $lexiconElement->html = false;
         $lexiconElement->repeated_field = true;
         $lexiconElement->date_picker = false;
         $lexiconElement->date_range_picker = false;
@@ -3014,6 +3124,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $lexiconElement->tool_id = $toolCount->id;
         $lexiconElement->score_slider = false;
         $lexiconElement->long_text = false;
+        $lexiconElement->html = false;
         $lexiconElement->repeated_field = false;
         $lexiconElement->date_picker = false;
         $lexiconElement->date_range_picker = false;
@@ -3034,6 +3145,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $lexiconElement->tool_id = $toolCountclass->id;
         $lexiconElement->score_slider = false;
         $lexiconElement->long_text = false;
+        $lexiconElement->html = false;
         $lexiconElement->repeated_field = false;
         $lexiconElement->date_picker = false;
         $lexiconElement->date_range_picker = false;

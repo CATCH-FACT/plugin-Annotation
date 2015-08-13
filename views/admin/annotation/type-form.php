@@ -11,7 +11,7 @@ loadImageURL = <?php echo js_escape(img("ajax-loader.gif")); ?>;
 
 jQuery(window).load(function () {
     
-    Omeka.Tabs.initialize();
+//    Omeka.Tabs.initialize();
 
     elementFormTagToolUrl = <?php echo js_escape(url('annotation/annotation/element-form-tagtool')); ?>;
 
@@ -24,10 +24,11 @@ jQuery(window).load(function () {
     //tags autocomplete
     Omeka.Items.tagChoices('#tags', <?php echo js_escape(url(array('controller'=>'tags', 'action'=>'autocomplete'), 'default', array(), true)); ?>);
 
-//    Omeka.wysiwyg({
-//        mode: "none",
-//        forced_root_block: ""
-//    });
+    //html
+    Omeka.wysiwyg({
+        mode: "none",
+        forced_root_block: ""
+    });
 
     // Must run the element form scripts AFTER reseting textarea ids.
     jQuery(document).trigger('omeka:elementformload');
@@ -51,16 +52,17 @@ jQuery(document).bind('omeka:elementformload', function (event) { //
     Omeka.Elements.makeElementInformationTooltips();
     
     Omeka.Items.enableAddFiles(<?php echo js_escape(__('Add Another File')); ?>);
+
     //NOT adding HTML control (should I add it with a setting?)
-//    Omeka.Elements.enableWysiwyg(event.target);
+    Omeka.Elements.enableWysiwyg(event.target);
 });
 //]]>
 </script>
 
 <?php if (!$type): ?>
-<p>Please choose an annotation type to continue.</p>
+<p><?php echo __("Please choose an annotation type to continue.")?></p>
 <?php else: ?>
-<h2>Annotate a <?php echo $type->display_name; ?></h2>
+<h2><?php echo __("Annotate a %s", $type->display_name); ?></h2>
 
 <?php 
 ############################
@@ -106,7 +108,7 @@ if (!isset($required) && $type->isFileAllowed()){
     //<![CDATA[
     jQuery(document).bind('omeka:elementformload', function (event) {
          Omeka.Elements.makeElementControls(event.target, <?php echo js_escape(url('user-profiles/profiles/element-form')); ?>,'UserProfilesProfile'<?php if ($id = metadata($profile, 'id')) echo ', '.$id; ?>, ko);
-//         Omeka.Elements.enableWysiwyg(event.target);
+         Omeka.Elements.enableWysiwyg(event.target);
     });
     //]]>
     </script>

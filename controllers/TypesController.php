@@ -60,6 +60,7 @@ class Annotation_TypesController extends Omeka_Controller_AbstractActionControll
             }
             $elementOrder = $this->_getParam('elementOrder');
             $elementPromptValue = $element->prompt;
+            $elementHtml = $this->_getParam('elementHtml');
             $elementAutocomplete = $this->_getParam('elementAutocomplete');
             $elementAutocompleteMainId = $this->_getParam('elementAutocompleteMain');
             $elementAutocompleteExtraId = $this->_getParam('elementAutocompleteExtraId');
@@ -73,6 +74,7 @@ class Annotation_TypesController extends Omeka_Controller_AbstractActionControll
             $elementDescription = '';
             $elementOrder = intval($this->_getParam('elementCount')) + 1;
             $elementPromptValue = '';
+            $elementHtml = '';
             $elementAutocomplete = '';
             $elementAutocompleteMainId = '';
             $elementAutocompleteExtraId = '';
@@ -87,6 +89,7 @@ class Annotation_TypesController extends Omeka_Controller_AbstractActionControll
         $elementToolName = $stem .'[toolid]';
         $elementOrderName = $stem .'[order]';
         $elementPromptName = $stem . '[prompt]';
+        $elementHtmlName = $stem . '[html]';
         $elementLongName = $stem . '[long_text]';
         $elementRepeatedName = $stem . '[repeated_field]';
         $elementScoresliderName = $stem . '[score_slider]';
@@ -116,6 +119,7 @@ class Annotation_TypesController extends Omeka_Controller_AbstractActionControll
                 'element_prompt_value' => $elementPromptValue,
                 'element_long_name' => $elementLongName,
                 'element_repeated_name' => $elementRepeatedName,
+                'element_html_name' => $elementHtmlName,
                 'element_scoreslider_name' => $elementScoresliderName,
                 'element_datepicker_name' => $elementDatepickerName,
                 'element_daterangepicker_name' => $elementDateRangepickerName,
@@ -193,6 +197,7 @@ class Annotation_TypesController extends Omeka_Controller_AbstractActionControll
                             $annotationEl->order = $elementInfo['order'];
                             $annotationEl->long_text = $elementInfo['long_text'];
                             $annotationEl->repeated_field = $elementInfo['repeated_field'];
+                            $annotationEl->html = $elementInfo['html'];
                             $annotationEl->score_slider = $elementInfo['score_slider'];
                             $annotationEl->date_picker = $elementInfo['date_picker'];
                             $annotationEl->date_range_picker = $elementInfo['date_range_picker'];
@@ -223,6 +228,7 @@ class Annotation_TypesController extends Omeka_Controller_AbstractActionControll
                             $annotationEl->prompt = $elementInfo['prompt'];
                             $annotationEl->order = $elementInfo['order'];
                             $annotationEl->long_text = $elementInfo['long_text'];
+                            $annotationEl->html = $elementInfo['html'];
                             $annotationEl->repeated_field = $elementInfo['repeated_field'];
                             $annotationEl->score_slider = $elementInfo['score_slider'];
                             $annotationEl->date_picker = $elementInfo['date_picker'];

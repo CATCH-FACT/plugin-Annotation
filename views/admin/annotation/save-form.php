@@ -1,4 +1,4 @@
-        <?php echo $this->formSubmit('form-submit', __('Add Item'), array('class' => 'submit big green button')); ?>    
+        <?php echo $this->formSubmit('form-submit', __('Save Item'), array('class' => 'submit big green button')); ?>    
 
         <div id="public-featured">
             <?php if ( is_allowed('Items', 'makePublic') ): ?>

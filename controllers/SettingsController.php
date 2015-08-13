@@ -92,7 +92,7 @@ class Annotation_SettingsController extends Omeka_Controller_AbstractActionContr
         if(plugin_is_active('MetaMetaData')) {
             $form->addElementToEditGroup('checkbox', 'annotation_metametadata', array(
                 'label' => __("Add MetaMetaData for Automatic Annotations"),
-                'description' => __("Check this option if you want to keep track of automatically annotated values. "),
+                'description' => __("Check this option if you want to keep track of automatically annotated values."),
                 ),
                 array('checked'=> (bool) get_option('annotation_metametadata') ? 'checked' : '')         
             );

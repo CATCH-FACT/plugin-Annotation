@@ -47,12 +47,16 @@
         echo $this->formSelect(
             $element_tool_name, $element_tool_value,
             array('class' => 'element-drop-down'), $toolsArray );
-        echo "<br>";
+            
+        echo "<hr>";
 
         echo "<span class='comments'>" . __("Comments:") . "</span>";
         echo $this->formText($element_prompt_name, $element_prompt_value, array('class'=>'prompt'));
 
-        echo "<br>";
+        echo "<span class='html'>" . __('Html') . "</span>";
+        echo $this->formCheckbox($element_html, null);
+
+        echo "<hr>";
         
         echo "<span class='long-text'>" . __('Large text field') . "</span>";
         echo $this->formCheckbox($element_long_name, null);
@@ -76,7 +80,7 @@
 
         echo "<hr>";
 
-        echo "<span class='auto-complete'>" . __('Autocomplete options ') . "</span>";
+        echo "<span class='auto-complete'>" . __('Autocomplete options') . "</span>";
         echo $this->formCheckbox($element_autocomplete_name, null);
 
         echo "<br>";

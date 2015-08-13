@@ -22,6 +22,7 @@ class AnnotationTypeElement extends Omeka_Record_AbstractRecord
     public $english_name;
     public $order;
     public $long_text;
+    public $html;
     public $repeated_field;
     public $score_slider; #add a score slider to restrict annotation values (js)
     public $date_picker; #adds a date picker (js)
