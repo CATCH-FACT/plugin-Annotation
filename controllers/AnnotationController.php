@@ -171,7 +171,6 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
                 
         if ($this->_processForm($_POST, $item)) { //first check if form is posted
 
-            $this->_helper->flashMessenger("Data accepted. Annotated Item created.", 'success');
             $route = $this->getFrontController()->getRouter()->getCurrentRouteName();
             $this->_helper->_redirector->gotoRoute(array('action' => 'doannotation'), $route);
 
@@ -232,7 +231,7 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
     {
 
         if ($this->_processForm($_POST, false)) {
-            $this->_helper->flashMessenger("Data accepted. Pre-annotated Item created.", 'success');
+//            $this->_helper->flashMessenger("Data accepted. Pre-annotated Item created.", 'success');
             $route = $this->getFrontController()->getRouter()->getCurrentRouteName();
             $this->_helper->_redirector->gotoRoute(array('action' => 'doannotation'), $route);
 #            $this->_helper->_redirector->gotoRoute(array('action' => 'thankyou'), $route);
@@ -264,6 +263,7 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
      * through the public form.
      */
     public function doannotationAction(){
+        
         $this->_helper->flashMessenger( __('Your annotations has been successfully added.'), 'success');
     }
     

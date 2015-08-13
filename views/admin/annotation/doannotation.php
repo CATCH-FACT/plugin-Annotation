@@ -10,7 +10,7 @@ queue_js_file('annotation-admin-form');
 $annotationPath = 'annotation';
 queue_css_file('form');
 
-$head = array('title' => 'Annotate',
+$head = array('title' => 'Annotation result',
               'bodyclass' => 'doannotation');
 echo head($head);
 ?>
@@ -24,7 +24,11 @@ echo $this->partial('annotation-navigation.php');
     
     <h1><?php echo $head['title']; ?></h1>
     
-    <p><?php link_to($this->temp_item, 'show', "Your annotated item"); ?></p>
-
+    <p> <?php echo __("New: ") . link_to($this->item, 'show', __("Your annotated item")); ?></p>
+    
+    <?php print_r($this->item); ?>
+-
+    <?php print_r($this->item_id); ?>  
+    
 </div>
 <?php echo foot();

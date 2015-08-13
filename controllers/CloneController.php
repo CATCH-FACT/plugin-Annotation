@@ -11,13 +11,14 @@ class Annotation_CloneController extends Omeka_Controller_AbstractActionControll
     
     public function init()
     {
-        $this->session = new Zend_Session_Namespace('Annotation');
         $this->_helper->db->setDefaultModelName('Item');
     }
     
     public function cloneAction(){
         
 //        $elementTable = get_db()->getTable('Element');
+
+        $this->session = new Zend_Session_Namespace();
         
         $this->_helper->db->setDefaultModelName('Item');
 
@@ -105,7 +106,7 @@ class Annotation_CloneController extends Omeka_Controller_AbstractActionControll
 
         $this->session->unsetAll();
     
-        $this->view->assign(compact('record', 'new_record'));
+//        $this->view->assign(compact('record', 'new_record'));
 
         $this->_helper->flashMessenger(__('The Item was succesfully cloned! Press Edit or Annotate to continue editing.'), 'success');
         $this->_helper->redirector->gotoUrl('/items/show/' . $new_record->id); //after all is ok: redirect to the next step*/
