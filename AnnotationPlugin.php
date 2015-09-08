@@ -112,7 +112,8 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
             $html .= "<H2>" . __("Existing unannotated Items") . "</H2>";
             $html .= "<br>";
             $collection = get_record_by_id('Collection', $contribution_collection_id);
-            $html .= link_to_items_in_collection(__("Unannotated Items Collection: <br>") . metadata($collection, array('Dublin Core', 'Title')) . " (" . metadata($collection, 'total_items') . ")", $props = array(), $action = 'browse', $collectionObj = $collection);
+            $html .= __("Unannotated Items Collection:") . "<br>";
+            $html .= link_to_items_in_collection(metadata($collection, array('Dublin Core', 'Title')) . " (" . metadata($collection, 'total_items') . ")", $props = array(), $action = 'browse', $collectionObj = $collection);
             $html .= "<br><br>";
         }
 
@@ -188,7 +189,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         
         $html .= '    </tbody>';
         $html .= '</table>';
-
+        $html .= $html .= "<td><a href='" . url('annotation/items') . "'>" . __("All annotated items") . "</a></td>";
     	return $html;
     }
 

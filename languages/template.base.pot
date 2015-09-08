@@ -220,3 +220,18 @@ msgstr ""
 
 msgid "No collection"
 msgstr ""
+
+msgid "Annotation control"
+msgstr ""
+
+msgid "Unannotated Items Collection:"
+msgstr ""
+
+msgid "Annotate a new item"
+msgstr ""
+
+msgid "Recently annotated Items"
+msgstr ""
+
+msgid "All annotated items"
+msgstr ""
