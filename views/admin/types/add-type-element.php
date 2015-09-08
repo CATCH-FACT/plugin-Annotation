@@ -54,7 +54,7 @@
         echo $this->formText($element_prompt_name, $element_prompt_value, array('class'=>'prompt'));
 
         echo "<span class='html'>" . __('Html') . "</span>";
-        echo $this->formCheckbox($element_html, null);
+        echo $this->formCheckbox($element_html_name, null);
 
         echo "<hr>";
         

@@ -451,17 +451,8 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
                 Builder_Item::IS_FEATURED    => (int) $post['annotation-featured'],
                 Builder_Item::ITEM_TYPE_ID   => $itemTypeId,
                 Builder_Item::COLLECTION_ID  => (int) $post['collection_id'],
-//                Builder_Item::TAGS           => $tags,
             );
-
-/*            $itemMetadata = array('item_type_id' => $itemTypeId);
-
-            $itemMetadata['featured'] = (int) $post['annotation-featured'];
-            $itemMetadata['public'] = (int) $post['annotation-public'];
-            $itemMetadata['collection_id'] = (int) $post['collection_id'];
-            $itemMetadata['tags'] = "test1,test2";
-            $itemMetadata['tag'] = "test1,test2";
-*/            
+         
             $fileMetadata = $this->_processFileUpload($annotationType);
 
             // This is a hack to allow the file upload job to succeed
