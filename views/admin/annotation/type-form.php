@@ -54,7 +54,7 @@ jQuery(document).bind('omeka:elementformload', function (event) { //
     Omeka.Items.enableAddFiles(<?php echo js_escape(__('Add Another File')); ?>);
 
     //NOT adding HTML control (should I add it with a setting?)
-    Omeka.Elements.enableWysiwyg(event.target);
+//    Omeka.Elements.enableWysiwyg(event.target);
 });
 //]]>
 </script>

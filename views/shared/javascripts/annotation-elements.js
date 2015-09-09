@@ -122,9 +122,6 @@ Omeka.Elements = {};
                             node = node[jsonxml_value_node[i]];
                         }
                         
-                        
-                        console.log(node);
-                        
                         //make separate fields when the returned response node is an array
                         //but when slidebar and idx: order set and concat based on score
                         if( Object.prototype.toString.call( node ) === '[object Array]' ) {
@@ -251,11 +248,13 @@ Omeka.Elements = {};
                         jQuery(inputSelector).val(ui.item.label);
                         return false;
                     }
+                }).focus(function () {
+                        $(this).autocomplete("search");
                 }).data( "ui-autocomplete" )._renderItem = function( ul, item ) { //alternative rendering
-                      return $( "<li>" )
-                            .data( "ui-autocomplete-item", item )
-                            .append( "<a><b>" + item.label + "</b>" +  (item.value ? ": " + item.value : "") + "</a>" )
-                            .appendTo( ul );
+                  return $( "<li>" )
+                        .data( "ui-autocomplete-item", item )
+                        .append( "<a><b>" + item.label + "</b>" +  (item.value ? ": " + item.value : "") + "</a>" )
+                        .appendTo( ul );
                 };
             }
         });
@@ -317,7 +316,6 @@ Omeka.Elements = {};
                 offset  = $fs.offset(),
                 topPadding = 62,
                 $contentDiv = $("#content");
-                console.log(rememberWidth);
             if ($(this).prop('checked')){
                 $window.scroll(function () {
                     if($window.scrollTop() > offset.top && $window.width() > 767 && ($window.height() - topPadding - 85) >  $fs.height()) {
@@ -359,6 +357,7 @@ Omeka.Elements = {};
 
         //set all the autocomplete fields active
         autocomplete.each(function() {
+            //extend the url
             elementFormElementUrl = elementFormPartialUrl + "-element";
             Omeka.Elements.autocompleteChoices($(this), autocompleteChoicesUrl, elementFormElementUrl);
         });
@@ -614,10 +613,7 @@ Omeka.Elements = {};
         // When a generate metadata button is clicked, make an AJAX request based on the specified toolhat is connected to the field.
         context.find(annotationSelector).click(function (event) {
             event.preventDefault(); 
-            
-            console.log($(this));
-            console.log(autocompleteChoicesUrl);
-            
+                        
             $(this).after('<img src="' + loadImageUrl + '">');
 
             var fieldDiv = $(this).parents(fieldSelector);
@@ -631,18 +627,13 @@ Omeka.Elements = {};
                 }
             })
 
-//            console.log(allFields);
-
             elementFormPartialUrlNoadd = elementFormPartialUrl + "-noadd"; //url for empty elementFormPartial
             elementFormPartialUrlTool = elementFormPartialUrl + "-tool"; //url for retrieving tool info
+
             //we need the whole document (to send data values to the webapps)
             //model is sent to keep track of slider values
             Omeka.Elements.elementFormFillRequest(fieldDiv, {add: '1'}, elementFormPartialUrlNoadd, elementFormPartialUrlTool, allFields, recordType, recordId, annotationId, model);
 
-//            console.log(recordType);
-//            console.log(recordId);
-//            console.log(allFields);
-            
         });
 
         // When an add button is clicked, make an AJAX request to add another input.
