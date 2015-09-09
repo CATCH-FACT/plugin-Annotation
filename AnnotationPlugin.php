@@ -189,7 +189,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         
         $html .= '    </tbody>';
         $html .= '</table>';
-        $html .= $html .= "<td><a href='" . url('annotation/items') . "'>" . __("All annotated items") . "</a></td>";
+        $html .= "<td><a href='" . url('annotation/items') . "'>" . __("All annotated items") . "</a></td>";
     	return $html;
     }
 
