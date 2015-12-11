@@ -32,11 +32,11 @@ class Annotation_CloneController extends Omeka_Controller_AbstractActionControll
         
 //        _log(print_r($elementsTexts, false));
         
-        $this->session->id = $id;
+/*        $this->session->id = $id;
         $this->session->record = $record;
         $this->session->itemTypeId = $itemTypeId;
         $this->session->elementsTexts = $elementsTexts;
-
+*/
         $this->view->assign(compact('itemTypeId', 'record', 'elementsTexts', 'allElements', 'id'));
 
         $columnNames = get_table_options(
@@ -46,14 +46,23 @@ class Annotation_CloneController extends Omeka_Controller_AbstractActionControll
                     )
                 );
         
-        $this->session->columnNames = $columnNames["Itemtype metadata"] + $columnNames["Dublin Core"];
-
+//        $this->session->columnNames = $columnNames["Itemtype metadata"] + $columnNames["Dublin Core"];
+        $columnNames = $columnNames["Itemtype metadata"] + $columnNames["Dublin Core"];
+        
         require_once ANNOTATION_FORMS_DIR . '/CloneForm.php';
-        $form = new Annotation_Form_CloneForm(array(
+/*        $form = new Annotation_Form_CloneForm(array(
             'itemTypeId' => $this->session->itemTypeId,
             'columnNames' => $this->session->columnNames,
             'elementsTexts' => $this->session->elementsTexts,
             'record' => $this->session->record
+        ));
+        */
+        
+        $form = new Annotation_Form_CloneForm(array(
+            'itemTypeId' => $itemTypeId,
+            'columnNames' => $columnNames,
+            'elementsTexts' => $elementsTexts,
+            'record' => $record
         ));
         
         $this->view->form = $form;
