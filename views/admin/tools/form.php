@@ -50,7 +50,7 @@ $toolOutputOptions = array('' => 'Select an Item Type', 'raw' => 'Raw format (li
          <div class="inputs five columns omega">
              <p class="explanation"><?php echo __("Bare command or URL of the (web)application. Examples can be found in <a href=\"annotation/index\">Getting started</a>."); ?></p>
              <div class="input-block">
-              <?php echo $this->formTextArea('command', $annotation_tool->command, array('rows' => '8')); ?>
+              <?php echo $this->formTextarea('command', $annotation_tool->command, array('rows' => '8')); ?>
              </div>
          </div>
      </div>
@@ -76,7 +76,7 @@ $toolOutputOptions = array('' => 'Select an Item Type', 'raw' => 'Raw format (li
              <p class="explanation"><?php echo __("Additional POST arguments to transfer data to the tool. Will be integrated in POST JSON data structure. format: KEY:VALUE(S)<br>
                                                     More info: <a href=\"annotation/index\">Getting started</a>."); ?></p>
              <div class="input-block">
-              <?php echo $this->formTextArea('post_arguments', $annotation_tool->post_arguments, array('rows' => '8')); ?>
+              <?php echo $this->formTextarea('post_arguments', $annotation_tool->post_arguments, array('rows' => '8')); ?>
              </div>
          </div>
      </div>
