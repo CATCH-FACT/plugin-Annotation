@@ -155,8 +155,6 @@ class Annotation_TypesController extends Omeka_Controller_AbstractActionControll
         $this->_helper->json($data);
     }
     
-    
-    
     protected function  _getAddSuccessMessage($record)
     {
         return 'Type successfully added.';
@@ -188,7 +186,7 @@ class Annotation_TypesController extends Omeka_Controller_AbstractActionControll
                             if(empty($elementInfo['english_name'])) {
                                 $elementInfo['english_name'] = strtolower($elementTable->find($elementInfo['id'])->name);
                             }
-
+                            
                             $annotationEl = new AnnotationTypeElement();
                             $annotationEl->element_id = $elementInfo['id'];
                             $annotationEl->english_name = $elementInfo['english_name'];
@@ -223,6 +221,7 @@ class Annotation_TypesController extends Omeka_Controller_AbstractActionControll
                             if(empty($elementInfo['english_name'])) {
                                 $elementInfo['english_name'] = strtolower($elementTable->find($annotationEl->element_id)->name);
                             }
+                            
                             $annotationEl->english_name = $elementInfo['english_name'];
                             $annotationEl->tool_id = $elementInfo['toolid'];
                             $annotationEl->prompt = $elementInfo['prompt'];

@@ -172,7 +172,7 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
         if ($this->_processForm($_POST, $item)) { //first check if form is posted
 
             $route = $this->getFrontController()->getRouter()->getCurrentRouteName();
-            $this->_helper->_redirector->gotoRoute(array('action' => 'doannotation'), $route);
+            $this->_helper->_redirector->gotoRoute(array('action' => 'doannotation', 'id' => $item_id), $route);
 
         } elseif($item_id) { //if not for posted, check for id in url
 
@@ -263,7 +263,15 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
      * through the public form.
      */
     public function doannotationAction(){
+
+        $db = $this->_helper->db;
         
+        $itemId = $this->getParam('id');
+        
+        $item = $db->getTable('Item')->find($itemId);
+
+        $this->view->item = $item;
+
         $this->_helper->flashMessenger( __('Your annotations has been successfully added.'), 'success');
     }
     

@@ -24,11 +24,21 @@ echo $this->partial('annotation-navigation.php');
     
     <h1><?php echo $head['title']; ?></h1>
     
-    <p> <?php echo __("New: ") . link_to($this->item, 'show', __("Your annotated item")); ?></p>
-    
-    <?php print_r($this->item); ?>
--
-    <?php print_r($this->item_id); ?>  
+    <p><b> <?php echo __("New: ") . link_to($this->item, 'show', __("Your annotated item")); ?></b></p>
+
+    <br><hr>
+
+    <p class="folktale-description" style="border:0; color:grey">Een <?php echo metadata('item', array('Item Type Metadata', 'Subgenre'), array('no_filter' => true)); ?> (<?php echo metadata('item', array('Dublin Core', 'Type'), array('no_filter' => true)); ?>), <?php echo metadata('item', array('Dublin Core', 'Date')); ?></p>
+
+    <div id="primary">
+
+        <?php fire_plugin_hook('public_items_show_top', array('view' => $this, 'item' => $item)); ?>
+        
+        <?php echo all_element_texts('item'); ?>
+
+    </div><!-- end primary -->
+
+
     
 </div>
 <?php echo foot();

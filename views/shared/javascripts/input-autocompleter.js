@@ -145,7 +145,7 @@ function dateTranslator(elementNumber) {
     });
 }
 
-jQuery(document).ready(function() {
+/*jQuery(document).ready(function() {
     console.log("autocompleter added");
     server = "http://bookstore.ewi.utwente.nl/afact/";
 //    server = "http://127.0.0.1/testing/resting/";
@@ -162,4 +162,4 @@ jQuery(document).ready(function() {
     autocompleteExternal("67", server + "corpus.json?style=list&search=");         //CORPUS helper
     //kloekehelper??
     
-});
+});*/

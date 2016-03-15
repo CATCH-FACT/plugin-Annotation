@@ -126,7 +126,7 @@
                 $tool_id = $annotationElement->Tool ? $annotationElement->Tool->id : "";
                 echo $this->formSelect(
                     "elements[$annotationElement->id][toolid]", $tool_id, //set in controller like english_name
-                    array('class' => 'element-drop-down'), $toolsArray );
+                    array('class' => 'element-drop-down autoc'), $toolsArray );
                 ?>
                 
                 <hr>
@@ -198,7 +198,7 @@
                 
                 
                 <?php echo $this->formHidden("elements[$annotationElement->id][order]", $annotationElement->order, array('size' => 2, 'class' => 'type-element-order')); ?>
-                <?php echo $this->formHidden("elements[$annotationElement->id][toolid]", $annotationElement->tool_id, array('size' => 2, 'class' => 'type-element-toolid')); ?>
+                <?php #echo $this->formHidden("elements[$annotationElement->id][toolid]", $annotationElement->tool_id, array('size' => 2, 'class' => 'type-element-toolid')); ?>
 
                 <?php echo $this->formHidden("elements[$annotationElement->id][id]", $annotationElement->idout, array('size' => 2, 'class' => 'type-element-toolid')); ?>
                 <?php echo $this->formHidden("elements[$annotationElement->id][id]", $annotationElement->idin, array('size' => 2, 'class' => 'type-element-toolid')); ?>
