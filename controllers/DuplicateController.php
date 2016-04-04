@@ -18,6 +18,16 @@ class Annotation_DuplicateController extends Omeka_Controller_AbstractActionCont
      */
     public function indexAction(){
         
+        $id = $this->getParam('id');
+
+        $record = $this->_helper->db->findById($id);
+        
+        $itemTypeId = $record->item_type_id;
+
+        $elementsTexts = $record->getAllElementTextsByElement();
+        
+        $this->view->assign(compact('itemTypeId', 'record', 'elementsTexts', 'allElements', 'id'));
+        
     }
 
 
