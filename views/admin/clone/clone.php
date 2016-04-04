@@ -11,10 +11,10 @@
     
     <?php // echo metadata($record, array('Item Type Metadata', 'Text')); ?>
     
-    <?php echo "Original item: " . link_to_item(metadata($record, array('Dublin Core', 'Identifier')), array(), 'show', $record); ?>
+    <?php //echo "Original item: " . link_to_item(metadata($record, array('Dublin Core', 'Identifier')), array(), 'show', $record); ?>
     <br>
     <br>
-    <?php echo $this->form; ?>
+    <?php //echo $this->form; ?>
 </div>
 <?php 
     echo foot(); 

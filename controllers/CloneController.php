@@ -15,11 +15,13 @@ class Annotation_CloneController extends Omeka_Controller_AbstractActionControll
 //        $this->session = new Zend_Session_Namespace();
     }
     
-    
     public function cloneAction(){
+        _log("reprogramming clone function");
+    }
+    
+    
+    public function cloneActionOLD(){
         
-//        $elementTable = get_db()->getTable('Element');
-
         $this->_helper->db->setDefaultModelName('Item');
 
         $id = $this->getParam('id');
@@ -30,13 +32,6 @@ class Annotation_CloneController extends Omeka_Controller_AbstractActionControll
 
         $elementsTexts = $record->getAllElementTextsByElement();
         
-//        _log(print_r($elementsTexts, false));
-        
-/*        $this->session->id = $id;
-        $this->session->record = $record;
-        $this->session->itemTypeId = $itemTypeId;
-        $this->session->elementsTexts = $elementsTexts;
-*/
         $this->view->assign(compact('itemTypeId', 'record', 'elementsTexts', 'allElements', 'id'));
 
         $columnNames = get_table_options(
@@ -46,17 +41,9 @@ class Annotation_CloneController extends Omeka_Controller_AbstractActionControll
                     )
                 );
         
-//        $this->session->columnNames = $columnNames["Itemtype metadata"] + $columnNames["Dublin Core"];
         $columnNames = $columnNames["Itemtype metadata"] + $columnNames["Dublin Core"];
         
         require_once ANNOTATION_FORMS_DIR . '/CloneForm.php';
-/*        $form = new Annotation_Form_CloneForm(array(
-            'itemTypeId' => $this->session->itemTypeId,
-            'columnNames' => $this->session->columnNames,
-            'elementsTexts' => $this->session->elementsTexts,
-            'record' => $this->session->record
-        ));
-        */
         
         $form = new Annotation_Form_CloneForm(array(
             'itemTypeId' => $itemTypeId,
@@ -113,16 +100,9 @@ class Annotation_CloneController extends Omeka_Controller_AbstractActionControll
 
         $new_record->save();
 
-//        $this->view->assign(compact('record', 'new_record'));
-
         $this->_helper->flashMessenger(__('The Item was succesfully cloned! Press Edit or Annotate to continue editing.'), 'success');
         
-//        $this->_helper->flashMessenger(__('Annotate:') . " " . url('/annotation/annotation/edit/id/' . $new_record->id), 'success');
-
         $this->_helper->redirector->gotoUrl('/items/show/' . $new_record->id); //after all is ok: redirect to the next step*/
-
-//        $this->session->unsetAll();
-        
     }
     
     public function prePrint($identifier, $i){

@@ -381,7 +381,6 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
 
         $acl->addResource('Annotation_Clone');
         $acl->allow(null, 'Annotation_Clone', array('clone', 'cloned'));
-
         
         $acl->addResource('Annotation_Annotators');
         $acl->allow(null, 'Annotation_Annotators');

@@ -230,10 +230,10 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
     public function addAction()
     {
 
-        if ($this->_processForm($_POST, false)) {
+        if ($item = $this->_processForm($_POST, false)) {
 //            $this->_helper->flashMessenger("Data accepted. Pre-annotated Item created.", 'success');
             $route = $this->getFrontController()->getRouter()->getCurrentRouteName();
-            $this->_helper->_redirector->gotoRoute(array('action' => 'doannotation'), $route);
+            $this->_helper->_redirector->gotoRoute(array('action' => 'doannotation', 'id' => $item->id), $route);
 #            $this->_helper->_redirector->gotoRoute(array('action' => 'thankyou'), $route);
 
         } else {
@@ -266,11 +266,17 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
 
         $db = $this->_helper->db;
         
-        $itemId = $this->getParam('id');
+        if ($this->view->item){
+            $this->_helper->flashMessenger( __('New Item forged.'), 'success');
+        }
+        else{
         
-        $item = $db->getTable('Item')->find($itemId);
+            $itemId = $this->getParam('id');
+        
+            $item = $db->getTable('Item')->find($itemId);
 
-        $this->view->item = $item;
+            $this->view->item = $item;
+        }
 
         $this->_helper->flashMessenger( __('Your annotations has been successfully added.'), 'success');
     }
@@ -500,10 +506,11 @@ class Annotation_AnnotationController extends Omeka_Controller_AbstractActionCon
             
             $item->save();
             
-            $this->temp_item = $item;
+            $this->view->item = $item;
             
-            $this->_linkItemToAnnotatedItem($item, $annotator, $post); 
-            return true;
+            $this->_linkItemToAnnotatedItem($item, $annotator, $post);
+            
+            return $item;
         }
         return false;
     }
