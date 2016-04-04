@@ -11,7 +11,6 @@
     
     <br>
     <br>
-    <?php echo $this->form; ?>
 </div>
 <?php 
     echo foot(); 
