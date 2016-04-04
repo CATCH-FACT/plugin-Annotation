@@ -1,6 +1,6 @@
 <?php
 /**
- * @version $Id$
+ * @version
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @copyright Meertens Institute 2016
  * @package Annotation
@@ -22,6 +22,5 @@ class Annotation_DuplicateController extends Omeka_Controller_AbstractActionCont
 
 
     public function init(){
-//        $this->session = new Zend_Session_Namespace('Clone');
     }
 }
