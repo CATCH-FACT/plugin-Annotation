@@ -6,9 +6,8 @@
 ?>
 
 <div id="primary">
-
-    <br>
 </div>
+
 <?php 
     echo foot(); 
 ?>
