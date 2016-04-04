@@ -7,8 +7,6 @@
 
 <div id="primary">
 
-    <h2><?php echo __('You want to duplicate the following item:'); ?></h2>
-    
     <br>
 </div>
 <?php 
