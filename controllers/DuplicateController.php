@@ -18,6 +18,8 @@ class Annotation_DuplicateController extends Omeka_Controller_AbstractActionCont
      */
     public function indexAction(){
         
+        $this->_helper->db->setDefaultModelName('Item');
+        
         $id = $this->getParam('id');
 
         $record = $this->_helper->db->findById($id);
