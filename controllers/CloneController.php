@@ -11,7 +11,7 @@ class Annotation_CloneController extends Omeka_Controller_AbstractActionControll
     
     public function init()
     {
-        $this->_helper->db->setDefaultModelName('Item');
+//        $this->_helper->db->setDefaultModelName('Item');
 //        $this->session = new Zend_Session_Namespace();
     }
     

@@ -375,9 +375,9 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         $acl = $args['acl'];
         
         $acl->addResource('Annotation_Annotation');
-        $acl->allow(array('super', 'admin', 'contributor'), 'Annotation_Annotation');
-        $acl->allow(null, 'Annotation_Annotation', array('add', 'doannotation', 'element-form-noadd', 'element-form-element', 'element-form-tool', 
-                                                        'element-form-tagtool', 'element-form', 'save-form', "tag-form", "type-form", "autocomplete"));
+//        $acl->allow(array('super', 'admin', 'contributor'), 'Annotation_Annotation');
+//        $acl->allow(null, 'Annotation_Annotation', array('add', 'doannotation', 'element-form-noadd', 'element-form-element', 'element-form-tool', 
+//                                                        'element-form-tagtool', 'element-form', 'save-form', "tag-form", "type-form", "autocomplete"));
 
         $acl->addResource('Annotation_Clone');
         $acl->allow(array('super', 'admin', 'contributor'), 'Annotation_Clone', array('clone', 'cloned'));
@@ -413,28 +413,20 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
         // annotation controller.
 
         // get the base path
-        $bp = get_option('annotation_page_path');
-        if ($bp) {
-            $router->addRoute('annotationCustom',
-                new Zend_Controller_Router_Route("$bp/:action/*",
+/*        $bp = get_option('annotation_page_path');
+        $router->addRoute('annotationDefault',
+              new Zend_Controller_Router_Route('annotation/:action/*',
                     array('module'     => 'annotation',
                           'controller' => 'annotation',
                           'action'     => 'annotate')));
-        } else {
-            $router->addRoute('annotationDefault',
-                  new Zend_Controller_Router_Route('annotation/:action/*',
-                        array('module'     => 'annotation',
-                              'controller' => 'annotation',
-                              'action'     => 'annotate')));
-        }
-        
+*/
         if(is_admin_theme()){
-            $router->addRoute('annotationAdmin',
+/*            $router->addRoute('annotationAdmin',
                 new Zend_Controller_Router_Route('annotation/:controller/:action/*',
                     array('module' => 'annotation',
                           'controller' => 'index',
                           'action' => 'index')));
-
+*/
 /*            $router->addRoute('cloneAdmin',
                 new Zend_Controller_Router_Route('annotation/clone/:action/*',
                     array('module' => 'annotation',
