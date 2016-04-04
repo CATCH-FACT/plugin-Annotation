@@ -380,7 +380,7 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
                                                         'element-form-tagtool', 'element-form', 'save-form', "tag-form", "type-form", "autocomplete"));
 
         $acl->addResource('Annotation_Clone');
-        $acl->allow(null, 'Annotation_Clone', array('clone', 'cloned'));
+        $acl->allow(array('super', 'admin', 'contributor'), 'Annotation_Clone', array('clone', 'cloned'));
         
         $acl->addResource('Annotation_Annotators');
         $acl->allow(null, 'Annotation_Annotators');
@@ -435,12 +435,12 @@ class AnnotationPlugin extends Omeka_Plugin_AbstractPlugin
                           'controller' => 'index',
                           'action' => 'index')));
 
-            $router->addRoute('cloneAdmin',
+/*            $router->addRoute('cloneAdmin',
                 new Zend_Controller_Router_Route('annotation/clone/:action/*',
                     array('module' => 'annotation',
                           'controller' => 'clone',
                           'action' => 'clone')));
-
+*/
 
         }
     }
